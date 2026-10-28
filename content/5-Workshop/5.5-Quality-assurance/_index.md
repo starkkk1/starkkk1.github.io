@@ -1,151 +1,150 @@
 ---
-title: "Testing & Quality"
-date: 2026-07-07
-weight: 5
+title: "5.5 Monitoring & Security"
+date: 2026-10-28T10:00:00+07:00
+weight: 50
 chapter: false
-pre: " <b> 5.5. </b> "
+pre: "<b>5.5. </b>"
 ---
 
-# Section 5.5 - Testing & Quality Assurance
+# 5.5 Monitoring, CloudWatch Alarms & Access Control
 
-To ensure high reliability, safety, and data integrity for **AI AWS Advisor**, the project uses a two-layer, independent automated testing architecture.
+### 5.5.1 Container Logging & Host Metrics Collection
 
----
+Production observabilty relies on **Amazon CloudWatch Logs** and the **Amazon CloudWatch Agent**:
 
-## 1. Backend Testing Environment (Pytest + Moto)
+#### 1. Container Structured Logging
+The Docker daemon uses the `awslogs` log driver to stream all `stdout` and `stderr` output directly to dedicated CloudWatch Log Groups:
+- `/plant-disease/backend`: Captures structured JSON middleware access logs, including `request_id`, client IP, HTTP method, request path, status code, and execution duration.
+- `/plant-disease/frontend`: Captures Next.js server requests, static file requests, and rendering errors.
+- **Log Retention:** Set to **7 days** to minimize storage overhead while preserving troubleshooting history.
 
-The backend uses `pytest` together with the AWS-mocking library `moto` to test business logic without incurring cost or hitting real APIs.
-
-### Technology used:
-- **`pytest` & `pytest-mock`:** Testing framework and fixture mocking.
-- **`moto`:** Intercepts `boto3` AWS SDK calls, spinning up a virtual DynamoDB database running purely in RAM.
-- **Bedrock mocking:** Intercepts Bedrock's `invoke_model()` call to return a standardized JSON response, testing the AI data-handling logic and error handling.
+Inspect real-time application logs using the AWS CLI:
 
 ```bash
-cd backend
-python -m pytest tests/ -v
+# Stream the last 10 minutes of backend API logs
+aws logs tail /plant-disease/backend --since 10m --region ap-southeast-2
+
+# Filter for errors or warnings
+aws logs filter-log-events \
+  --log-group-name /plant-disease/backend \
+  --filter-pattern "ERROR" \
+  --region ap-southeast-2
 ```
-**Figure 1.** **Backend** test results from `pytest tests/ -v`, showing all **26 tests** across **7 test files** (API Handlers, AI Analyzer, and the Shared Database Layer) passing successfully. The test run completes in **4.32 seconds** and reaches **93% code coverage**, showing that the system's core components have been verified and behave reliably.
 
+#### 2. CloudWatch Agent Metrics
+While standard EC2 monitoring provides hypervisor-level CPU utilization, memory and disk metrics are not visible from the hypervisor. The **Amazon CloudWatch Agent** is configured on the host to collect and report memory and disk telemetry every 60 seconds under the custom namespace `PlantDisease/Host`:
 
+Create `/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json`:
 
-![Pytest_output](/images/5-Workshop/5.5-Quality-assurance/pytest_output.png)
+```json
+{
+  "metrics": {
+    "namespace": "PlantDisease/Host",
+    "metrics_collected": {
+      "mem": {
+        "measurement": [
+          "mem_used_percent"
+        ],
+        "metrics_collection_interval": 60
+      },
+      "disk": {
+        "measurement": [
+          "disk_used_percent"
+        ],
+        "metrics_collection_interval": 60,
+        "resources": [
+          "/"
+        ]
+      }
+    }
+  }
+}
+```
 
-
-
-
----
-
-## 2. Frontend Testing Environment (Vitest + React Testing Library)
-
-The React application uses UI testing focused on user experience and chart data rendering.
-
-### Technology used:
-- **`Vitest`:** A high-speed testing framework built into Vite.
-- **`React Testing Library (RTL)`:** Renders components against a virtual DOM (`jsdom`).
-- **`vi.mock()`:** Intercepts API calls from TanStack React Query and Axios.
+Start the CloudWatch Agent service and verify status:
 
 ```bash
-cd frontend
-npm run test
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+  -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+
+# Check agent status
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status
 ```
-
-**Figure 2.** **Frontend** test results from `npm run test` (Vitest), showing all **7 tests** across **5 test files** (Dashboard, Copilot, Project Context, and API) passing successfully. The test run completes in **under 3 seconds**, and supports **Vite Watch Mode** to automatically re-run tests when source code changes, shortening the development and UI-verification loop.
-
-![npm_test_output](/images/5-Workshop/5.5-Quality-assurance/npm_test_output.png)
-
-
 
 ---
 
-## 3. Test Execution Workflow
+### 5.5.2 Configure Host RAM Saturation Alarm
 
-Both test suites are designed to run without any external service or cloud round-trip. The local workflow below is what every developer runs before pushing code:
+To protect the single-host deployment from memory exhaustion caused by unexpected traffic surges, configure a CloudWatch Alarm on host memory usage:
+
+#### Alarm Specification
+
+| Metric Parameter | Target Setting |
+|---|---|
+| **Namespace** | `PlantDisease/Host` |
+| **Metric Name** | `mem_used_percent` |
+| **Statistic** | Average |
+| **Evaluation Period** | 60 seconds (1 minute) |
+| **Breach Threshold** | Greater than **85%** (`> 85`) |
+| **Evaluation Window** | 3 consecutive periods out of 3 (3 breaching datapoints) |
+| **Missing Data Treatment** | Treat missing data as missing |
+| **Alarm Action** | Publish notification to SNS topic `plant-disease-alerts` |
+
+Create the SNS notification topic and alarm via the AWS CLI:
 
 ```bash
-# Backend tests (~4.32s average)
-cd backend
-python -m pytest tests/ -v --tb=short
+# 1. Create SNS topic
+SNS_TOPIC_ARN=$(aws sns create-topic \
+  --name plant-disease-alerts \
+  --region ap-southeast-2 \
+  --query 'TopicArn' --output text)
 
-# Backend coverage
-python -m pytest tests/ --cov=. --cov-report=term-missing
+# 2. Subscribe operator email address
+aws sns subscribe \
+  --topic-arn "$SNS_TOPIC_ARN" \
+  --protocol email \
+  --notification-endpoint "your-email@example.com" \
+  --region ap-southeast-2
 
-# Frontend tests (~2.5s average)
-cd frontend
-npm run test -- --run
+# 3. Create CloudWatch Metric Alarm
+aws cloudwatch put-metric-alarm \
+  --alarm-name "PlantDisease-HighMemoryUtilization" \
+  --alarm-description "Triggers when host memory exceeds 85% for 3 consecutive minutes" \
+  --namespace "PlantDisease/Host" \
+  --metric-name "mem_used_percent" \
+  --statistic Average \
+  --period 60 \
+  --threshold 85 \
+  --comparison-operator GreaterThanThreshold \
+  --evaluation-periods 3 \
+  --datapoints-to-alarm 3 \
+  --alarm-actions "$SNS_TOPIC_ARN" \
+  --region ap-southeast-2
 ```
 
-{{% notice tip %}}The backend test suite relies on `moto` to mock every AWS service (Lambda, DynamoDB, Bedrock, STS, SNS), so tests run with **zero AWS API calls** and are safe to execute on any laptop or CI runner without credentials.{{% /notice %}}
+> [!TIP]
+> **Controlled Testing:** To verify email dispatch without artificially exhausting system memory, temporarily lower the alarm threshold to `0%` (`--threshold 0`). Confirm that CloudWatch transitions to the `ALARM` state and an email arrives in your inbox. Once confirmed, restore the threshold to `85%` and verify the alarm returns to `OK`.
 
 ---
 
-## 4. Detailed Test Suite Breakdown (26 Backend + 7 Frontend = 33 Tests)
+### 5.5.3 Security Hardening & Least Privilege
 
-The full test suite is split across 12 files, totaling 33 tests, and completes in under 8 seconds with no cloud round-trip. The breakdown below helps identify which tests protect which subsystem:
+The architecture adheres strictly to AWS Well-Architected security best practices:
 
-| Test File | Tests | Purpose |
-|---|---|---|
-| backend/tests/api/test_projects.py | 5 | Projects CRUD endpoint + sync trigger |
-| backend/tests/api/test_resources.py | 4 | List/get resource endpoint + pagination |
-| backend/tests/api/test_insights.py | 3 | List insights + on-demand generation |
-| backend/tests/api/test_alerts.py | 2 | List alerts with severity filter |
-| backend/tests/api/test_chat.py | 2 | Bedrock chat prompt assembly + fallback |
-| backend/tests/ai/test_analyzer.py | 5 | Prompt construction + JSON schema validation |
-| backend/tests/shared/test_db.py | 5 | DynamoDB marshalling, GSI key encoding |
-| frontend/src/pages/__tests__/Dashboard.test.jsx | 3 | Dashboard component rendering + health score widgets |
-| frontend/src/tests/pages/Dashboard.test.jsx | 1 | Dashboard page integration test |
-| frontend/src/tests/pages/Copilot.test.jsx | 1 | Copilot chat UI smoke test |
-| frontend/src/tests/context/ProjectContext.test.jsx | 1 | Project context provider state |
-| frontend/src/services/__tests__/api.test.js | 1 | Axios API client + Cognito interceptor |
-| **Total** | **33** | 7 backend test files + 5 frontend test files |
-
----
-
-## 5. HTML Coverage Report
-
-pytest-cov writes an interactive HTML coverage report to htmlcov/index.html. Generate and open it locally:
-
-```bash
-cd backend
-python -m pytest tests/ --cov=. --cov-report=html
-# open htmlcov/index.html in your browser
+```mermaid
+flowchart TD
+    subgraph Security_Best_Practices ["Security Controls Applied"]
+        P1["S3 Private Bucket: Block All Public Access enabled"]
+        P2["IAM Instance Profile: No hardcoded credentials"]
+        P3["Security Group: Ingress locked to operator /32"]
+        P4["Container Isolation: Read-Only volume mounts"]
+        P5["Non-Root Execution: User nextjs & appuser"]
+    end
 ```
 
-The HTML report lets you drill down file-by-file and line-by-line. The 93% aggregate figure is dragged down mainly by collector/ (some error branches are intentionally left uncovered to keep tests fast) and shared/aws_client.py (STS AssumeRole retries that depend on timing).
+1. **Private S3 Bucket:** S3 Block Public Access is completely enabled. Model weights are accessible solely by authenticated requests bearing the EC2 instance's assumed IAM role.
+2. **Elimination of Long-Lived Credentials:** No access keys, secret keys, or private SSH keys are stored in source control or on the server file system.
+3. **Read-Only Container Mounts:** The model weights directory `/app/artifacts` is mounted into the container with the `:ro` flag, ensuring the inference engine cannot mutate model checkpoints.
+4. **Non-Root Execution:** The production container images create and execute under dedicated low-privilege system accounts (`nextjs` UID 1001 for frontend, `appuser` for backend).
 
-{{% notice info %}}The HTML report is **gitignored**. Re-run the command above after pulling new code if you want a current snapshot.{{% /notice %}}
-
----
-
-## 6. CI/CD Pipeline Readiness
-
-Both test suites run independently in under **8 seconds** total (4.32s pytest + ~2.5s vitest + ~1s setup) with no internet or cloud dependency. The full pipeline is ready to drop into a GitHub Actions workflow at github/workflows/test.yml:
-
-```yaml
-name: tests
-on: [push, pull_request]
-jobs:
-  backend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.12' }
-      - run: pip install -r backend/requirements.txt
-      - run: cd backend && python -m pytest tests/ -v
-  frontend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: '20' }
-      - run: cd frontend && npm ci && npm run test
-```
-
-This workflow can be extended to deploy on release tags (on: push: tags: ['v*']) using sam deploy --no-confirm-changeset once tests pass.
-
----
-
-## Section Summary
-
-The two-layer testing strategy, combining **Pytest** and **Moto** for the backend with **Vitest** and **React Testing Library (RTL)** for the frontend, delivers a total of **33 tests** with fast, deterministic execution and **93% code coverage**. The entire suite completes in **under 8 seconds**, has no external dependencies, and integrates easily into virtually any **Continuous Integration (CI)** platform.
+![Automated Test Verification](/images/5-Workshop/5.5-Quality-assurance/pytest_output.png?width=700px)

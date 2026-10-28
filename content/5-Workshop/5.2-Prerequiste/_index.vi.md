@@ -1,159 +1,128 @@
 ---
-title: "Yêu cầu & Chuẩn bị"
-date: 2026-05-01
-weight: 2
+title: "5.2 Điều kiện chuẩn bị"
+date: 2026-10-28T10:00:00+07:00
+weight: 20
 chapter: false
-pre: " <b> 5.2. </b> "
+pre: "<b>5.2. </b>"
 ---
 
-# Phần 5.2 - Yêu cầu Hệ thống & Môi trường
+# 5.2 Điều kiện chuẩn bị & Thiết lập Môi trường
 
-Để triển khai và vận hành hệ thống **AI AWS Advisor**, môi trường phát triển và tài khoản AWS cần đáp ứng các điều kiện tiên quyết sau.
-
----
-
-## 1. Yêu cầu Tài khoản AWS & Quyền Dịch vụ
-
-- **Tài khoản AWS:** Cần có quyền Quản trị viên (`AdministratorAccess`).
-- **Quyền Truy cập Amazon Bedrock Model:**
-  - Mô hình `Claude 3 Haiku` phải được kích hoạt tại region `us-east-1` hoặc `ap-southeast-1` trên AWS Console (**Bedrock -> Model access -> Request access**).
-  - Model ID / ARN: `anthropic.claude-3-haiku-20240307-v1:0`.
-  - **Lưu ý quan trọng với model của Anthropic:** Bedrock yêu cầu bạn gửi **form Mô tả Use Case** (Tên công ty, Website, Ngành, Mô tả use case) một lần qua Chat/Text Playground trước lần gọi đầu tiên. Sau khi Anthropic duyệt (thường trong vòng 24 giờ), model mới có thể gọi được. Nếu bạn thấy thông báo *"Your account is not authorized to perform this action"* thì đó chính là lý do cần điền form này.
-  - **Phương án thay thế (không cần duyệt):** Đổi Model ID trong `template.yaml` sang `amazon.nova-lite-v1:0` — các model first-party của Amazon không yêu cầu bước duyệt thủ công của Anthropic.
-- **AWS CLI v2:** Đã cài đặt và cấu hình lệnh (`aws configure`).
-
-**Hình - Cấu hình `aws configure` và xác minh bằng `aws sts get-caller-identity`:**
-
-<img src="/images/5.2-Prerequiste/aws_cli_configure.png?v=2026-08-01-r1" alt="Terminal PowerShell 7 hiển thị các prompt của aws configure cho AWS Access Key ID, AWS Secret Access Key, Default region name (us-east-1), Default output format (json), tiếp theo là lệnh aws sts get-caller-identity trả về JSON với UserId, Account, và Arn xác nhận IAM credentials hợp lệ" width="700" style="max-width:700px;width:100%;height:auto;display:block;margin:0 auto;">
-
-**Hình 1 - Trang Amazon Bedrock Model Access — toàn bộ model Anthropic Claude 3 family đã được cấp quyền (trạng thái Access granted tại region `us-east-1`):**
-
-<img src="/images/5.2-Prerequiste/bedrock_model_access.jpg?v=2026-08-01-r3" alt="Trang Amazon Bedrock Model Access hiển thị toàn bộ model Anthropic Claude 3 family (3.5 Sonnet v2, 3.5 Sonnet, 3 Opus, 3 Sonnet, 3 Haiku) đều có trạng thái Access granted màu xanh tại region us-east-1" width="700" style="max-width:700px;width:100%;height:auto;display:block;margin:0 auto;">
-
-> **Ghi chú kiểm chứng:** Ảnh chụp được lấy từ tài khoản AWS của tác giả workshop tại thời điểm xuất bản. Nếu console của bạn hiển thị *"Not available"* hoặc *"Access denied"* cho bất kỳ model Anthropic nào, hãy mở **Bedrock Chat/Text Playground** một lần và gửi **form Use Case** (Tên công ty, Website, Ngành, Đối tượng, Mô tả use case). Anthropic thường duyệt trong vòng 24 giờ. Hoặc đơn giản hơn, đổi Model ID trong `template.yaml` sang `amazon.nova-lite-v1:0` — không cần bước duyệt thủ công.
+Trước khi triển khai ứng dụng Nhận diện Bệnh lá Cây trồng lên Amazon Web Services, cần chuẩn bị đầy đủ tài khoản AWS, quyền hạn IAM, cấu hình mạng VPC và cài đặt các công cụ cần thiết.
 
 ---
 
-## 2. Toolchain Verification
+### Ma trận Điều kiện & Yêu cầu Kỹ thuật
 
-Trước khi triển khai, hãy chạy các lệnh dưới đây trong PowerShell / Terminal và đối chiếu kết quả với phiên bản được khuyến nghị:
+Bảng dưới đây tổng hợp các yêu cầu cấu hình thực tế được ghi nhận trong quá trình triển khai:
 
-**Hình 2 - Kiểm tra phiên bản toolchain: `aws / sam / python / node / docker`:**
+| Nhóm Yêu cầu | Cấu hình Tiêu chuẩn | Mục đích & Chi tiết Kỹ thuật |
+|---|---|---|
+| **Tài khoản AWS** | Tài khoản AWS Cá nhân | Đảm bảo môi trường thực hành độc lập, kiểm soát chi phí tối ưu |
+| **Khu vực AWS (Region)** | Sydney (`ap-southeast-2`) | Độ trễ thấp, hỗ trợ đầy đủ các dịch vụ EC2, S3, CloudWatch và SNS |
+| **Máy chủ Ảo (EC2)** | Amazon EC2 (Amazon Linux 2023 x86_64) | Máy chủ chạy Docker Engine, AWS CLI v2 để điều phối container |
+| **Mạng & VPC** | Public Subnet (`0.0.0.0/0` -> Internet Gateway) | Cung cấp đường truyền tải gói phần mềm và phục vụ web; gán Public IPv4 |
+| **Bảo mật Cổng vào** | Cổng `22` (SSH), Cổng `3000` (Frontend), Cổng `8000` (API) | Giới hạn duy nhất tới địa chỉ IP công cộng của người vận hành (`/32`) |
+| **Lưu trữ Trọng số** | Amazon S3 (Bucket Riêng tư - Private) | Lưu tệp checkpoint mô hình dưới tiền tố `mobilenet-distilled-v1/` |
+| **IAM Instance Role** | EC2 Instance Profile | Cấp quyền `s3:GetObject` trên tệp mô hình và `CloudWatchAgentServerPolicy` |
+| **Quyền Truy vấn Log** | `logs:FilterLogEvents` | Cho phép người vận hành truy vấn log container qua AWS CLI |
+| **Tính toàn vẹn Model** | Tệp `model.pth` và `class_to_idx.json` | Kiểm tra tính toàn vẹn bằng mã băm mật mã học SHA256 |
 
-<img src="/images/5.2-Prerequiste/toolchain_check.png?v=2026-08-01-r1" alt="Terminal PowerShell 7 hiển thị kết quả kiểm tra phiên bản AWS CLI (2.17.10), SAM CLI (1.124.0), Python (3.12.6), Node.js (20.15.0), Docker (27.0.3) và lệnh aws sts get-caller-identity trả về thông tin IAM user của tác giả workshop" width="700" style="max-width:700px;width:100%;height:auto;display:block;margin:0 auto;">
+> [!WARNING]
+> Tuyệt đối KHÔNG mở cổng `0.0.0.0/0` cho SSH (cổng 22) hoặc cổng API. Luôn giới hạn IP nguồn vào địa chỉ IP tĩnh của bạn để ngăn chặn nguy cơ xâm nhập trái phép.
+
+---
+
+### Bước 1: Cấu hình AWS CLI & Xác thực Danh tính
+
+Đảm bảo máy trạm vận hành đã cài đặt **AWS CLI v2** và đăng nhập tài khoản có quyền quản trị cần thiết:
+
+![Cấu hình AWS CLI](/images/5-Workshop/5.2-Prerequisite/aws_cli_configure.png?width=700px)
+
+Kiểm tra danh tính đang đăng nhập và đặt khu vực mặc định là Sydney:
 
 ```bash
-# Kiểm tra phiên bản các công cụ
-aws --version
-sam --version
-python --version
-node --version
+# Kiểm tra danh tính người dùng AWS
+aws sts get-caller-identity
+
+# Đặt region mặc định là ap-southeast-2 (Sydney)
+export AWS_DEFAULT_REGION="ap-southeast-2"
+aws configure set default.region ap-southeast-2
+```
+
+---
+
+### Bước 2: Thiết lập Security Group cho EC2
+
+Tạo một Security Group có tên `plant-disease-sg` trong VPC mặc định với các quy tắc Inbound sau:
+
+| Loại | Giao thức | Dải cổng | Nguồn IP | Mục đích |
+|---|---|---|---|---|
+| SSH | TCP | `22` | `<IP_CỦA_BẠN>/32` | Truy cập dòng lệnh quản trị qua SSH |
+| Custom TCP | TCP | `3000` | `<IP_CỦA_BẠN>/32` | Giao diện Web Next.js Frontend |
+| Custom TCP | TCP | `8000` | `<IP_CỦA_BẠN>/32` | Dịch vụ API suy luận FastAPI Backend |
+
+---
+
+### Bước 3: Cấu hình IAM Instance Role & Phân quyền
+
+Gắn một IAM Role vào máy chủ EC2 để các container và tập lệnh nội bộ có thể truy cập Amazon S3 và CloudWatch **mà không cần lưu trữ AWS Access Key hay Secret Key** trên máy ảo.
+
+Gắn các chính sách phân quyền sau vào IAM Role:
+1. **AmazonCloudWatchAgentServerPolicy** (Chính sách do AWS quản lý): Cho phép CloudWatch Agent gửi metrics bộ nhớ, đĩa và tạo log stream.
+2. **PlantDiseaseS3Policy** (Chính sách nội tuyến): Giới hạn quyền đọc nghiêm ngặt chỉ trong thư mục tệp mô hình:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowS3ModelArtifactsDownload",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::plant-disease-model-artifacts-ap-southeast-2",
+        "arn:aws:s3:::plant-disease-model-artifacts-ap-southeast-2/mobilenet-distilled-v1/*"
+      ]
+    },
+    {
+      "Sid": "AllowOperatorLogInspection",
+      "Effect": "Allow",
+      "Action": [
+        "logs:FilterLogEvents",
+        "logs:GetLogEvents",
+        "logs:DescribeLogStreams"
+      ],
+      "Resource": "arn:aws:logs:ap-southeast-2:*:log-group:/plant-disease/*"
+    }
+  ]
+}
+```
+
+![Chính sách IAM](/images/5-Workshop/5.4-Deployment-strategy/iam_audit_role_trust_policy.png?width=700px)
+
+---
+
+### Bước 4: Khởi tạo Phần mềm trên Máy chủ EC2
+
+Sau khi SSH vào máy ảo Amazon Linux 2023, tiến hành cài đặt Docker Engine và CloudWatch Agent:
+
+```bash
+# Cập nhật các gói phần mềm trên Amazon Linux 2023
+sudo dnf update -y
+
+# Cài đặt Docker và Git
+sudo dnf install -y docker git
+sudo systemctl enable --now docker
+sudo usermod -aG docker ec2-user
+
+# Cài đặt CloudWatch Agent
+sudo dnf install -y amazon-cloudwatch-agent
+
+# Kiểm tra các phiên bản
 docker --version
+aws --version
 ```
-
-Nếu bất kỳ lệnh nào trả về *"command not found"*, hãy cài đặt trước khi tiếp tục:
-- **AWS CLI:** Tải từ [AWS CLI v2 installer](https://awscli.amazonaws.com/AWSCLIV2.msi).
-- **AWS SAM CLI:** `pip install aws-sam-cli` hoặc tải từ [AWS SAM CLI releases](https://github.com/aws/aws-sam-cli/releases).
-- **Docker Desktop:** Cài từ [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/) (yêu cầu WSL 2 backend).
-- **Python:** Từ [python.org](https://www.python.org/downloads/) (đánh dấu **"Add to PATH"** khi cài).
-- **Node.js:** Từ [nodejs.org](https://nodejs.org/) (khuyến nghị bản LTS 20.x).
-
----
-
-## 3. Công cụ Backend Serverless
-
-- **AWS SAM CLI:** Bộ công cụ đóng gói và triển khai cơ sở hạ tầng dưới dạng mã (IaC - `template.yaml`).
-- **Python 3.12+:** Ngôn ngữ lập trình chính cho các API Handlers và AI Analyzer trên AWS Lambda.
-- **Docker Desktop:** Cần thiết cho SAM CLI (`sam build --use-container`) để biên dịch mã nguồn tương thích với môi trường Amazon Linux 2023 của Lambda.
-
----
-
-## 4. Công cụ Frontend & Giả lập Môi trường
-
-- **Node.js (v20.0 trở lên):** Môi trường thực thi cho React 19 / Vite 8. (Vite 8 yêu cầu Node 20+; Node 18 cũ sẽ fail khi cài đặt dependencies.)
-- **npm / pnpm / yarn:** Trình quản lý thư viện Node.js.
-- **DynamoDB Local:** Giả lập DynamoDB offline qua Docker Compose (`amazon/dynamodb-local`) để phát triển không cần chạm vào DB thật trên cloud.
-
-Tham chiếu lại **§2 Toolchain Verification** phía trên — cùng các lệnh (`aws --version`, `sam --version`, `python --version`, `node --version`, `docker --version`) đã xác nhận tất cả công cụ được liệt kê trong phần này.
-
----
-
-## 5. Thư viện Python Backend
-
-Backend khai báo toàn bộ package Python trong `backend/requirements.txt`. Các thư viện quan trọng nhất:
-
-| Thư viện | Mục đích |
-|---|---|
-| `boto3` | AWS SDK cho Python (DynamoDB, Bedrock, STS, EC2, S3, IAM, CloudWatch) |
-| `aws-lambda-powertools` | Structured logging, custom metrics, distributed tracing |
-| `pydantic` | Validate dữ liệu runtime cho JSON payload |
-| `botocore` | Low-level AWS SDK (đi kèm `boto3`) — cần thiết cho client `STS`, `bedrock-runtime` |
-
-{{% notice warning %}}
-**Không commit secret trong `requirements-dev.txt`** lên Git public. File `env.json` (SAM dùng qua `--parameter-overrides`) chứa email nhận alert và override region Bedrock — coi như config runtime, không phải mã nguồn.
-{{% /notice %}}
-
----
-
-## 6. Khởi tạo Amazon Cognito User Pool
-
-AI AWS Advisor dùng **Amazon Cognito** làm identity provider. Template SAM (`template.yaml`) tự động tạo:
-
-- **User Pool** (`ai-advisor-user-pool`) với `email` là username attribute và bật auto-verified email.
-- **User Pool Client** (`ai-advisor-web-client`) hỗ trợ public OAuth flow (`ALLOW_USER_SRP_AUTH`, `ALLOW_USER_PASSWORD_AUTH`, `ALLOW_REFRESH_TOKEN_AUTH`).
-
-Sau khi deploy, lấy 2 identifier từ CloudFormation outputs:
-
-```bash
-aws cloudformation describe-stacks \
-  --stack-name ai-aws-advisor \
-  --query 'Stacks[0].Outputs[?OutputKey==`UserPoolId` || OutputKey==`UserPoolClientId`].OutputValue'
-```
-
-Tạo ít nhất 1 user Cognito để React dashboard đăng nhập được:
-
-```bash
-aws cognito-idp admin-create-user \
-  --user-pool-id <UserPoolId> \
-  --username admin@example.com \
-  --user-attributes Name=email,Value=admin@example.com Name=email_verified,Value=true \
-  --temporary-password "ChangeMe123!" \
-  --message-action SUPPRESS
-```
-
-User phải đổi mật khẩu tạm thời ở lần đăng nhập đầu tiên.
-
----
-
-## 7. DynamoDB Local (Phát triển Offline)
-
-Để phát triển local không đụng database cloud, chạy **DynamoDB Local** trong Docker:
-
-```bash
-docker run -d --name dynamodb-local \
-  -p 8000:8000 \
-  amazon/dynamodb-local:latest \
-  -jar DynamoDBLocal.jar -inMemory -sharedDb
-```
-
-Sau đó trỏ Lambda env về local bằng cách override `DYNAMODB_ENDPOINT_URL`:
-
-```bash
-DYNAMODB_ENDPOINT_URL=http://localhost:8000 \
-  AWS_ACCESS_KEY_ID=dummy AWS_SECRET_ACCESS_KEY=dummy AWS_DEFAULT_REGION=us-east-1 \
-  sam local start-api --env-vars env.json
-```
-
-{{% notice info %}}
-**Production phải để `DYNAMODB_ENDPOINT_URL=""`** (chuỗi rỗng). Template SAM mặc định là rỗng, nên Lambda khi deploy sẽ gọi DynamoDB thật.
-{{% /notice %}}
-
----
-
-## Tóm tắt Phần
-
-Sau khi hoàn thành các bước trên, bạn đã có:
-- Tài khoản AWS Administrator đã xác nhận Bedrock model access (hoặc thay bằng Nova Lite).
-- Toolchain Python/Node/Docker/SAM đã verified.
-- Cognito User Pool + Client đã được provision (sau lần `sam deploy` đầu tiên).
-- Tuỳ chọn container DynamoDB Local để iterate offline.

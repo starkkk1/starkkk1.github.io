@@ -1,151 +1,150 @@
-﻿---
-title: "Kiểm thử & Chất lượng"
-date: 2026-07-07
-weight: 5
+---
+title: "5.5 Giám sát & Bảo mật"
+date: 2026-10-28T10:00:00+07:00
+weight: 50
 chapter: false
-pre: " <b> 5.5. </b> "
+pre: "<b>5.5. </b>"
 ---
 
-# Phần 5.5 - Kiểm thử & Đảm bảo Chất lượng
+# 5.5 Giám sát Vận hành, Cảnh báo CloudWatch & Kiểm soát Bảo mật
 
-Để đảm bảo tính tin cậy cao, độ an toàn và toàn vẹn dữ liệu cho **AI AWS Advisor**, dự án áp dụng kiến trúc kiểm thử tự động 2 lớp độc lập.
+### 5.5.1 Thu thập Nhật ký Container & Metrics Hệ thống
 
----
+Hệ thống giám sát vận hành được xây dựng trên nền tảng **Amazon CloudWatch Logs** và **Amazon CloudWatch Agent**:
 
-## 1. Môi trường Kiểm thử Backend (Pytest + Moto)
+#### 1. Nhật ký Container Có Cấu trúc (Structured Logging)
+Docker daemon sử dụng `awslogs` driver để chuyển toàn bộ luồng `stdout` và `stderr` trực tiếp về các nhóm CloudWatch Log Groups riêng biệt:
+- `/plant-disease/backend`: Thu thập log định dạng JSON từ middleware backend, bao gồm `request_id`, IP máy khách, phương thức HTTP, đường dẫn yêu cầu, mã trạng thái HTTP và thời gian xử lý.
+- `/plant-disease/frontend`: Ghi nhận các yêu cầu tải trang Next.js, tài nguyên tĩnh và các cảnh báo lỗi render.
+- **Thời gian Lưu trữ (Retention):** Được thiết lập là **7 ngày** để tối ưu hóa chi phí lưu trữ đám mây.
 
-Backend sử dụng `pytest` kết hợp với thư viện giả lập môi trường AWS (`moto`) để kiểm thử logic nghiệp vụ mà không phát sinh chi phí hay gọi đến API thật.
-
-### Công nghệ sử dụng:
-- **`pytest` & `pytest-mock`:** Khung kiểm thử và giả lập hàm fixture.
-- **`moto`:** Chặn các cuộc gọi `boto3` AWS SDK, tạo cơ sở dữ liệu DynamoDB ảo chạy trên bộ nhớ RAM.
-- **Giả lập Bedrock:** Chặn hàm `invoke_model()` của Bedrock để trả về phản hồi JSON chuẩn, kiểm thử khả năng xử lý dữ liệu AI và xử lý lỗi.
+Truy vấn nhật ký theo thời gian thực bằng AWS CLI:
 
 ```bash
-cd backend
-python -m pytest tests/ -v
+# Xem log trong 10 phút gần nhất của Backend
+aws logs tail /plant-disease/backend --since 10m --region ap-southeast-2
+
+# Lọc các dòng nhật ký chứa lỗi
+aws logs filter-log-events \
+  --log-group-name /plant-disease/backend \
+  --filter-pattern "ERROR" \
+  --region ap-southeast-2
 ```
-**Hình 1.** Kết quả kiểm thử **Backend** bằng lệnh `pytest tests/ -v`, trong đó toàn bộ **26 bài kiểm thử** thuộc **7 tệp kiểm thử** (API Handlers, AI Analyzer và Shared Database Layer) đều thực thi thành công. Quá trình kiểm thử hoàn tất trong **4,32 giây** và đạt **93% độ bao phủ mã nguồn (Code Coverage)**, cho thấy các thành phần cốt lõi của hệ thống đã được kiểm chứng và hoạt động ổn định.
 
+#### 2. Thu thập Metrics bằng CloudWatch Agent
+Mặc định dịch vụ EC2 chỉ cung cấp các chỉ số phần cứng tầng ảo hóa (như CPU). Để theo dõi RAM và ổ đĩa, **CloudWatch Agent** được cấu hình để gửi dữ liệu định kỳ mỗi 60 giây vào namespace tùy chỉnh `PlantDisease/Host`:
 
+Tạo tệp cấu hình `/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json`:
 
-![Pytest_output](/images/5-Workshop/5.5-Quality-assurance/pytest_output.png)
+```json
+{
+  "metrics": {
+    "namespace": "PlantDisease/Host",
+    "metrics_collected": {
+      "mem": {
+        "measurement": [
+          "mem_used_percent"
+        ],
+        "metrics_collection_interval": 60
+      },
+      "disk": {
+        "measurement": [
+          "disk_used_percent"
+        ],
+        "metrics_collection_interval": 60,
+        "resources": [
+          "/"
+        ]
+      }
+    }
+  }
+}
+```
 
-
-
-
----
-
-## 2. Môi trường Kiểm thử Frontend (Vitest + React Testing Library)
-
-Ứng dụng React áp dụng kiểm thử giao diện tập trung vào trải nghiệm người dùng và hiển thị dữ liệu biểu đồ.
-
-### Công nghệ sử dụng:
-- **`Vitest`:** Khung kiểm thử tốc độ cao tích hợp sẵn với Vite.
-- **`React Testing Library (RTL)`:** Render các component trên DOM ảo (`jsdom`).
-- **`vi.mock()`:** Chặn các lệnh gọi API từ TanStack React Query và Axios.
+Khởi chạy dịch vụ CloudWatch Agent:
 
 ```bash
-cd frontend
-npm run test
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+  -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+
+# Kiểm tra trạng thái hoạt động của agent
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status
 ```
-
-**Hình 2.** Kết quả kiểm thử **Frontend** bằng lệnh `npm run test` (Vitest), trong đó toàn bộ **7 bài kiểm thử** thuộc **5 tệp kiểm thử** (Dashboard, Copilot, Project Context và API) đều thực thi thành công. Quá trình kiểm thử hoàn tất trong **dưới 3 giây**, đồng thời hỗ trợ **Vite Watch Mode** để tự động chạy lại các bài kiểm thử khi mã nguồn thay đổi, giúp rút ngắn thời gian phát triển và kiểm tra giao diện.
-
-![npm_test_output](/images/5-Workshop/5.5-Quality-assurance/npm_test_output.png)
-
-
 
 ---
 
-## 3. Quy trình Thực thi Test
+### 5.5.2 Cấu hình Cảnh báo Quá tải RAM
 
-Cả hai bộ test được thiết kế để chạy mà không cần dịch vụ bên ngoài hay cloud round-trip. Quy trình local dưới đây là quy trình mà mọi developer sử dụng trước khi push code:
+Để bảo vệ máy chủ đơn khỏi nguy cơ cạn kiệt bộ nhớ khi lưu lượng truy cập tăng đột biến, cấu hình một CloudWatch Alarm giám sát chỉ số RAM của máy chủ:
+
+#### Thông số Cấu hình Cảnh báo
+
+| Thuộc tính | Giá trị Thiết lập Thực tế |
+|---|---|
+| **Namespace** | `PlantDisease/Host` |
+| **Tên Chỉ số (Metric)** | `mem_used_percent` |
+| **Cách tính (Statistic)** | Trung bình (Average) |
+| **Chu kỳ Đánh giá** | 60 giây (1 phút) |
+| **Ngưỡng Vi phạm** | Lớn hơn **85%** (`> 85`) |
+| **Số lần Vi phạm Kích hoạt** | 3 chu kỳ liên tiếp (3 datapoints) |
+| **Xử lý Dữ liệu Thiếu** | Xem như dữ liệu bị thiếu (Treat missing as missing) |
+| **Hành động Cảnh báo** | Gửi thông báo đến SNS Topic `plant-disease-alerts` |
+
+Tạo topic SNS và kích hoạt cảnh báo CloudWatch bằng AWS CLI:
 
 ```bash
-# Backend tests (4.32s trung bình)
-cd backend
-python -m pytest tests/ -v --tb=short
+# 1. Tạo topic SNS
+SNS_TOPIC_ARN=$(aws sns create-topic \
+  --name plant-disease-alerts \
+  --region ap-southeast-2 \
+  --query 'TopicArn' --output text)
 
-# Backend coverage
-python -m pytest tests/ --cov=. --cov-report=term-missing
+# 2. Đăng ký email nhận thông báo
+aws sns subscribe \
+  --topic-arn "$SNS_TOPIC_ARN" \
+  --protocol email \
+  --notification-endpoint "your-email@example.com" \
+  --region ap-southeast-2
 
-# Frontend tests (~2.5s trung bình)
-cd frontend
-npm run test -- --run
+# 3. Tạo CloudWatch Alarm
+aws cloudwatch put-metric-alarm \
+  --alarm-name "PlantDisease-HighMemoryUtilization" \
+  --alarm-description "Kích hoạt khi RAM máy chủ vượt 85% trong 3 phút liên tiếp" \
+  --namespace "PlantDisease/Host" \
+  --metric-name "mem_used_percent" \
+  --statistic Average \
+  --period 60 \
+  --threshold 85 \
+  --comparison-operator GreaterThanThreshold \
+  --evaluation-periods 3 \
+  --datapoints-to-alarm 3 \
+  --alarm-actions "$SNS_TOPIC_ARN" \
+  --region ap-southeast-2
 ```
 
-{{% notice tip %}}Bộ test backend dựa vào `moto` để mock tất cả AWS services (Lambda, DynamoDB, Bedrock, STS, SNS), do đó test chạy với **zero AWS API call** và an toàn để thực thi trên bất kỳ laptop hay CI runner nào mà không cần credentials.{{% /notice %}}
+> [!TIP]
+> **Phương pháp Kiểm thử Có Kiểm soát:** Để xác minh cơ chế gửi email mà không cần làm đầy RAM thật, tạm thời hạ ngưỡng cảnh báo xuống `0%` (`--threshold 0`). Kiểm tra trạng thái alarm chuyển sang `ALARM` và có email gửi về hòm thư. Sau đó khôi phục lại ngưỡng `85%` và xác nhận trạng thái trở về `OK`.
 
 ---
 
-## 4. Phân tích Chi tiết Test Suite (26 Backend + 7 Frontend = 33 Tests)
+### 5.5.3 Thắt chặt Bảo mật & Nguyên tắc Quyền Tối thiểu
 
-Toàn bộ test suite được chia trên 12 file, tổng cộng 33 test, thực thi dưới 8 giây mà không cần cloud round-trip. Bảng phân tích giúp xác định test nào bảo vệ subsystem nào:
+Hạ tầng triển khai tuân thủ chặt chẽ khung nguyên tắc AWS Well-Architected Framework:
 
-| Test File | Tests | Mục đích |
-|---|---|---|
-| backend/tests/api/test_projects.py | 5 | CRUD endpoint projects + sync trigger |
-| backend/tests/api/test_resources.py | 4 | List/get resource endpoint + pagination |
-| backend/tests/api/test_insights.py | 3 | List insights + generate on-demand |
-| backend/tests/api/test_alerts.py | 2 | List alerts với severity filter |
-| backend/tests/api/test_chat.py | 2 | Bedrock chat prompt assembly + fallback |
-| backend/tests/ai/test_analyzer.py | 5 | Prompt construction + JSON schema validation |
-| backend/tests/shared/test_db.py | 5 | DynamoDB marshalling, GSI key encoding |
-| frontend/src/pages/__tests__/Dashboard.test.jsx | 3 | Dashboard component render + health score widgets |
-| frontend/src/tests/pages/Dashboard.test.jsx | 1 | Dashboard page integration test |
-| frontend/src/tests/pages/Copilot.test.jsx | 1 | Copilot chat UI smoke test |
-| frontend/src/tests/context/ProjectContext.test.jsx | 1 | Project context provider state |
-| frontend/src/services/__tests__/api.test.js | 1 | Axios API client + Cognito interceptor |
-| **Tổng** | **33** | 7 file test backend + 5 file test frontend |
-
----
-
-## 5. Báo cáo Coverage HTML
-
-pytest-cov ghi báo cáo coverage HTML tương tác tại htmlcov/index.html. Tạo và mở local:
-
-```bash
-cd backend
-python -m pytest tests/ --cov=. --cov-report=html
-# open htmlcov/index.html trong trình duyệt
+```mermaid
+flowchart TD
+    subgraph Security_Best_Practices ["Các Biện pháp Bảo mật Thực tế"]
+        P1["S3 Riêng tư: Chặn toàn bộ truy cập công cộng"]
+        P2["IAM Instance Profile: Không lưu Access Key tĩnh"]
+        P3["Security Group: Khóa cổng theo IP máy khách /32"]
+        P4["Cô lập Container: Gắn ổ đĩa chỉ đọc Read-Only"]
+        P5["Không dùng Root: Tài khoản nextjs và appuser"]
+    end
 ```
 
-Báo cáo HTML drill down file-by-file và line-by-line. Điểm 93% aggregate tập trung ở collector/ (một số nhánh lỗi cố ý không cover để giữ test nhanh) và shared/aws_client.py (STS AssumeRole retries phụ thuộc thời gian).
+1. **Khóa Toàn bộ Quyền Public của S3:** Bật tính năng Block All Public Access. Trọng số mô hình chỉ có thể được đọc thông qua IAM Role hợp lệ của máy chủ EC2.
+2. **Loại bỏ Tuyệt đối Khóa Truy cập Tĩnh:** Không lưu trữ bất kỳ access key hoặc secret key nào trong mã nguồn hoặc tệp cấu hình trên máy chủ.
+3. **Gắn Ổ đĩa Chỉ Đọc (Read-Only Mount):** Thư mục tệp mô hình `/app/artifacts` được gắn vào container với cờ `:ro`, ngăn chặn triệt để nguy cơ tệp mô hình bị ghi đè hoặc chỉnh sửa.
+4. **Thực thi bằng Tài khoản Phổ thông:** Các image production chạy hoàn toàn dưới tài khoản người dùng hạn chế quyền (`nextjs` UID 1001 và `appuser`).
 
-{{% notice info %}}Báo cáo HTML được **gitignore**. Chạy lại lệnh trên sau khi pull code mới nếu muốn snapshot hiện tại.{{% /notice %}}
-
----
-
-## 6. Sẵn sàng cho CI/CD Pipeline
-
-Cả hai test suite chạy độc lập dưới **8 giây** (4.32s pytest + ~2.5s vitest + ~1s setup) mà không cần internet hay cloud dependency. Chuỗi đầy đủ sẵn sàng thêm vào GitHub Actions workflow tại github/workflows/test.yml:
-
-```yaml
-name: tests
-on: [push, pull_request]
-jobs:
-  backend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.12' }
-      - run: pip install -r backend/requirements.txt
-      - run: cd backend && python -m pytest tests/ -v
-  frontend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: '20' }
-      - run: cd frontend && npm ci && npm run test
-```
-
-Workflow này có thể mở rộng để deploy khi tag release (on: push: tags: ['v*']) dùng sam deploy --no-confirm-changeset sau khi tests pass.
-
----
-
-## Tóm tắt Phần
-
-Chiến lược kiểm thử hai lớp, kết hợp **Pytest** và **Moto** cho backend với **Vitest** và **React Testing Library (RTL)** cho frontend, cung cấp tổng cộng **33 bài kiểm thử** có thời gian thực thi nhanh, kết quả ổn định (deterministic) và đạt **93% độ bao phủ mã nguồn (Code Coverage)**. Toàn bộ các bài kiểm thử hoàn thành trong **dưới 8 giây**, không phụ thuộc vào các dịch vụ bên ngoài (external dependencies), đồng thời có thể dễ dàng tích hợp vào hầu hết các nền tảng **Continuous Integration (CI)**.
+![Kiểm thử Tự động với Pytest](/images/5-Workshop/5.5-Quality-assurance/pytest_output.png?width=700px)

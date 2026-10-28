@@ -1,173 +1,94 @@
 ---
-title : "Giới thiệu"
-date : 2026-07-07
-weight : 1
-chapter : false
-pre : " <b> 5.1. </b> "
+title: "5.1 Tổng quan Workshop"
+date: 2026-10-28T10:00:00+07:00
+weight: 10
+chapter: false
+pre: "<b>5.1. </b>"
 ---
 
-# Phần 5.1 - Tổng quan Workshop
+# 5.1 Tổng quan Workshop & Hệ thống Deep Learning
 
-## Tóm tắt Dự án
+### Giới thiệu Dự án Phân loại Bệnh lá Cây trồng
 
-**AI AWS Advisor** được thiết kế như một hệ thống B2B SaaS toàn diện cấp doanh nghiệp, có khả năng quét hạ tầng đa tài khoản AWS của khách hàng một cách an toàn, thu thập cấu hình bằng cơ chế phân quyền tạm thời và phân tích bằng Trí tuệ nhân tạo (Generative AI).
+Hệ thống **Plant Disease Detection** được nghiên cứu và phát triển nhằm mang lại giải pháp nhận diện nhanh chóng, chính xác và có khả năng giải thích trực quan các loại bệnh thường gặp trên cây cà chua. Bằng cách kết hợp nghiên cứu thị giác máy tính hiện đại với kỹ thuật hạ tầng đám mây trên AWS, dự án mang đến cho nhà nông, kỹ sư nông nghiệp và chuyên gia một ứng dụng web trực quan có khả năng suy luận AI theo thời gian thực ngay trên vi xử lý CPU thông thường.
 
-**Hình 1 - Sơ đồ Kiến trúc Tổng quan AI AWS Advisor**
+Hệ thống tiếp nhận ảnh chụp lá cây ở định dạng **JPEG** hoặc **PNG** từ điện thoại di động hoặc máy ảnh, phân tích các biểu hiện bệnh học bằng mô hình Deep Learning đã được tinh chỉnh, và trả về danh sách phân loại bệnh được sắp xếp kèm theo độ tin cậy thống kê (confidence score).
 
-
-![Architecture](/images/5-Workshop/5.1-Workshop-overview/architecture.png)
-
-
-Sơ đồ trên minh họa luồng dữ liệu tổng quan của nền tảng **AI AWS Advisor**. Người dùng truy cập **Enterprise Web Dashboard**, sau đó gửi các yêu cầu qua giao thức **HTTPS/REST** đến **Amazon API Gateway**. API Gateway tiếp nhận và phân phối yêu cầu đến năm **AWS Lambda API Handler** chuyên biệt (**Projects, Resources, Insights, Chat Copilot** và **Alerts**), các Lambda này thực hiện việc đọc và ghi dữ liệu trên **bốn bảng Amazon DynamoDB**.
-
-Song song với luồng xử lý yêu cầu từ người dùng, **Hourly Scanning Collector Lambda** định kỳ sử dụng quyền `sts:AssumeRole` để truy cập an toàn vào tài khoản AWS của khách hàng, thu thập thông tin tài nguyên và tạo **Prompt JSON Context**. Dữ liệu này được gửi đến **Amazon Bedrock** (Claude 3 Haiku) để phân tích và sinh các khuyến nghị tối ưu hóa bằng AI.
-
-Toàn bộ backend của hệ thống được triển khai theo kiến trúc serverless với **sáu hàm Lambda**, bao gồm **năm API Lambda Handler** và **một Collector Lambda**.
-
+![Giao diện Ứng dụng Di động](/images/5-Workshop/plant-disease/frontend-mobile.png?width=700px)
 
 ---
 
-## Bài toán Thực tế
+### Phạm vi Phân loại & Danh mục 11 Lớp Bệnh
 
-Quản lý hệ thống AWS lớn trong môi trường thực tế gặp 3 thách thức lớn:
+Mạng nơ-ron được huấn luyện để nhận dạng chính xác **11 phân lớp đầu ra**, bao gồm các loại bệnh do vi khuẩn, nấm, virus phổ biến trên lá cà chua, cùng với mẫu đối chứng khỏe mạnh và mẫu không xác định:
 
-1. **Lỗi cấu hình Bảo mật tiềm ẩn:** S3 Bucket mở công khai, Security Group mở `0.0.0.0/0`, hay dữ liệu không được mã hóa thường bị bỏ qua cho đến khi xảy ra rò rỉ dữ liệu.
-2. **Lãng phí Chi phí Đám mây:** EBS Volume nhàn rỗi, EC2 instance bỏ trống, Elastic IP không gắn vào server làm tiêu tốn hàng nghìn USD hàng tháng.
-3. **Quy trình Kiểm toán Thủ công tốn thời gian:** Đội ngũ DevOps và Security phải tốn hàng trăm giờ rà soát thủ công các file JSON cấu hình thô.
-
----
-
-## Công nghệ Sử dụng
-
-- **Frontend:** React 19 (JavaScript SPA), Vite, Tailwind CSS, shadcn/ui-style components (Radix UI primitives + `class-variance-authority`), Recharts, TanStack React Query.
-- **Backend Serverless:** Python 3.12, AWS Lambda, Amazon API Gateway, Amazon EventBridge, Amazon SNS.
-- **Trí tuệ Nhân tạo (GenAI):** Amazon Bedrock (Anthropic Claude 3 Haiku `anthropic.claude-3-haiku-20240307-v1:0`).
-- **Cơ sở dữ liệu:** Amazon DynamoDB (Thiết kế Multi-Table NoSQL — 4 bảng chuyên biệt + 1 GSI).
-- **Bảo mật:** AWS Security Token Service (STS `sts:AssumeRole`) phân quyền cross-account.
-- **IaC:** AWS Serverless Application Model (SAM CLI).
-
----
-
-## Danh mục Lambda Backend (6 Functions)
-
-Toàn bộ backend serverless gồm **6 Lambda function** (5 API handler + 1 Collector theo lịch), được khai báo trong `template.yaml`:
-
-| # | Function Name | Handler | Trigger | Mục đích chính |
-|---|---|---|---|---|
-| 1 | `ai-advisor-projects-api` | `api.projects.lambda_handler` | API Gateway (5 route) | CRUD dự án + kích hoạt sync |
-| 2 | `ai-advisor-resources-api` | `api.resources.lambda_handler` | API Gateway (2 route) | Liệt kê tài nguyên AWS đã quét |
-| 3 | `ai-advisor-insights-api` | `api.insights.lambda_handler` | API Gateway (2 route) | Liệt kê + sinh AI insights |
-| 4 | `ai-advisor-chat-api` | `api.chat.lambda_handler` | API Gateway (1 route) | Generative AI Copilot (Q&A) |
-| 5 | `ai-advisor-alerts-api` | `api.alerts.lambda_handler` | API Gateway (1 route) | Liệt kê cảnh báo rủi ro nghiêm trọng |
-| 6 | `ai-advisor-collector` | `collector.main.lambda_handler` | EventBridge `rate(1 hour)` | Quét tài khoản đích qua STS |
-
-Cả 6 function chạy trên **Python 3.12** runtime, tích hợp **AWS Lambda Powertools** (logger, metrics, tracer) cho observability.
-
----
-
-## Cấu trúc Frontend React
-
-SPA React 19 được xây trên **Vite** và dùng **TanStack React Query** để fetch dữ liệu qua API Gateway. Sáu trang chính nằm trong `frontend/src/pages/`:
-
-| Trang | Route | Mục đích |
-|---|---|---|
-| **Dashboard** | `/` | Tổng quan KPI của toàn bộ dự án |
-| **Projects** | `/projects` | Liệt kê, tạo, xóa dự án; nhập Role ARN |
-| **Cost** | `/cost` | Biểu đồ khuyến nghị tiết kiệm chi phí (Recharts) |
-| **Performance** | `/performance` | Lambda cold start, mức sử dụng EC2 |
-| **Security** | `/security` | S3 public, security group mở, IAM hygiene |
-| **Copilot** | `/copilot` | Chat với Bedrock Claude 3 Haiku |
-
-UI primitive dùng **shadcn/ui** (Radix-based), style bằng **Tailwind CSS**; biểu đồ bằng **Recharts**. State nằm trong cache của **TanStack React Query** và tự động retry khi gặp lỗi 5xx.
-
-Dưới đây là giao diện thực tế của từng trang, chụp từ session workshop author với stack đã deploy tại `us-east-1`:
-
-**Hình 2.** Trang **Dashboard Overview** (`/`) hiển thị bốn thẻ KPI chính gồm **System Health (78%)**, **Resources (75)**, **Critical Risks (4)** và **Monthly Savings ($2.5K)**. Bên dưới là khu vực chuyển đổi giữa các dự án (**ProDev**, **Beta Dev** và **Production**). Ở phía phải là **AI Analysis Panel**, hiển thị số lượng cảnh báo theo từng mức độ nghiêm trọng (severity) và ô nhập **AI Chat** để người dùng đặt câu hỏi về hạ tầng AWS.
-
-
-
-![dashboard](/images/5-Workshop/5.1-Workshop-overview/dashboard_overview.png)
-
-
-
-
-**Hình 3.** Trang **Projects** (`/projects`) hiển thị ba môi trường AWS dưới dạng các thẻ (card) với màu sắc phân biệt theo trạng thái, gồm **ProDev** (Active – dấu tick xanh), **Beta Dev** (Pending – màu hổ phách) và **Production** (Warning – 4 Critical Issues, màu đỏ). Mỗi thẻ cung cấp các thông tin chính như **Project ID**, **IAM Role ARN**, **thời điểm quét gần nhất (Last Scan)** và ba nút thao tác để quản lý dự án.
-
-
-![projects_list](/images/5-Workshop/5.1-Workshop-overview/projects_list.png)
-
-**Hình 4.** Trang **Cost Optimization** (`/cost`) hiển thị kết quả phân tích chi phí do AI tạo ra, bao gồm **Hero Card – Potential Monthly Savings** với mức tiết kiệm ước tính **124,50 USD/tháng** nhờ phát hiện **EC2 instance** không hoạt động (idle). Bên dưới là ba **Cost Optimization Insights** được sắp xếp theo mức độ ưu tiên (severity), gồm **Idle EC2 Detected**, **Rightsizing Recommendation** và **Reserved Instance Opportunity**, giúp người dùng nhanh chóng xác định các cơ hội tối ưu chi phí trên hạ tầng AWS.
-
-
-![cost_optimization](/images/5-Workshop/5.1-Workshop-overview/cost_optimization.png)
-
-
-**Hình 5.** Trang **Performance Insights** (`/performance`) hiển thị kết quả phân tích hiệu năng hệ thống, trong đó nổi bật là cảnh báo **DB Node Overloaded** với mức sử dụng **CPU đạt 98,5%**. Bên dưới là ba **Performance Insights** được AI phân tích, gồm **CPU Saturation**, **I/O Bottleneck** và **Lambda Cold Start**. Mỗi mục hiển thị thanh **Utilization** cùng các khuyến nghị do AI đề xuất, giúp người dùng nhanh chóng xác định nguyên nhân gây suy giảm hiệu năng và lựa chọn giải pháp tối ưu phù hợp.
-
-
-![cost_optimization](/images/5-Workshop/5.1-Workshop-overview/cost_optimization.png)
-
-
-
-**Hình 6.** Trang **Security Risks** (`/security`) hiển thị các rủi ro bảo mật được AI phát hiện trên hạ tầng AWS, bao gồm hai cảnh báo mức **Critical** liên quan đến **S3 Bucket Exposure** (*Public Access* và *Missing Encryption*) cùng một rủi ro mức **Medium** đối với **IAM Over-privileged Role**. Mỗi **Risk Card** cung cấp các thông tin quan trọng như **Severity Badge**, **Resource ARN**, **Detection Method** và các **AI Remediation Steps**, giúp người dùng nhanh chóng đánh giá mức độ ảnh hưởng và thực hiện các biện pháp khắc phục được đề xuất.
-
-
-![security_risks](/images/5-Workshop/5.1-Workshop-overview/security_risks.png)
-
-
-
-**Hình 7.** Trang **AI Copilot** (`/copilot`) minh họa cuộc hội thoại gồm ba lượt trao đổi giữa người vận hành (operator) và **Claude 3 Haiku**. Người dùng đặt câu hỏi về tài nguyên đang phát sinh chi phí cao nhất, AI phân tích và xác định **Production EC2 Fleet** là đối tượng cần ưu tiên tối ưu. Trong lượt trao đổi tiếp theo, AI tiếp tục trả lời câu hỏi về các quyền và phương án tối ưu dưới dạng **Action Plan** được trình bày theo từng bước đánh số, giúp người dùng dễ dàng thực hiện các khuyến nghị.
-
-
-
-![ai_copilot](/images/5-Workshop/5.1-Workshop-overview/ai_copilot.png)
-
-
----
-
-## Danh mục REST API Endpoint (11 Route)
-
-Toàn bộ 11 route được deploy dưới một stage API Gateway duy nhất (`/prod`), bảo vệ bằng **Amazon Cognito JWT authorizer**. CORS được mở `*` (production nên giới hạn lại):
-
-| Method | Path | Lambda | Mục đích |
+| Mã lớp | Tên Phân loại Bệnh | Tác nhân Gây bệnh | Triệu chứng Hình thái Điển hình |
 |---|---|---|---|
-| `GET` | `/projects` | ProjectsFunction | Liệt kê dự án của user hiện tại |
-| `POST` | `/projects` | ProjectsFunction | Tạo dự án mới (nhận Role ARN + region) |
-| `GET` | `/projects/{project_id}` | ProjectsFunction | Chi tiết 1 dự án |
-| `DELETE` | `/projects/{project_id}` | ProjectsFunction | Xóa dự án (cascade resources/insights) |
-| `POST` | `/projects/{project_id}/sync` | ProjectsFunction | Kích hoạt Collector không đồng bộ |
-| `GET` | `/projects/{project_id}/resources` | ResourcesFunction | Liệt kê tài nguyên AWS đã quét |
-| `GET` | `/projects/{project_id}/resources/{resource_id}` | ResourcesFunction | Lấy raw_data JSON đầy đủ |
-| `GET` | `/projects/{project_id}/insights` | InsightsFunction | Liệt kê AI insights (phân trang) |
-| `POST` | `/projects/{project_id}/insights/generate` | InsightsFunction | Yêu cầu Bedrock sinh insights mới |
-| `POST` | `/projects/{project_id}/chat` | ChatFunction | Gửi prompt + context tài nguyên cho Bedrock |
-| `GET` | `/projects/{project_id}/alerts` | AlertsFunction | Liệt kê cảnh báo rủi ro nghiêm trọng |
+| `0` | **Tomato___Bacterial_spot** | Vi khuẩn *Xanthomonas campestris* | Các đốm nhỏ ngậm nước, chuyển nâu đen có quầng vàng bao quanh |
+| `1` | **Tomato___Early_blight** | Nấm *Alternaria solani* | Các vòng tròn đồng tâm màu nâu sẫm như tâm bia, có quầng úa vàng |
+| `2` | **Tomato___Late_blight** | Nấm *Phytophthora infestans* | Vết bệnh hình dạng bất định màu xanh xám ngậm nước trên bề mặt lá |
+| `3` | **Tomato___Leaf_Mold** | Nấm *Passalora fulva* | Đốm vàng nhạt ở mặt trên, lớp mốc nhung màu ô-liu sẫm ở mặt dưới lá |
+| `4` | **Tomato___Septoria_leaf_spot** | Nấm *Septoria lycopersici* | Nhiều đốm nhỏ hình tròn viền sẫm, tâm xám tro xuất hiện rải rác |
+| `5` | **Tomato___Spider_mites** | Nhện đỏ *Tetranychus urticae* | Đốm châm kim màu vàng li ti, xuất hiện tơ nhện mỏng mặt dưới |
+| `6` | **Tomato___Target_Spot** | Nấm *Corynespora casiicola* | Đốm nâu hình tròn hoặc góc cạnh có các vân đồng tâm nổi bật |
+| `7` | **Tomato___Tomato_Yellow_Leaf_Curl_Virus** | Geminivirus (Bọ phấn trắng truyền) | Rìa lá cong vồng lên, phiến lá thu nhỏ, vàng úa giữa các gân |
+| `8` | **Tomato___Tomato_mosaic_virus** | Tobamovirus | Phiến lá loang lổ xen kẽ các mảng xanh đậm nhạt, lá biến dạng |
+| `9` | **Tomato___healthy** | Lá Khỏe mạnh (Đối chứng) | Lá xanh mướt, phát triển bình thường, không có vết hoại tử |
+| `10` | **unknown** | Mẫu Ngoài Phân bố (OOD) | Ảnh không phải lá cà chua, ảnh mờ nhiễu hoặc phông nền không xác định |
 
-API Gateway throttle **100 requests/giây** với **burst 50** và quota **1000 request/tháng** qua `AdvisorUsagePlan`.
-
----
-
-## Cấu trúc Repository
-
-```
-aws-advisor/
-├── backend/                     # Ứng dụng AWS SAM Python 3.12 serverless
-│   ├── api/                     # 5 API handler (projects, resources, insights, chat, alerts)
-│   ├── collector/               # 6 collector (ec2, s3, iam, lambda, cloudwatch, main)
-│   ├── ai/                      # Bedrock Claude 3 prompt + rule engine
-│   ├── shared/                  # aws_client (STS AssumeRole), db, models
-│   ├── tests/                   # pytest + moto (26 tests)
-│   └── template.yaml            # CloudFormation / SAM IaC
-├── frontend/                    # Vite + React 19 + JavaScript SPA (JSX, không TypeScript)
-│   ├── src/pages/               # 6 trang chính (Dashboard, Projects, Cost, ...)
-│   ├── src/components/          # shadcn/ui primitive + custom cards
-│   ├── src/services/            # API client (apiClient.js, queryKeys.js)
-│   └── src/__tests__/           # Vitest + RTL (5 test files)
-└── docs/                        # Engineering reflection + future roadmap
-```
+> [!NOTE]
+> Hệ thống hiện tại đóng vai trò là một dự án nghiên cứu và triển khai thử nghiệm trên AWS; cần thực hiện các đánh giá thực địa mở rộng trước khi áp dụng vào hoạt động nông nghiệp quy mô lớn.
 
 ---
 
-## Tóm tắt Phần
+### Kiến trúc Trí tuệ Nhân tạo: Chưng cất Tri thức (Knowledge Distillation)
 
-Phần tổng quan này đặt nền tảng cho toàn bộ workshop. Các phần sau đi sâu vào yêu cầu hệ thống (5.2), kiến trúc end-to-end (5.3), chiến lược triển khai (5.4), đảm bảo chất lượng (5.5) và vận hành & dọn dẹp (5.6).
+Để dung hòa giữa độ chính xác cao và chi phí vận hành máy chủ CPU giá rẻ trên AWS EC2, dự án đã áp dụng kỹ thuật **Chưng cất Tri thức (Knowledge Distillation)**:
+
+```mermaid
+flowchart TD
+    Teacher["Mô hình Giáo viên: ConvNeXt-Tiny<br/>(Dung lượng lớn ~114 MiB, Độ chính xác cao)"]
+    Student["Mô hình Học sinh: MobileNetV3-Small<br/>(Tối ưu CPU, Dung lượng siêu nhẹ ~6 MiB)"]
+    
+    Data["Tập dữ liệu Lá Cà chua<br/>(Tiền xử lý & Tăng cường)"] --> Teacher
+    Data --> Student
+    
+    Teacher -->|Xác suất mềm (Soft Logits)| KD_Loss["Hàm Mất mát Chưng cất<br/>(KL Divergence + Cross-Entropy)"]
+    Student -->|Dự đoán của Học sinh| KD_Loss
+    
+    KD_Loss -->|Lan truyền ngược / Học hỏi| DistilledModel["Tệp trọng số Triển khai:<br/>mobilenetv3_small_100_distilled_best.pth<br/>(Độ trễ: 29.23 ms | Dung lượng: 6 MiB)"]
+```
+
+- **Mô hình Giáo viên (ConvNeXt-Tiny):** Kiến trúc tích chập hiện đại với các khối inverted bottleneck và trường tiếp nhận lớn 7x7, cung cấp khả năng trích xuất đặc trưng sâu sắc.
+- **Mô hình Học sinh (MobileNetV3-Small):** Được tối ưu hóa bằng thuật toán tìm kiếm kiến trúc phần cứng, sử dụng depthwise separable convolutions và hàm kích hoạt hard-swish, cực kỳ tối ưu cho CPU.
+- **Kết quả Thực nghiệm:** Mô hình MobileNetV3 chưng cất giữ được hơn 96% độ chính xác của giáo viên, trong khi giảm hơn **94%** dung lượng tệp trọng số (chỉ còn khoảng 6 MiB) và đạt tốc độ suy luận CPU xuất sắc: **29.23 ms** cho mỗi yêu cầu.
+
+---
+
+### Khả năng Giải thích Quyết định với Grad-CAM++
+
+Khả năng giải thích là tiêu chuẩn thiết yếu trong chẩn đoán nông nghiệp. Ứng dụng tích hợp công nghệ **Grad-CAM++** để vẽ biểu đồ nhiệt (heatmap), làm nổi bật chính xác các khu vực pixel trên lá mà mạng nơ-ron đã căn cứ vào đó để đưa ra kết luận chẩn đoán.
+
+![Tính năng Grad-CAM++ trên Giao diện Di động](/images/5-Workshop/plant-disease/frontend-explain-mobile.png?width=700px)
+
+#### So sánh Biểu đồ Nhiệt giữa các Kiến trúc
+
+Bảng sau đây thể hiện cách các kiến trúc mạng khác nhau tập trung vào tổn thương bệnh học trên lá:
+
+| Kiến trúc | Vai trò | Hình ảnh Trực quan hóa Lớp Phủ (Overlay) |
+|---|---|---|
+| **MobileNetV3-Small Chưng cất** | Mô hình Triển khai Chính | ![MobileNetV3 Overlay](/images/5-Workshop/plant-disease/explain-mobilenetv3_small_100_distilled-overlay.png?width=320px) |
+| **ConvNeXt-Tiny** | Mô hình Giáo viên | ![ConvNeXt Overlay](/images/5-Workshop/plant-disease/explain-convnext_tiny-overlay.png?width=320px) |
+| **EfficientNet-B0** | Mô hình Ứng viên | ![EfficientNet Overlay](/images/5-Workshop/plant-disease/explain-efficientnet_b0-overlay.png?width=320px) |
+
+---
+
+### Luồng Vận hành Tổng thể trên AWS
+
+Chu trình vận hành kết nối liền mạch từ kho mã nguồn đến hạ tầng đám mây AWS:
+
+1. **Tự động hóa CI/CD:** Các commit trên nhánh `master` kích hoạt GitHub Actions chạy kiểm thử mã nguồn Python, build giao diện Next.js và đóng gói container image đẩy lên **GHCR (GitHub Container Registry)**.
+2. **Lưu trữ Tách rời Trọng số:** Tệp mô hình (`model.pth`) và ánh xạ phân lớp (`class_to_idx.json`) được lưu trữ tại **Amazon S3** bảo mật dưới tiền tố `mobilenet-distilled-v1/`.
+3. **Máy chủ EC2 Chạy Container:** Máy chủ Amazon Linux 2023 kéo images từ GHCR và gắn ổ đĩa S3 chỉ đọc (read-only) vào thư mục `/app/artifacts`.
+4. **Mạng & Cổng Giao tiếp:** Người dùng truy cập giao diện Next.js tại cổng `3000`, giao diện tự động gửi yêu cầu suy luận tới FastAPI tại cổng `8000`.
+5. **Khả năng Quan sát:** Nhật ký stdout/stderr được chuyển về CloudWatch Logs bằng Docker `awslogs` driver. **CloudWatch Agent** đo đạc chỉ số RAM và đĩa định kỳ 60 giây để kích hoạt cảnh báo email tự động.

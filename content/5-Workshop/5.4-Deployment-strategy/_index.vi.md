@@ -1,180 +1,121 @@
-﻿---
-title: "Chiến lược Triển khai"
-date: 2026-07-07
-weight: 4
+---
+title: "5.4 Triển khai Container"
+date: 2026-10-28T10:00:00+07:00
+weight: 40
 chapter: false
-pre: " <b> 5.4. </b> "
+pre: "<b>5.4. </b>"
 ---
 
-# Phần 5.4 - Chiến lược Triển khai & Tích hợp Khách hàng
+# 5.4 Triển khai Ứng dụng bằng Container
 
-Tài liệu này chi tiết quy trình triển khai hạ tầng Backend Serverless, ứng dụng Frontend React và các bước tích hợp tài khoản AWS của khách hàng vào hệ thống.
+### 5.4.1 Quy trình Triển khai Tự động (Continuous Delivery)
 
----
+Hệ thống triển khai được xây dựng dựa trên luồng tự động hóa tích hợp liên tục (CI) với **GitHub Actions** (`.github/workflows/ci.yml`). Mỗi khi có commit mới vào kho mã nguồn:
+1. Chạy toàn bộ bộ kiểm thử tự động Python (linting, kiểm thử unit test cho tiền xử lý và schema dữ liệu).
+2. Xây dựng gói mã nguồn giao diện Next.js, tối ưu hóa các tệp tĩnh và đảm bảo tương thích khi chạy với tài khoản không có quyền root.
+3. Đóng gói container Docker nhiều giai đoạn (multi-stage) cho cả frontend và backend, tự động gắn thẻ và phát hành lên **GHCR (GitHub Container Registry)**.
 
-## 1. Triển khai Backend Serverless (AWS SAM CLI)
+#### Ghi nhận Định danh Bản phát hành
 
-### Bước 1: Biên dịch Mã nguồn
-Biên dịch thư viện phụ thuộc bên trong container Amazon Linux để đảm bảo tính tương thích binary với AWS Lambda.
+Để đảm bảo tính tái lập và tránh các vấn đề phát sinh do sử dụng thẻ mutable (như `:latest`), dự án lưu trữ chính xác mã băm commit và image digest:
 
-```bash
-cd backend
-sam build --use-container
-```
-
-**Hình 1 - Kết quả SAM CLI `sam build --use-container` (Build Succeeded):**
-
-![SAM Build](/images/5-Workshop/5.4-Deployment-strategy/sam_build.png)
-
-### Bước 2: Triển khai CloudFormation Stack
-Thực hiện triển khai theo hướng dẫn để khởi tạo API Gateway, Lambda Functions, DynamoDB, EventBridge và SNS.
-
-```bash
-sam deploy --guided
-```
-
-**Hình 2 - Kết quả SAM CLI `sam deploy --guided` (Successfully created/updated stack):**
-
-![SAM Deploy](/images/5-Workshop/5.4-Deployment-strategy/sam_deploy.png)
-
-Các tham số chính:
-- **Stack Name:** `ai-aws-advisor`
-- **AWS Region:** `us-east-1` (hoặc region hỗ trợ Amazon Bedrock)
-- **Confirm changes before deploy:** `Y`
-- **Allow SAM CLI IAM role creation:** `Y`
-- **Save parameters to configuration file:** `Y` (`samconfig.toml`)
-
-### Bước 3: Lưu lại Đầu ra Outputs
-Ghi lại URL `ApiGatewayEndpoint` được xuất ra từ SAM CLI (ví dụ: `https://<api-id>.execute-api.us-east-1.amazonaws.com/prod`).
-
----
-
-## 2. Triển khai Frontend React Application
-
-### Bước 1: Cấu hình Môi trường
-Tạo file `.env` tại thư mục `frontend/`:
-
-```env
-VITE_API_BASE_URL=https://<your-api-id>.execute-api.us-east-1.amazonaws.com/prod
-```
-
-### Bước 2: Chạy Server Phát triển
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### Bước 3: Đóng gói Sản phẩm
-```bash
-npm run build
-```
-Tạo mã nguồn tĩnh trong thư mục `dist/` sẵn sàng tải lên Amazon S3 + CloudFront, Vercel hoặc Netlify.
-
----
-
-## 3. Quy trình Tích hợp Tài khoản Khách hàng
-
-Các bước khách hàng thực hiện để kết nối tài khoản AWS cần kiểm toán:
-
-1. Khách hàng đăng nhập vào AWS Console của tài khoản cần kiểm toán.
-2. Truy cập **IAM -> Roles -> Create Role**.
-3. Chọn loại Trusted Entity là **AWS Account** và nhập Account ID của tài khoản SaaS Provider.
-4. Gắn policy `ReadOnlyAccess` cho IAM Role.
-5. Sao chép **Role ARN** được tạo ra (`arn:aws:iam::<CustomerAccountID>:role/AIAdvisorAuditRole`).
-6. Nhập Role ARN này trên Dashboard của AI AWS Advisor để khởi tạo Dự án.
-
-**Hình 3 - Trang tóm tắt IAM Role phía khách hàng (đã che Account ID):**
-
-![IAM Audit Role Summary](/images/5-Workshop/5.4-Deployment-strategy/iam_audit_role_summary.png)
-
-**Hình 4 - Tab Trust relationships — JSON Trust policy (đã che Account ID):**
-
-![IAM Trust Policy](/images/5-Workshop/5.4-Deployment-strategy/iam_audit_role_trust_policy.png)
-
----
-
-## 4. CloudFormation Outputs (Ghi nhận sau khi Deploy)
-
-Sau khi sam deploy --guided hoàn tất, SAM CLI in ra 5 output mà frontend và CLI script phụ thuộc. Hãy ghi nhận ngay - đây là cách duy nhất để wire SPA với API, AI scanner với IAM role khách hàng, và SNS alert pipeline với email người nhận:
-
-| Output Key | Mô tả | Ví dụ |
+| Thành phần | Định danh Phiên bản | Mã băm Ghi nhận Thực tế |
 |---|---|---|
-| ApiGatewayEndpoint | Base URL mà React SPA gọi. | https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod |
-| CollectorFunctionArn | ARN của Collector Lambda theo lịch. | arn:aws:lambda:us-east-1:111122223333:function:ai-advisor-collector |
-| AlertsTopicArn | ARN SNS Topic cho cảnh báo mức độ cao (subscribe email khách hàng tại đây). | arn:aws:sns:us-east-1:111122223333:ai-advisor-alerts |
-| UserPoolId | ID Cognito User Pool (dùng trong frontend .env). | us-east-1_aBcDeFgHi |
-| UserPoolClientId | ID Cognito User Pool Client (dùng trong frontend .env). | 7a8b9c0d1e2f3g4h5i6j7k8l9m |
-
-Lấy lại bất cứ lúc nào bằng một lệnh:
-
-```bash
-aws cloudformation describe-stacks 
-  --stack-name ai-aws-advisor 
-  --query 'Stacks[0].Outputs[].OutputValue' 
-  --output text
-` 
+| **Git Commit** | `ff6b75bf3a625db124cc6449f52fa224bf76631e` | Bản phát hành chính thức |
+| **Backend API Image** | `ghcr.io/starkkk1/plant-disease-api` | `sha256:f61be1570a834f1819614ad041f79e6114e00a0503852a121a564725cad4c27c` |
+| **Frontend Image** | `ghcr.io/starkkk1/plant-disease-frontend` | `sha256:ec211d13241680f208b29f8282c7fb12a19735e9048d1f8dab9b6a27499a7f85` |
 
 ---
 
-## 5. Triển khai Frontend Production (S3 + CloudFront)
+### 5.4.2 Cấu hình Môi trường Chạy Backend
 
-Để deploy SPA production-grade, host folder tĩnh dist/ trên Amazon S3 sau CloudFront CDN. Bước build từ §2.3 đã tạo artifact trong `frontend/dist/` - giờ ship chúng đi.
+Container backend chạy ứng dụng FastAPI trên nền Python 3.12 với PyTorch CPU. Máy chủ gắn thư mục `checkpoints/v1` đã tải từ S3 vào container theo chế độ **chỉ đọc (read-only)** tại đường dẫn `/app/artifacts`.
 
-### Bước 1: Tạo S3 bucket cho static hosting
-
-```bash
-aws s3 mb s3://ai-aws-advisor-web-prod --region us-east-1
-aws s3 website s3://ai-aws-advisor-web-prod --index-document index.html --error-document index.html
-` 
-
-### Bước 2: Upload bản production build
+Khởi chạy container backend bằng câu lệnh sau:
 
 ```bash
-cd frontend
-aws s3 sync dist/ s3://ai-aws-advisor-web-prod --delete --cache-control 'public, max-age=31536000, immutable'
+docker run -d \
+  --name plant-disease-api \
+  --restart unless-stopped \
+  -p 8000:8000 \
+  -v /home/ec2-user/checkpoints/v1:/app/artifacts:ro \
+  -e MODEL_CHECKPOINT=/app/artifacts/model.pth \
+  -e MODEL_CLASS_MAP=/app/artifacts/class_to_idx.json \
+  -e MODEL_NAME=mobilenetv3_small_100 \
+  -e MODEL_THREADS=2 \
+  -e CORS_ORIGINS="http://localhost:3000,http://$(curl -s http://checkip.amazonaws.com):3000" \
+  --log-driver awslogs \
+  --log-opt awslogs-region=ap-southeast-2 \
+  --log-opt awslogs-group=/plant-disease/backend \
+  --log-opt awslogs-create-group=true \
+  ghcr.io/starkkk1/plant-disease-api@sha256:f61be1570a834f1819614ad041f79e6114e00a0503852a121a564725cad4c27c
 ```
 
-### Bước 3: Tạo CloudFront distribution trỏ về bucket
+> [!NOTE]
+> - `MODEL_THREADS=2` giới hạn số luồng tính toán song song của PyTorch ở mức 2 core CPU, ngăn không cho các tác vụ suy luận chiếm dụng toàn bộ tài nguyên máy chủ.
+> - Mô hình chỉ được nạp vào bộ nhớ một lần duy nhất khi tiến trình khởi động. Nếu tệp mô hình bị thiếu hoặc sai lệch, endpoint `/health` sẽ trả về trạng thái `unavailable` và chặn mọi yêu cầu suy luận với mã lỗi 503.
+
+---
+
+### 5.4.3 Cấu hình Giao diện Frontend và Mạng
+
+Frontend được đóng gói theo mô hình **Next.js Standalone** chạy trên Node.js 20. Container thực thi bằng tài khoản người dùng bảo mật không có quyền root (`nextjs`) và phục vụ tại cổng `3000`.
+
+Khởi chạy container frontend:
 
 ```bash
-aws cloudfront create-distribution 
-  --origin-domain-name ai-aws-advisor-web-prod.s3.amazonaws.com 
-  --default-root-object index.html
-` 
-
-{{% notice warning %}}Với SPA routing, cấu hình CloudFront custom error response: map cả 403 và 404 về /index.html với HTTP 200, để client-side route như /projects/abc không vỡ khi hard reload.{{% /notice %}}
-
-### Bước 4: Set biến môi trường SPA lúc build
-
-React app đọc `VITE_API_BASE_URL`, `VITE_USER_POOL_ID`, và `VITE_USER_POOL_CLIENT_ID` **lúc build** (Vite inline chúng). Set trong `frontend/.env.production` trước khi `npm run build`:
-
-```env
-VITE_API_BASE_URL=https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod
-VITE_USER_POOL_ID=us-east-1_aBcDeFgHi
-VITE_USER_POOL_CLIENT_ID=7a8b9c0d1e2f3g4h5i6j7k8l9m
-VITE_AWS_REGION=us-east-1
+docker run -d \
+  --name plant-disease-frontend \
+  --restart unless-stopped \
+  -p 3000:3000 \
+  -e NODE_ENV=production \
+  -e PORT=3000 \
+  --log-driver awslogs \
+  --log-opt awslogs-region=ap-southeast-2 \
+  --log-opt awslogs-group=/plant-disease/frontend \
+  --log-opt awslogs-create-group=true \
+  ghcr.io/starkkk1/plant-disease-frontend@sha256:ec211d13241680f208b29f8282c7fb12a19735e9048d1f8dab9b6a27499a7f85
 ```
 
 ---
 
-## 6. Hướng dẫn Dashboard: Thêm Customer Project
+### 5.4.4 Xác minh Hoạt động của Ứng dụng
 
-Khi SPA đã live, operator thêm một tài khoản khách hàng qua 4 bước trên dashboard:
+Kiểm tra trạng thái của các container và gửi yêu cầu suy luận thử nghiệm với tệp ảnh mẫu:
 
-1. **Đăng nhập** tại URL CloudFront bằng Cognito credentials đã tạo ở §5.2.6. JWT được lưu trong localStorage và gắn vào mọi API call qua Axios interceptor.
-2. **Vào Projects -> Add Project**. Điền: project name, AWS region cần quét, và Role ARN do khách hàng cung cấp (xem §3 phía trên).
-3. **Trigger manual scan** bằng cách bấm Sync Now. Frontend POST lên /projects/{id}/sync, Lambda sẽ invoke Collector. Scan đầu tiên thường hoàn tất trong 30-60 giây cho tài khoản AWS nhỏ.
-4. **Mở Dashboard** để xem các tab Cost / Performance / Security đã populate với AI insights. Bấm vào bất kỳ card nào để drill down vào raw JSON resource data.
+```bash
+# 1. Kiểm tra trạng thái container đang chạy
+sudo docker ps
 
-EventBridge schedule theo giờ giữ data tươi ở background không cần operator can thiệp.
+# 2. Kiểm tra Health của Backend
+curl --fail http://127.0.0.1:8000/health
 
-**Hình 6 - Dashboard sau scan đầu tiên thành công, hiển thị 4 KPI card và insight cho từng dự án được sinh bởi Bedrock Claude 3 Haiku:**
+# 3. Kiểm tra Header phản hồi của Frontend
+curl -I http://127.0.0.1:3000
 
-![Dashboard Overview](/images/5-Workshop/5.4-Deployment-strategy/dashboard_overview.png)
+# 4. Gửi yêu cầu suy luận trực tiếp với ảnh mẫu
+curl --fail-with-body \
+  -F "file=@frontend/tests/fixtures/tomato-leaf.jpg;type=image/jpeg" \
+  -F "top_k=3" \
+  http://127.0.0.1:8000/predict
+```
 
----
+#### Bảng Kết quả Kiểm định Thực tế
 
-## Tóm tắt Phần
+Các kết quả đo đạc thực tế trên máy ảo Sydney được ghi nhận như sau:
 
-Chiến lược triển khai của AI AWS Advisor gồm bốn giai đoạn chính: **(1)** triển khai backend bằng AWS SAM và ghi nhận các CloudFormation Outputs, **(2)** phát triển và kiểm thử ứng dụng frontend trên môi trường cục bộ, **(3)** tích hợp tài khoản AWS của khách hàng thông qua cơ chế IAM Role (cross-account), và **(4)** triển khai ứng dụng React lên môi trường production bằng Amazon S3 kết hợp CloudFront. Toàn bộ quy trình có thể được tái lập từ mã nguồn trong repository thông qua chuỗi lệnh `sam deploy --guided`, `npm run build` và `aws s3 sync`, giúp việc triển khai trở nên nhất quán, dễ bảo trì và thuận tiện tích hợp vào các quy trình DevOps.
+| Hạng mục Kiểm tra | Lệnh / Endpoint | Kết quả Ghi nhận | Trạng thái |
+|---|---|---|---|
+| **Toàn vẹn Tệp Trọng số** | `sha256sum` | Cả hai tệp `model.pth` và `class_to_idx.json` trùng khớp | **ĐẠT** |
+| **Trạng thái Backend** | `GET /health` | `{"status": "ok", "api_version": "1.0", "is_mock": false}` | **ĐẠT** |
+| **Trạng thái Frontend** | `GET /` | `HTTP/1.1 200 OK` | **ĐẠT** |
+| **Phiên bản Mô hình** | `POST /predict` | `model_version: mobilenetv3_small_100:05e72798a741` | **ĐẠT** |
+| **Thời gian Suy luận** | Phản hồi API | **29.23 ms** thời gian tính toán trên CPU | **ĐẠT** |
+| **Lớp Dự đoán Cao nhất** | Ảnh lá mẫu | **`Tomato___Bacterial_spot`** với độ tin cậy **0.7058** | **ĐẠT** |
+| **Giao diện Đa nền tảng** | Máy tính & Điện thoại | Truy cập giao diện web mượt mà, phản hồi đầy đủ | **ĐẠT** |
+
+![Kết quả Kiểm tra API Suy luận Trực tiếp](/images/5-Workshop/plant-disease/inference-live-fixed.png?width=750px)
+
+Tệp ảnh mẫu được sử dụng để kiểm thử chẩn đoán bệnh (`tomato-leaf.jpg`):
+
+![Mẫu Ảnh Lá Cà chua Kiểm thử](/images/5-Workshop/plant-disease/tomato-leaf.jpg?width=300px)

@@ -1,103 +1,115 @@
 ---
-title: "Operations & Cleanup"
-date: 2026-07-07
-weight: 6
+title: "5.6 Clean Up & Operations"
+date: 2026-10-28T10:00:00+07:00
+weight: 60
 chapter: false
-pre: " <b> 5.6. </b> "
+pre: "<b>5.6. </b>"
 ---
 
-# Section 5.6 - Operations, Resource Cleanup & Architecture Review
+# 5.6 Clean Up and Daily Operations
 
-This document walks through the process for safely tearing down system resources, and summarizes the architecture and future direction for **AI AWS Advisor**.
+### Daily Operational Routine
 
----
+In a learning, research, or proof-of-concept environment, continuous 24/7 EC2 execution accumulates unnecessary hourly compute costs. Establish a disciplined routine for pausing and resuming workloads:
 
-## 1. Automated Cloud Resource Teardown
-
-Since the entire Backend infrastructure is managed as code (IaC) via the AWS SAM CLI, resource cleanup is fully automated.
-
-To delete the CloudFormation stack and release all Lambda functions, API Gateway, EventBridge rules, and DynamoDB tables:
+#### 1. Pausing Applications Between Sessions
+When halting daily development, pause the container runtime and stop the underlying EC2 instance:
 
 ```bash
-cd backend
-sam delete
+# On EC2 Host via SSH: Gracefully stop application containers
+sudo docker stop plant-disease-frontend plant-disease-api
+
+# From Operator Terminal or AWS CloudShell: Stop the EC2 instance
+aws ec2 stop-instances \
+  --instance-ids "$INSTANCE_ID" \
+  --region ap-southeast-2
 ```
 
-**Figure 1 - SAM CLI `sam delete --no-prompts` output (Successfully deleted stack):**
+> [!NOTE]
+> Stopping an EC2 instance halts hourly EC2 compute billing. Attached Amazon EBS root volumes, stored CloudWatch metrics, and S3 objects remain intact but continue to incur standard low-cost storage fees.
 
-![Sam_delete](/images/5-Workshop/5.6-Operations-cleanup/sam_delete.png)
+#### 2. Resuming Operations
+When resuming work, restart the instance and initialize services in the correct dependency sequence:
 
+```bash
+# 1. Start EC2 instance
+aws ec2 start-instances --instance-ids "$INSTANCE_ID" --region ap-southeast-2
 
-Confirm the deletion when prompted for the stack name (`ai-aws-advisor`).
+# 2. Reconnect via SSH (Note: Public IPv4 may change unless using an Elastic IP)
+ssh -i key.pem ec2-user@<NEW_PUBLIC_IP>
 
----
+# 3. Start Backend first and await readiness
+sudo docker start plant-disease-api
+curl --retry 5 --retry-connrefused http://127.0.0.1:8000/health
 
-## 2. Post-Cleanup Checklist
+# 4. Start Frontend
+sudo docker start plant-disease-frontend
+```
 
-- **Amazon CloudWatch Log Groups:** Check and manually delete log groups prefixed `/aws/lambda/ai-aws-advisor-*` to avoid accumulating storage costs.
-- **Revoke the Customer IAM Role:** Delete the delegation IAM Roles (`AIAdvisorAuditRole`) on the customer's AWS accounts.
-
----
-
-## 3. Architecture Summary & Lessons Learned
-
-1. **Zero-Trust Security Model:** Using `sts:AssumeRole` completely eliminates the risk of long-lived Access Key leaks, meeting enterprise compliance standards (SOC2 / ISO27001).
-2. **Cost Optimization with Serverless:** Using AWS Lambda and a Multi-Table DynamoDB design (4 dedicated tables, all on `PAY_PER_REQUEST`) keeps the system's idle cost at $0/month.
-3. **AI as the Operating Engine:** Amazon Bedrock (Claude 3 Haiku) proves that an LLM works extremely effectively as a tool for turning raw configuration data into standardized, structured JSON.
-
----
-
-## 4. Future Direction
-
-- **Real-Time Event Processing:** Move from hourly scheduled scanning to real-time CloudTrail event-stream processing via an EventBridge Event Bus.
-- **Automated Remediation (Autopilot):** Add controlled write permissions so the AI Advisor can auto-fix issues (e.g. automatically enabling encryption on an S3 bucket).
-- **Real-time Ingestion:** Move from hourly cron scanning to real-time CloudTrail event stream ingestion via EventBridge Event Buses.
-- **Automated Remediation (Autopilot):** Add write-enabled IAM permissions for approved autonomous patches (e.g. automatically encrypting an unencrypted S3 bucket).
-- **Cross-Account Organization Audit:** Extend the Collector to walk every account in an AWS Organization (via `organizations:ListAccounts`) and roll up every finding into a single dashboard, replacing today's one-project-per-IAM-Role model.
-- **AI Cost Forecasting:** Extend the AI Analyzer to forecast each project's cost trajectory over the next 30 days using CloudWatch metrics + Bedrock summarization.
-- **Multi-Region Failover:** Replicate the 4 DynamoDB tables to a secondary region via Global Tables for HA/DR.
+> [!IMPORTANT]
+> If your EC2 instance does not have an allocated Elastic IP (EIP), stopping and restarting the instance assigns a **new public IPv4 address**. You must update your SSH connection string, client browser URL, and backend `CORS_ORIGINS` setting accordingly.
 
 ---
 
-## 5. Monthly Cost (Idle vs. Active)
+### Complete Teardown & Resource Deletion Checklist
 
-The $42.30/month figure shown in the screenshot is the **idle steady-state cost** after the first development cycle. Below is a cost breakdown assuming the workshop author runs the stack 24/7 with no traffic:
+At the conclusion of the workshop or project lifecycle, execute the following teardown procedure to ensure zero residual billing across your AWS account:
 
-| Service | Quantity | Pricing Model | Monthly Cost (USD) |
-|---|---|---|---|
-| API Gateway REST API | 1 stage + 1 usage plan | $3.50/million requests | ~$0.00 (under quota) |
-| Lambda invocations | 6 functions | $0.20/million + GB-second | ~$0.50 (1 scan/hour) |
-| DynamoDB on-demand | 4 tables | $1.25/million WCU + RRU | ~$0.50 (~10K writes/day) |
-| Cognito User Pool | 1 pool + 1 client | Free up to 50K MAU | $0.00 |
-| SNS topic | 1 topic + 1 email sub | $0.50/million + $0.10/100K emails | ~$0.10 (alerts only) |
-| EventBridge schedule | 1 rule | $1.00/million invocations | ~$0.20 (720/day) |
-| CloudWatch Logs | ~6 log groups | $0.50/GB ingested | ~$5.00 (verbose logs) |
-| Bedrock Claude 3 Haiku | 1 model | $0.25/million input + $1.25/million output tokens | ~$30.00 (~120M tokens/month) |
-| S3 (frontend hosting) | 1 bucket | $0.023/GB storage + requests | ~$0.50 |
-| CloudFront | 1 distribution | $0.085/GB data transfer | ~$5.00 (low traffic) |
-| **Total (idle)** | | | **~$42.30** |
+```mermaid
+flowchart TD
+    Step1["1. Terminate EC2 Instance<br/>(Automatically deletes attached root EBS volume)"]
+    Step2["2. Delete EBS Snapshots & Unattached Volumes"]
+    Step3["3. Delete CloudWatch Log Groups<br/>(/plant-disease/backend, /plant-disease/frontend)"]
+    Step4["4. Delete CloudWatch Alarm & SNS Topic<br/>(PlantDisease-HighMemoryUtilization)"]
+    Step5["5. Empty and Delete S3 Bucket Artifacts<br/>(mobilenet-distilled-v1/)"]
+    Step6["6. Release Elastic IP Address (if assigned)"]
+    
+    Step1 --> Step2 --> Step3 --> Step4 --> Step5 --> Step6
+```
 
-The two largest cost drivers:
+#### Step-by-Step Deletion Commands:
 
-1. **Amazon Bedrock** accounts for ~70%. Ways to reduce it: cache identical prompt results in DynamoDB for 24h, switch to amazon.nova-lite-v1:0 (cheaper, no Anthropic approval needed), or batch insight generation per project/day instead of per scan.
-2. **CloudWatch Logs** accounts for ~12%. Ways to reduce it: set retention from "Never expire" down to 7 days via retention_in_days: 7 in the SAM template, or only log at INFO level on hot paths.
+```bash
+# 1. Terminate the EC2 instance
+aws ec2 terminate-instances \
+  --instance-ids "$INSTANCE_ID" \
+  --region ap-southeast-2
+
+# 2. Delete CloudWatch Log Groups
+aws logs delete-log-group \
+  --log-group-name /plant-disease/backend \
+  --region ap-southeast-2
+
+aws logs delete-log-group \
+  --log-group-name /plant-disease/frontend \
+  --region ap-southeast-2
+
+# 3. Delete CloudWatch Alarm
+aws cloudwatch delete-alarms \
+  --alarm-names "PlantDisease-HighMemoryUtilization" \
+  --region ap-southeast-2
+
+# 4. Delete SNS Topic
+aws sns delete-topic \
+  --topic-arn "$SNS_TOPIC_ARN" \
+  --region ap-southeast-2
+
+# 5. Empty and delete S3 Bucket
+aws s3 rm "s3://$MODEL_BUCKET" --recursive
+aws s3api delete-bucket --bucket "$MODEL_BUCKET" --region ap-southeast-2
+
+# 6. Release Elastic IP (if allocated)
+aws ec2 release-address --allocation-id "$EIP_ALLOC_ID" --region ap-southeast-2
+```
 
 ---
 
-## 6. Safety Checklist Before Deleting
+### References & Documentation
 
-Before running `sam delete`, check the following items to avoid leaving orphan resources that keep incurring cost:
+The architectural designs, performance benchmarks, and implementation decisions in this workshop adhere to the following technical references:
 
-* **Back up production data (if any):** Export the DynamoDB tables to Amazon S3 using `aws dynamodb export-table-to-point-in-time`. By default the workshop doesn't use production data, but it's still worth verifying before deleting.
-* **Disable the EventBridge Rule (if not deleting the stack right away):** If you only want to pause the periodic scan, use `aws events disable-rule --name ai-advisor-schedule`.
-* **Check for active API activity:** Monitor CloudWatch Logs over the past hour to make sure no scan is currently in progress, to avoid leaving incomplete data in DynamoDB when the stack is deleted.
-* **Back up the Cognito user list:** Every user in the User Pool will be deleted along with the stack. If you might need to restore them later, export the list with `aws cognito-idp list-users --user-pool-id <UserPoolId> > users.json`.
-* **Disable the API Gateway Usage Plan:** Do this if you want to stop tracking throttling limits and API usage statistics.
-* **Delete S3 Deployment Artifacts:** Clean up the bucket created by AWS SAM to store deployment artifacts (e.g. `aws-sam-cli-managed-default-samclisourcebucket-...`).
-* **Revoke the Customer IAM Role:** If you configured an IAM Role on customer AWS accounts for AI AWS Advisor to `AssumeRole`, revoke or delete these roles once they're no longer needed.
-
-Once you've completed the steps above and confirmed `sam delete` ran successfully, every resource deployed by AI AWS Advisor will be cleaned up, and AWS costs will return to baseline.
-
-## Section Summary
-
-Cleanup is centered around `sam delete` and completes in under 60 seconds. The total idle cost of ~$42.30/month is dominated by Bedrock inference; log retention and prompt-result caching are the two biggest levers for further reducing it. Walking through the 7-point checklist ensures no orphan resources survive teardown.
+1. **[1] Project Repository & Release Artifacts:** [starkkk1/plant-disease-detection](https://github.com/starkkk1/plant-disease-detection) — Complete training notebooks, model export scripts, and Next.js / FastAPI source code.
+2. **[2] AWS EC2 Stop and Start Lifecycle:** [AWS Documentation on Instance Lifecycle](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html) — Details on state preservation, ephemeral storage behavior, and public IP reassignments.
+3. **[3] Amazon S3 HeadObject and Least-Privilege IAM:** [S3 Security Best Practices](https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html) — Policy scoping for model weight downloads and bucket isolation.
+4. **[4] Amazon CloudWatch Agent Installation:** [CloudWatch Agent User Guide](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html) — Custom metrics collection for host RAM and disk percent.
+5. **[5] Amazon CloudWatch Alarm Actions & Amazon SNS:** [Using Amazon CloudWatch Alarms](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html) — Configuring high-priority notification triggers for operations teams.
