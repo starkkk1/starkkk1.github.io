@@ -1,115 +1,173 @@
 ---
 title: "Proposal"
-date: 2024-01-01
+date: 2026-10-16
 weight: 2
 chapter: false
 pre: " <b> 2. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your report, including this warning.
-{{% /notice %}}
 
-In this section, you need to summarize the contents of the workshop that you **plan** to conduct.
+# AWS Plant Disease Detection Project Proposal
 
-# IoT Weather Platform for Lab Research
-## A Unified AWS Serverless Solution for Real-Time Weather Monitoring
+## Twelve week implementation and validation plan
 
-### 1. Executive Summary
-The IoT Weather Platform is designed for the ITea Lab team in Ho Chi Minh City to enhance weather data collection and analysis. It supports up to 5 weather stations, with potential scalability to 10-15, utilizing Raspberry Pi edge devices with ESP32 sensors to transmit data via MQTT. The platform leverages AWS Serverless services to deliver real-time monitoring, predictive analytics, and cost efficiency, with access restricted to 5 lab members via Amazon Cognito.
+16 October 2026  |  Sydney  |  ap-southeast-2
 
-### 2. Problem Statement
-### What’s the Problem?
-Current weather stations require manual data collection, becoming unmanageable with multiple units. There is no centralized system for real-time data or analytics, and third-party platforms are costly and overly complex.
+We propose a twelve-week implementation and validation program for a containerized tomato leaf classification application on EC2, S3 and CloudWatch. The plan starts from the existing prototype and closes deployment, evidence and operational gaps.
 
-### The Solution
-The platform uses AWS IoT Core to ingest MQTT data, AWS Lambda and API Gateway for processing, Amazon S3 for storage (including a data lake), and AWS Glue Crawlers and ETL jobs to extract, transform, and load data from the S3 data lake to another S3 bucket for analysis. AWS Amplify with Next.js provides the web interface, and Amazon Cognito ensures secure access. Similar to Thingsboard and CoreIoT, users can register new devices and manage connections, though this platform operates on a smaller scale and is designed for private use. Key features include real-time dashboards, trend analysis, and low operational costs.
 
-### Benefits and Return on Investment
-The solution establishes a foundational resource for lab members to develop a larger IoT platform, serving as a study resource, and provides a data foundation for AI enthusiasts for model training or analysis. It reduces manual reporting for each station via a centralized platform, simplifying management and maintenance, and improves data reliability. Monthly costs are $0.66 USD per the AWS Pricing Calculator, with a 12-month total of $7.92 USD. All IoT equipment costs are covered by the existing weather station setup, eliminating additional development expenses. The break-even period of 6-12 months is achieved through significant time savings from reduced manual work.
+### 1 Executive summary
 
-### 3. Solution Architecture
-The platform employs a serverless AWS architecture to manage data from 5 Raspberry Pi-based stations, scalable to 15. Data is ingested via AWS IoT Core, stored in an S3 data lake, and processed by AWS Glue Crawlers and ETL jobs to transform and load it into another S3 bucket for analysis. Lambda and API Gateway handle additional processing, while Amplify with Next.js hosts the dashboard, secured by Cognito. The architecture is detailed below:
+The project will deliver a reproducible AWS demonstration with a responsive frontend, CPU inference API, privately stored model artifacts and one operational RAM alarm. GitHub Actions will publish images; a controlled manual procedure will deploy and roll back compatible image and model versions. This scope fits a backend and MLOps learning project without requiring serverless or microservices claims.
 
-![IoT Weather Station Architecture](/images/2-Proposal/edge_architecture.jpeg)
+The planning scenario uses 240 EC2 hours over twelve weeks and a gross budget of USD 67.20 including a 20 percent contingency. The account screenshot showed USD 100 available; an additional USD 100 is not assumed to be earned. Actual credit eligibility, expiry, regional prices and tax must be checked before spending. The estimate is a planning allowance, not an AWS quotation. [6–12]
 
-![IoT Weather Platform Architecture](/images/2-Proposal/platform_architecture.jpeg)
 
-### AWS Services Used
-- **AWS IoT Core**: Ingests MQTT data from 5 stations, scalable to 15.
-- **AWS Lambda**: Processes data and triggers Glue jobs (two functions).
-- **Amazon API Gateway**: Facilitates web app communication.
-- **Amazon S3**: Stores raw data in a data lake and processed outputs (two buckets).
-- **AWS Glue**: Crawlers catalog data, and ETL jobs transform and load it.
-- **AWS Amplify**: Hosts the Next.js web interface.
-- **Amazon Cognito**: Secures access for lab users.
+### 2 Problem statement
 
-### Component Design
-- **Edge Devices**: Raspberry Pi collects and filters sensor data, sending it to IoT Core.
-- **Data Ingestion**: AWS IoT Core receives MQTT messages from the edge devices.
-- **Data Storage**: Raw data is stored in an S3 data lake; processed data is stored in another S3 bucket.
-- **Data Processing**: AWS Glue Crawlers catalog the data, and ETL jobs transform it for analysis.
-- **Web Interface**: AWS Amplify hosts a Next.js app for real-time dashboards and analytics.
-- **User Management**: Amazon Cognito manages user access, allowing up to 5 active accounts.
+A locally trained classifier is difficult to reproduce on another host when model weights, class ordering, preprocessing and dependencies are managed separately. LAN-only access limits demonstrations, and an apparently healthy process may still fail prediction because of missing weights, CORS, queue saturation or permission errors. Source-code synchronization alone does not update a running container.
 
-### 4. Technical Implementation
-**Implementation Phases**
-This project has two parts—setting up weather edge stations and building the weather platform—each following 4 phases:
-- Build Theory and Draw Architecture: Research Raspberry Pi setup with ESP32 sensors and design the AWS serverless architecture (1 month pre-internship)
-- Calculate Price and Check Practicality: Use AWS Pricing Calculator to estimate costs and adjust if needed (Month 1).
-- Fix Architecture for Cost or Solution Fit: Tweak the design (e.g., optimize Lambda with Next.js) to stay cost-effective and usable (Month 2).
-- Develop, Test, and Deploy: Code the Raspberry Pi setup, AWS services with CDK/SDK, and Next.js app, then test and release to production (Months 2-3).
+The project therefore needs a versioned release identity, least-privilege access to artifacts, evidence of real inference on AWS, actionable host monitoring and a documented recovery process. The current prototype supplies working components, but it does not yet establish high availability, field accuracy or automated production deployment.
 
-**Technical Requirements**
-- Weather Edge Station: Sensors (temperature, humidity, rainfall, wind speed), a microcontroller (ESP32), and a Raspberry Pi as the edge device. Raspberry Pi runs Raspbian, handles Docker for filtering, and sends 1 MB/day per station via MQTT over Wi-Fi.
-- Weather Platform: Practical knowledge of AWS Amplify (hosting Next.js), Lambda (minimal use due to Next.js), AWS Glue (ETL), S3 (two buckets), IoT Core (gateway and rules), and Cognito (5 users). Use AWS CDK/SDK to code interactions (e.g., IoT Core rules to S3). Next.js reduces Lambda workload for the fullstack web app.
 
-### 5. Timeline & Milestones
-**Project Timeline**
-- Pre-Internship (Month 0): 1 month for planning and old station review.
-- Internship (Months 1-3): 3 months.
-    - Month 1: Study AWS and upgrade hardware.
-    - Month 2: Design and adjust architecture.
-    - Month 3: Implement, test, and launch.
-- Post-Launch: Up to 1 year for research.
+### 3 Solution architecture
 
-### 6. Budget Estimation
-You can find the budget estimation on the [AWS Pricing Calculator](https://calculator.aws/#/estimate?id=621f38b12a1ef026842ba2ddfe46ff936ed4ab01).  
-Or you can download the [Budget Estimation File](../attachments/budget_estimation.pdf).
 
-### Infrastructure Costs
-- AWS Services:
-    - AWS Lambda: $0.00/month (1,000 requests, 512 MB storage).
-    - S3 Standard: $0.15/month (6 GB, 2,100 requests, 1 GB scanned).
-    - Data Transfer: $0.02/month (1 GB inbound, 1 GB outbound).
-    - AWS Amplify: $0.35/month (256 MB, 500 ms requests).
-    - Amazon API Gateway: $0.01/month (2,000 requests).
-    - AWS Glue ETL Jobs: $0.02/month (2 DPUs).
-    - AWS Glue Crawlers: $0.07/month (1 crawler).
-    - MQTT (IoT Core): $0.08/month (5 devices, 45,000 messages).
+#### AWS services used
 
-Total: $0.7/month, $8.40/12 months
+| Service | Role | Design choice |
+| --- | --- | --- |
+| Amazon EC2 | Run frontend and API containers | One x86_64 host in Sydney |
+| Amazon S3 | Store checkpoint and class map | Private versioned artifacts |
+| Amazon CloudWatch | Logs metrics dashboard and RAM alarm | 60 second Agent metrics; 7 day logs |
+| IAM and VPC | Identity and network controls | Instance role and source IP rules |
+| Amazon SNS | Deliver alarm email | One confirmed email subscription |
 
-- Hardware: $265 one-time (Raspberry Pi 5 and sensors).
 
-### 7. Risk Assessment
-#### Risk Matrix
-- Network Outages: Medium impact, medium probability.
-- Sensor Failures: High impact, low probability.
-- Cost Overruns: Medium impact, low probability.
+#### Component design
 
-#### Mitigation Strategies
-- Network: Local storage on Raspberry Pi with Docker.
-- Sensors: Regular checks and spares.
-- Cost: AWS budget alerts and optimization.
+The browser reaches Next.js on port 3000 and FastAPI on port 8000 at the same EC2 hostname. FastAPI loads a MobileNet checkpoint once per process and validates the supplied class map. Prediction and Grad-CAM++ share a bounded execution slot. S3 is accessed at deployment time; uploaded user images do not need to be persisted in S3 for the current use case.
 
-#### Contingency Plans
-- Revert to manual methods if AWS fails.
-- Use CloudFormation for cost-related rollbacks.
+```text
+GitHub Actions -> GHCR -> manual deployment to EC2
+Private S3 artifacts -> host version directory -> read-only API mount
+Browser -> Next.js frontend and FastAPI API
+Container logs + Agent metrics -> CloudWatch -> RAM alarm -> SNS
+```
 
-### 8. Expected Outcomes
-#### Technical Improvements: 
-Real-time data and analytics replace manual processes.  
-Scalable to 10-15 stations.
-#### Long-term Value
-1-year data foundation for AI research.  
-Reusable for future projects.
+The architecture deliberately uses a public subnet with restricted inbound access for the demonstration. S3 VPC endpoints, on-premises connectivity, DNS simulation, load balancing and autoscaling are outside the baseline. A private-network extension can be evaluated later without being reported as an implemented feature.
+
+
+### 4 Technical implementation
+
+Build the frontend with its existing multi-stage Dockerfile and standalone Next.js output. Build the API with Dockerfile.deploy so the checkpoint remains outside the image. CI gates include Python tests, frontend build, backend build and frontend container smoke tests. Publish both images with full commit tags and record digests; tests using fixture weights remain distinct from real-model acceptance tests.
+
+Create the EC2 instance profile with scoped GetObject permission and CloudWatch delivery permissions. Download model artifacts from mobilenet-distilled-v1 and compare SHA256 values before mounting them read-only. Bind the API and frontend ports, configure CORS_ORIGINS with the exact page origin and use restart unless-stopped. Recreate containers when changing image or environment settings.
+
+Validate readiness, real-image prediction, response schema and model identity. Then validate browser upload and Grad-CAM++ on desktop and phone. Measure API latency under a declared request count and concurrency instead of interpreting a single request as p95. Evaluate macro F1 and per-class recall only when an independent labeled dataset is available; do not promise a diagnostic accuracy without that evaluation.
+
+Use CloudWatch Logs for both containers and Agent metrics for RAM and disk. Retain logs for seven days and configure one RAM alarm at Average greater than 85 percent for three one-minute datapoints. Confirm SNS delivery with a controlled threshold test, then restore 85. Record rollback and EC2 stop/start rehearsals, including public IP and CORS updates.
+
+
+### 5 Timelines and milestones
+
+Each week receives 20 planned working hours, totaling 240 hours. This is a proposed twelve-week schedule, not a reconstruction of dates already worked. EC2 runtime is separately capped at a planning total of 240 hours; it need not match every working hour.
+
+| Week | Work package | Milestone evidence |
+| --- | --- | --- |
+| 1 20 h | Scope and acceptance criteria | Architecture scope agreed |
+| 2 20 h | Audit model preprocessing and labels | Artifact manifest and hashes |
+| 3 20 h | Harden API validation and errors | API contract and tests |
+| 4 20 h | Validate frontend and explanations | Browser workflow verified locally |
+| 5 20 h | Package production containers | Two images pass smoke tests |
+| 6 20 h | Complete CI and GHCR delivery | Published release digests |
+| 7 20 h | Prepare AWS IAM network and budget | EC2 role and restricted connectivity |
+| 8 20 h | Store and retrieve S3 artifacts | Download hashes match |
+| 9 20 h | Deploy EC2 and test real inference | Desktop and phone acceptance |
+| 10 20 h | Configure CloudWatch and RAM alarm | Metrics logs and email test |
+| 11 20 h | Rehearse rollback and measure latency | Recovery and performance evidence |
+| 12 20 h | Finalize report demo and cleanup | Handover and cost review |
+
+
+### 6 Budget estimation
+
+Budget in USD before tax, credits and discounts, for Sydney. Assume one c7i-flex.large or another approved x86_64 instance only after checking availability and price. The existing instance type has not been verified. The EC2 allowance of USD 0.12 per hour and gp3 allowance of USD 0.12 per GiB-month are deliberately rounded planning inputs, not claimed Sydney list prices. Recalculate if the selected type exceeds the allowance. Public IPv4 uses the published USD 0.005 per hour rate. [6–8]
+
+| Item | Basis | USD |
+| --- | --- | --- |
+| EC2 | 240 h × $0.12 | $28.80 |
+| Public IPv4 | 240 h × $0.005 | $1.20 |
+| EBS gp3 | 30 GiB × 3 months × $0.12 | $10.80 |
+| CloudWatch metrics dashboard alarm | $3/month allowance × 3 | $9.00 |
+| CloudWatch Logs and queries | $1/month allowance × 3 | $3.00 |
+| S3 storage versions requests | Project allowance | $1.00 |
+| SNS email | Project allowance | $0.20 |
+| Data transfer | Low-traffic allowance | $2.00 |
+| Subtotal |  | $56.00 |
+| Contingency | 20% × $56.00 | $11.20 |
+| Total |  | $67.20 |
+
+The twelve weeks span 84 days; storage and fixed monitoring allowances are rounded up to three months. CloudWatch and S3 amounts are spending envelopes, not exact unit-rate calculations, and do not rely on Free Tier exemptions. The transfer allowance is suitable only for a small demonstration. Taxes, domain purchase, load balancers, NAT Gateway, GPUs, model training and extra VPC endpoints are excluded. [7–10]
+
+At the same assumptions, leaving EC2 and its public IPv4 running for all 2,016 hours of twelve weeks raises the subtotal to USD 278.00 and the total with contingency to USD 333.60. Scheduled manual stops are therefore essential for this credit-limited plan. EBS and retained monitoring resources still cost money while the instance is stopped. [2,6–9]
+
+Use only the verified USD 100 credit balance until additional credit is actually granted. The planned gross estimate leaves USD 32.80 headroom before actual pricing differences and tax. Configure a monthly budget alert and review actual gross usage weekly with credits excluded from the view. Budget notifications are not an immediate hard spending cap. [11–12]
+
+
+### 7 Risk assessment
+
+| Risk | Likelihood and impact | Mitigation and owner |
+| --- | --- | --- |
+| Credit depletion | Medium / High | Operator stops EC2 and reviews gross costs weekly |
+| Instance capacity or plan restriction | Medium / Medium | Operator checks eligible x86_64 type and revises budget |
+| Incorrect model or class order | Medium / High | ML developer verifies hashes map and preprocessing |
+| CORS or public IP change | High / Medium | Backend operator recreates container with correct origin |
+| Access or credential exposure | Medium / High | Operator uses instance role private S3 and restricted SSH |
+| Host outage or saturation | Medium / High | Backend operator measures queue load and rehearses recovery |
+| Alarm email not delivered | Medium / Medium | Operator confirms SNS and performs threshold test |
+| Field data differs from training | High / High | ML developer collects labeled samples and limits claims |
+
+The initial demonstrator accepts single-host downtime and HTTP access restricted to approved client IPs. Public production use requires a separate security and availability review, including HTTPS and authentication. The RAM alarm is intentionally the only operational alarm in this scope and does not cover service availability or ML quality.
+
+
+### 8 Expected outcomes
+
+| Outcome | Acceptance evidence |
+| --- | --- |
+| Reproducible release | Two image digests plus checkpoint map hashes and config |
+| Working AWS application | Health and prediction succeed; browser prediction and explanation verified |
+| Secure artifact retrieval | Private S3 GetObject by instance role with matching hashes |
+| Operational visibility | Logs host dashboard one RAM alarm and a received SNS email |
+| Documented recovery | Rollback and EC2 stop/start rehearsal with observed timings |
+| Measured performance | Latency report states image hardware concurrency samples and p95 |
+| Controlled cost | Weekly gross-cost log and final cleanup evidence |
+
+Success means a demonstrable and documented deployment within the approved spending envelope. It does not mean a proven agricultural diagnosis service, a zero-downtime platform or a completed twelve-week historical project. Accuracy and recovery objectives will be reported only after measurement.
+
+
+### References
+
+AWS documentation and pricing references accessed on 16 October 2026. Usage allowances in the proposal are planning assumptions, not a regional price quotation.
+
+[1] Project repository and release history
+
+[2] EC2 stop and start behavior
+
+[3] S3 HeadObject permissions and error responses
+
+[4] CloudWatch Agent installation
+
+[5] CloudWatch alarm actions
+
+[6] EC2 On Demand pricing
+
+[7] EBS pricing
+
+[8] Public IPv4 pricing
+
+[9] CloudWatch pricing
+
+[10] S3 pricing
+
+[11] AWS credits
+
+[12] AWS Budgets

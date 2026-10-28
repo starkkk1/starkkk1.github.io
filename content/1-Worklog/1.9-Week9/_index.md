@@ -1,57 +1,31 @@
 ---
 title: "Week 9 Worklog"
-date: 2024-01-01
-weight: 1
+date: 2026-10-16
+weight: 9
 chapter: false
 pre: " <b> 1.9. </b> "
 ---
-{{% notice warning %}} 
-⚠️ **Note:** The following information is for reference purposes only. Please **do not copy verbatim** for your own report, including this warning.
-{{% /notice %}}
 
+# Week 09 Worklog - Amazon CloudWatch Logs
 
-### Week 9 Objectives:
+**Project:** Tomato leaf disease detection on AWS  
+**Period:** Week 09 working days 1 to 5
 
-* Connect and get acquainted with members of First Cloud AI Journey.
-* Understand basic AWS services, how to use the console & CLI.
+### Week Objectives:
+- Collect operational logs from the EC2 workload.
+- Organize log groups and review retention settings.
+- Troubleshoot access to cloud logs.
 
 ### Tasks to be carried out this week:
-| Day | Task                                                                                                                                                                                                   | Start Date | Completion Date | Reference Material                        |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | --------------- | ----------------------------------------- |
-| 2   | - Get acquainted with FCAJ members <br> - Read and take note of internship unit rules and regulations                                                                                                   | 08/11/2025 | 08/11/2025      |
-| 3   | - Learn about AWS and its types of services <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                              | 08/12/2025 | 08/12/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Create AWS Free Tier account <br> - Learn about AWS Console & AWS CLI <br> - **Practice:** <br>&emsp; + Create AWS account <br>&emsp; + Install & configure AWS CLI <br> &emsp; + How to use AWS CLI | 08/13/2025 | 08/13/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Learn basic EC2: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - SSH connection methods to EC2 <br> - Learn about Elastic IP   <br>                            | 08/14/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Practice:** <br>&emsp; + Launch an EC2 instance <br>&emsp; + Connect via SSH <br>&emsp; + Attach an EBS volume                                                                                     | 08/15/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| Day | Task | Start Date | Completion Date | Reference Material |
+| --- | --- | --- | --- | --- |
+| 1 | Review CloudWatch log groups, log streams and log events. Identify which model initialization and inference events are useful for troubleshooting. | W09 D1 | W09 D1 | CloudWatch Logs guide |
+| 2 | Configure the workload to send operational output to CloudWatch Logs. Use identifiable log groups and streams for the project environment. | W09 D2 | W09 D2 | CloudWatch Logs guide |
+| 3 | Review log delivery permissions on the EC2 role. Distinguish successful log ingestion from permission to search or read the stored events. | W09 D3 | W09 D3 | AWS IAM best practices |
+| 4 | Inspect initialization messages and sample inference logs. Use time ranges and filters to locate failures without exposing credentials or private images. | W09 D4 | W09 D4 | CloudWatch Logs guide |
+| 5 | Review the seven-day retention target and log storage costs. Document the scoped logs:FilterLogEvents permission required for command-line log searches. | W09 D5 | W09 D5 | CloudWatch Logs guide |
 
-
-### Week 9 Achievements:
-
-* Understood what AWS is and mastered the basic service groups: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Successfully created and configured an AWS Free Tier account.
-
-* Became familiar with the AWS Management Console and learned how to find, access, and use services via the web interface.
-
-* Installed and configured AWS CLI on the computer, including:
-  * Access Key
-  * Secret Key
-  * Default Region
-  * ...
-
-* Used AWS CLI to perform basic operations such as:
-
-  * Check account & configuration information
-  * Retrieve the list of regions
-  * View EC2 service
-  * Create and manage key pairs
-  * Check information about running services
-  * ...
-
-* Acquired the ability to connect between the web interface and CLI to manage AWS resources in parallel.
-* ...
+### Achievements:
+- Organized operational logs in CloudWatch for the EC2 workload.
+- Prepared a repeatable approach to searching cloud log events.
+- Reviewed log retention and the permissions required to read logs.

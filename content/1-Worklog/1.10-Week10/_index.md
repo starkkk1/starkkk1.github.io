@@ -1,57 +1,31 @@
 ---
 title: "Week 10 Worklog"
-date: 2024-01-01
-weight: 2
+date: 2026-10-16
+weight: 10
 chapter: false
 pre: " <b> 1.10. </b> "
 ---
-{{% notice warning %}} 
-⚠️ **Note:** The following information is for reference purposes only. Please **do not copy verbatim** for your own report, including this warning.
-{{% /notice %}}
 
+# Week 10 Worklog - CloudWatch Metrics and RAM Alerting
 
-### Week 10 Objectives:
+**Project:** Tomato leaf disease detection on AWS  
+**Period:** Week 10 working days 1 to 5
 
-* Connect and get acquainted with members of First Cloud AI Journey.
-* Understand basic AWS services, how to use the console & CLI.
+### Week Objectives:
+- Collect memory and disk metrics from the EC2 host.
+- Build a focused resource monitoring view.
+- Configure one RAM alarm with an SNS notification action.
 
 ### Tasks to be carried out this week:
-| Day | Task                                                                                                                                                                                                   | Start Date | Completion Date | Reference Material                        |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | --------------- | ----------------------------------------- |
-| 2   | - Get acquainted with FCAJ members <br> - Read and take note of internship unit rules and regulations                                                                                                   | 08/11/2025 | 08/11/2025      |
-| 3   | - Learn about AWS and its types of services <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                              | 08/12/2025 | 08/12/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Create AWS Free Tier account <br> - Learn about AWS Console & AWS CLI <br> - **Practice:** <br>&emsp; + Create AWS account <br>&emsp; + Install & configure AWS CLI <br> &emsp; + How to use AWS CLI | 08/13/2025 | 08/13/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Learn basic EC2: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - SSH connection methods to EC2 <br> - Learn about Elastic IP   <br>                            | 08/14/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Practice:** <br>&emsp; + Launch an EC2 instance <br>&emsp; + Connect via SSH <br>&emsp; + Attach an EBS volume                                                                                     | 08/15/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| Day | Task | Start Date | Completion Date | Reference Material |
+| --- | --- | --- | --- | --- |
+| 1 | Review the difference between standard EC2 metrics and host metrics collected by the CloudWatch agent. Identify RAM and disk usage requirements. | W10 D1 | W10 D1 | CloudWatch agent guide |
+| 2 | Install and configure the CloudWatch agent on EC2. Publish host memory and disk metrics under the PlantDisease/Host namespace. | W10 D2 | W10 D2 | CloudWatch agent guide |
+| 3 | Inspect CPU, memory and disk graphs for the correct instance. Review metric dimensions, statistics and collection periods before building the dashboard. | W10 D3 | W10 D3 | CloudWatch agent guide |
+| 4 | Configure one RAM alarm: Average memory usage above 85 percent for three consecutive one-minute periods. Review how missing data affects its state. | W10 D4 | W10 D4 | CloudWatch alarms guide |
+| 5 | Prepare the SNS email notification action and subscription workflow. Review a controlled threshold test procedure and restoration to the operational threshold. | W10 D5 | W10 D5 | CloudWatch alarms guide |
 
-
-### Week 10 Achievements:
-
-* Understood what AWS is and mastered the basic service groups: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Successfully created and configured an AWS Free Tier account.
-
-* Became familiar with the AWS Management Console and learned how to find, access, and use services via the web interface.
-
-* Installed and configured AWS CLI on the computer, including:
-  * Access Key
-  * Secret Key
-  * Default Region
-  * ...
-
-* Used AWS CLI to perform basic operations such as:
-
-  * Check account & configuration information
-  * Retrieve the list of regions
-  * View EC2 service
-  * Create and manage key pairs
-  * Check information about running services
-  * ...
-
-* Acquired the ability to connect between the web interface and CLI to manage AWS resources in parallel.
-* ...
+### Achievements:
+- Prepared a CloudWatch monitoring view for EC2 host resources.
+- Defined one RAM alarm with an explicit threshold and evaluation window.
+- Documented the notification setup and controlled alarm test procedure.

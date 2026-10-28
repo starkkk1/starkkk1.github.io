@@ -1,59 +1,31 @@
 ---
-title: "Worklog Tuần 4"
-date: 2024-01-01
-weight: 1
+title: "Nhật ký công việc tuần 4"
+date: 2026-10-16
+weight: 4
 chapter: false
 pre: " <b> 1.4. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
 
+# Nhật ký công việc tuần 04 - Quản lý danh tính và quyền truy cập AWS (IAM)
 
-### Mục tiêu tuần 4:
+**Dự án:** Nhận diện bệnh lá cà chua trên AWS  
+**Giai đoạn:** Tuần 04 ngày làm việc 1 đến 5
 
-* Kết nối, làm quen với các thành viên trong First Cloud AI Journey.
-* Hiểu dịch vụ AWS cơ bản, cách dùng console & CLI.
+### Mục tiêu tuần:
+- Nắm rõ người dùng, vai trò (role), chính sách (policy) và thông tin xác thực tạm thời.
+- Chuẩn bị quyền truy cập từ EC2 đến artifacts mô hình mà không cần nhúng access key.
+- Áp dụng nguyên tắc đặc quyền tối thiểu (least privilege) cho quyền lưu trữ và giám sát.
 
-### Các công việc cần triển khai trong tuần này:
-| Thứ | Công việc                                                                                                                                                                                   | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu                            |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------- | ----------------------------------------- |
-| 2   | - Làm quen với các thành viên FCAJ <br> - Đọc và lưu ý các nội quy, quy định tại đơn vị thực tập                                                                                             | 11/08/2025   | 11/08/2025      |
-| 3   | - Tìm hiểu AWS và các loại dịch vụ <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                            | 12/08/2025   | 12/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Tạo AWS Free Tier account <br> - Tìm hiểu AWS Console & AWS CLI <br> - **Thực hành:** <br>&emsp; + Tạo AWS account <br>&emsp; + Cài AWS CLI & cấu hình <br> &emsp; + Cách sử dụng AWS CLI | 13/08/2025   | 13/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Tìm hiểu EC2 cơ bản: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - Các cách remote SSH vào EC2 <br> - Tìm hiểu Elastic IP   <br>                  | 14/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Thực hành:** <br>&emsp; + Tạo EC2 instance <br>&emsp; + Kết nối SSH <br>&emsp; + Gắn EBS volume                                                                                         | 15/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
+### Công việc thực hiện trong tuần:
+| Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| --- | --- | --- | --- | --- |
+| 1 | Rà soát các danh tính IAM, policy actions và ARN tài nguyên. Phân tách quyền của người vận hành với quyền của workload EC2. | Tuần 04 Ngày 1 | Tuần 04 Ngày 1 | Thực hành tốt nhất cho AWS IAM |
+| 2 | Rà soát bảo vệ tài khoản root và xác thực đa yếu tố (MFA). Xác định quy trình truy cập hàng ngày tránh sử dụng root credentials cho các thao tác dự án. | Tuần 04 Ngày 2 | Tuần 04 Ngày 2 | Thực hành tốt nhất cho AWS IAM |
+| 3 | Chuẩn bị service role và instance profile cho EC2. Rà soát trust policy cho phép EC2 nhận temporary credentials từ AWS. | Tuần 04 Ngày 3 | Tuần 04 Ngày 3 | Thực hành tốt nhất cho AWS IAM |
+| 4 | Giới hạn quyền đọc S3 đúng prefix chứa artifacts mô hình cần thiết. Tách quyền upload artifacts khỏi quyền tải về trên EC2. | Tuần 04 Ngày 4 | Tuần 04 Ngày 4 | Thực hành tốt nhất cho AWS IAM |
+| 5 | Rà soát quyền CloudWatch để xuất metrics, gửi log và đọc log. Ghi nhận lý do logs:FilterLogEvents tách biệt với quyền gửi log thông thường. | Tuần 04 Ngày 5 | Tuần 04 Ngày 5 | Hướng dẫn CloudWatch Logs |
 
-
-### Kết quả đạt được tuần 4:
-
-* Hiểu AWS là gì và nắm được các nhóm dịch vụ cơ bản: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Đã tạo và cấu hình AWS Free Tier account thành công.
-
-* Làm quen với AWS Management Console và biết cách tìm, truy cập, sử dụng dịch vụ từ giao diện web.
-
-* Cài đặt và cấu hình AWS CLI trên máy tính bao gồm:
-  * Access Key
-  * Secret Key
-  * Region mặc định
-  * ...
-
-* Sử dụng AWS CLI để thực hiện các thao tác cơ bản như:
-
-  * Kiểm tra thông tin tài khoản & cấu hình
-  * Lấy danh sách region
-  * Xem dịch vụ EC2
-  * Tạo và quản lý key pair
-  * Kiểm tra thông tin dịch vụ đang chạy
-  * ...
-
-* Có khả năng kết nối giữa giao diện web và CLI để quản lý tài nguyên AWS song song.
-* ...
-
-
+### Kết quả đạt được:
+- Chuẩn bị thiết kế IAM role cho phép EC2 truy cập an toàn vào tài nguyên AWS.
+- Xác định quyền truy cập artifacts S3 giới hạn và quyền giám sát phù hợp.
+- Làm rõ sự khác biệt giữa thông tin xác thực của workload và quyền của người vận hành.

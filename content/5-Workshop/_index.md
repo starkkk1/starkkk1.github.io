@@ -1,31 +1,38 @@
 ---
 title: "Workshop"
-date: 2024-01-01
+date: 2026-07-07
 weight: 5
 chapter: false
 pre: " <b> 5. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your report, including this warning.
-{{% /notice %}}
 
-# Secure Hybrid Access to S3 using VPC Endpoints
+# AI AWS Advisor (Enterprise SaaS)
 
 #### Overview
 
-**AWS PrivateLink** provides private connectivity to AWS services from VPCs and your on-premises networks, without exposing your traffic to the Public Internet.
+**AI AWS Advisor** is an enterprise-grade B2B SaaS (Software as a Service) platform that applies next-generation AI (**Amazon Bedrock - Claude 3 Haiku**) to automatically scan, analyze, and generate optimization recommendations for a customer's AWS infrastructure.
 
-In this lab, you will learn how to create, configure, and test VPC endpoints that enable your workloads to reach AWS services without traversing the Public Internet.
+The system addresses 3 core CloudOps challenges:
+1. **Security:** Detecting security vulnerabilities such as public S3 Buckets and over-privileged IAM Roles.
+2. **Cost Optimization:** Detecting wasted resources (idle EC2 instances, unattached EBS Volumes, unused Elastic IPs) and calculating monthly savings.
+3. **Performance & Reliability:** Recommending architectural improvements (e.g. configuring Provisioned Concurrency for AWS Lambda to avoid cold starts).
 
-You will create two types of endpoints to access Amazon S3: a Gateway VPC endpoint, and an Interface VPC endpoint. These two types of VPC endpoints offer different benefits depending on if you are accessing Amazon S3 from the cloud or your on-premises location
-+ **Gateway** - Create a gateway endpoint to send traffic to Amazon S3 or DynamoDB using private IP addresses.You route traffic from your VPC to the gateway endpoint using route tables.
-+ **Interface** - Create an interface endpoint to send traffic to endpoint services that use a Network Load Balancer to distribute traffic. Traffic destined for the endpoint service is resolved using DNS.
+---
 
-#### Content
+#### Technical Highlights
 
-1. [Workshop overview](5.1-Workshop-overview)
-2. [Prerequiste](5.2-Prerequiste/)
-3. [Access S3 from VPC](5.3-S3-vpc/)
-4. [Access S3 from On-premises](5.4-S3-onprem/)
-5. [VPC Endpoint Policies (Bonus)](5.5-Policy/)
-6. [Clean up](5.6-Cleanup/)
+- **Zero-Trust Security (Cross-Account STS):** Uses `sts:AssumeRole` to generate short-lived temporary credentials, never storing the customer's long-lived Access Keys.
+- **100% Serverless Architecture:** Built on AWS Lambda, Amazon API Gateway, and Amazon EventBridge, keeping idle cost at approximately $0.
+- **Multi-Table Design (Amazon DynamoDB):** Four dedicated tables (projects, resources, insights, alerts) sharing a common `project_id` Partition Key for tenant isolation, plus 1 GSI (`resource_type-index`) on `ai-advisor-resources` for cross-project queries.
+- **Generative AI Copilot (Amazon Bedrock):** Integrates Claude 3 Haiku to automatically generate reports and hold live conversations about the infrastructure.
+
+---
+
+#### Report Contents
+
+1. [Workshop Overview](5.1-workshop-overview/)
+2. [Requirements & Environment Setup](5.2-prerequiste/)
+3. [Architecture & Technical Design](5.3-architecture-design/)
+4. [Deployment Strategy & Customer Integration](5.4-deployment-strategy/)
+5. [Testing & Quality Assurance](5.5-quality-assurance/)
+6. [Operations, Cleanup & Architecture Review](5.6-operations-cleanup/)

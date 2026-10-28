@@ -1,59 +1,31 @@
 ---
-title: "Worklog Tuần 2"
-date: 2024-01-01
-weight: 1
+title: "Nhật ký công việc tuần 2"
+date: 2026-10-16
+weight: 2
 chapter: false
 pre: " <b> 1.2. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
 
+# Nhật ký công việc tuần 02 - Huấn luyện mô hình và chuẩn bị artifacts
 
-### Mục tiêu tuần 2:
+**Dự án:** Nhận diện bệnh lá cà chua trên AWS  
+**Giai đoạn:** Tuần 02 ngày làm việc 1 đến 5
 
-* Kết nối, làm quen với các thành viên trong First Cloud AI Journey.
-* Hiểu dịch vụ AWS cơ bản, cách dùng console & CLI.
+### Mục tiêu tuần:
+- Huấn luyện và đánh giá mô hình phân loại lá cà chua gọn nhẹ.
+- Chuẩn bị các file mô hình phù hợp để suy luận bằng CPU trên Amazon EC2.
+- Ghi nhận định danh mô hình mà không dựa vào các khẳng định độ chính xác chưa được chứng minh.
 
-### Các công việc cần triển khai trong tuần này:
-| Thứ | Công việc                                                                                                                                                                                   | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu                            |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------- | ----------------------------------------- |
-| 2   | - Làm quen với các thành viên FCAJ <br> - Đọc và lưu ý các nội quy, quy định tại đơn vị thực tập                                                                                             | 11/08/2025   | 11/08/2025      |
-| 3   | - Tìm hiểu AWS và các loại dịch vụ <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                            | 12/08/2025   | 12/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Tạo AWS Free Tier account <br> - Tìm hiểu AWS Console & AWS CLI <br> - **Thực hành:** <br>&emsp; + Tạo AWS account <br>&emsp; + Cài AWS CLI & cấu hình <br> &emsp; + Cách sử dụng AWS CLI | 13/08/2025   | 13/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Tìm hiểu EC2 cơ bản: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - Các cách remote SSH vào EC2 <br> - Tìm hiểu Elastic IP   <br>                  | 14/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Thực hành:** <br>&emsp; + Tạo EC2 instance <br>&emsp; + Kết nối SSH <br>&emsp; + Gắn EBS volume                                                                                         | 15/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
+### Công việc thực hiện trong tuần:
+| Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| --- | --- | --- | --- | --- |
+| 1 | Rà soát cấu hình MobileNetV3 Small và khởi tạo môi trường huấn luyện. Kiểm tra kích thước đầu ra của mô hình khớp với ánh xạ chỉ số lớp. | Tuần 02 Ngày 1 | Tuần 02 Ngày 1 | Tài liệu tập dữ liệu và mô hình dự án |
+| 2 | Chạy thử nghiệm huấn luyện ban đầu. Rà soát loss huấn luyện và kiểm định để phát hiện lỗi cấu hình và dấu hiệu quá khớp (overfitting). | Tuần 02 Ngày 2 | Tuần 02 Ngày 2 | Tài liệu tập dữ liệu và mô hình dự án |
+| 3 | Rà soát mô hình học sinh (student model) gọn nhẹ và quy trình chưng cất tri thức (knowledge distillation). So sánh các checkpoint ứng viên trên cùng phân vùng kiểm định và tiền xử lý. | Tuần 02 Ngày 3 | Tuần 02 Ngày 3 | Tài liệu tập dữ liệu và mô hình dự án |
+| 4 | Đánh giá checkpoint được chọn trên tập ảnh kiểm thử độc lập. Kiểm tra lỗi theo từng lớp và xác minh suy luận CPU với ánh xạ lớp tương ứng. | Tuần 02 Ngày 4 | Tuần 02 Ngày 4 | Tài liệu tập dữ liệu và mô hình dự án |
+| 5 | Xuất checkpoint đã chọn thành model.pth và ánh xạ nhãn thành class_to_idx.json. Tính mã băm SHA256 cho việc kiểm tra toàn vẹn trên cloud sau này. | Tuần 02 Ngày 5 | Tuần 02 Ngày 5 | Tài liệu tập dữ liệu và mô hình dự án |
 
-
-### Kết quả đạt được tuần 2:
-
-* Hiểu AWS là gì và nắm được các nhóm dịch vụ cơ bản: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Đã tạo và cấu hình AWS Free Tier account thành công.
-
-* Làm quen với AWS Management Console và biết cách tìm, truy cập, sử dụng dịch vụ từ giao diện web.
-
-* Cài đặt và cấu hình AWS CLI trên máy tính bao gồm:
-  * Access Key
-  * Secret Key
-  * Region mặc định
-  * ...
-
-* Sử dụng AWS CLI để thực hiện các thao tác cơ bản như:
-
-  * Kiểm tra thông tin tài khoản & cấu hình
-  * Lấy danh sách region
-  * Xem dịch vụ EC2
-  * Tạo và quản lý key pair
-  * Kiểm tra thông tin dịch vụ đang chạy
-  * ...
-
-* Có khả năng kết nối giữa giao diện web và CLI để quản lý tài nguyên AWS song song.
-* ...
-
-
+### Kết quả đạt được:
+- Chuẩn bị checkpoint mô hình gọn nhẹ và ánh xạ lớp tương thích.
+- Rà soát hành vi mô hình và khả năng suy luận CPU trước khi triển khai lên cloud.
+- Tạo các artifacts có định danh rõ ràng để lưu trữ và truy xuất trên Amazon S3.

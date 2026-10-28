@@ -1,59 +1,31 @@
 ---
-title: "Worklog Tuần 11"
-date: 2024-01-01
-weight: 2
+title: "Nhật ký công việc tuần 11"
+date: 2026-10-16
+weight: 11
 chapter: false
 pre: " <b> 1.11. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
 
+# Nhật ký công việc tuần 11 - Bảo mật truy cập công khai cho ứng dụng EC2
 
-### Mục tiêu tuần 11:
+**Dự án:** Nhận diện bệnh lá cà chua trên AWS  
+**Giai đoạn:** Tuần 11 ngày làm việc 1 đến 5
 
-* Kết nối, làm quen với các thành viên trong First Cloud AI Journey.
-* Hiểu dịch vụ AWS cơ bản, cách dùng console & CLI.
+### Mục tiêu tuần:
+- Kết nối tên miền hiện có tới địa chỉ công khai của EC2.
+- Kích hoạt truy cập HTTPS trong khi vẫn duy trì lớp bảo vệ tên miền.
+- Giảm thiểu các cổng mở không cần thiết thông qua Security Groups.
 
-### Các công việc cần triển khai trong tuần này:
-| Thứ | Công việc                                                                                                                                                                                   | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu                            |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------- | ----------------------------------------- |
-| 2   | - Làm quen với các thành viên FCAJ <br> - Đọc và lưu ý các nội quy, quy định tại đơn vị thực tập                                                                                             | 11/08/2025   | 11/08/2025      |
-| 3   | - Tìm hiểu AWS và các loại dịch vụ <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                            | 12/08/2025   | 12/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Tạo AWS Free Tier account <br> - Tìm hiểu AWS Console & AWS CLI <br> - **Thực hành:** <br>&emsp; + Tạo AWS account <br>&emsp; + Cài AWS CLI & cấu hình <br> &emsp; + Cách sử dụng AWS CLI | 13/08/2025   | 13/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Tìm hiểu EC2 cơ bản: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - Các cách remote SSH vào EC2 <br> - Tìm hiểu Elastic IP   <br>                  | 14/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Thực hành:** <br>&emsp; + Tạo EC2 instance <br>&emsp; + Kết nối SSH <br>&emsp; + Gắn EBS volume                                                                                         | 15/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
+### Công việc thực hiện trong tuần:
+| Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| --- | --- | --- | --- | --- |
+| 1 | Rà soát luồng DNS cho tên miền caycachua.id.vn và xác định nơi quản lý bản ghi. Phân biệt giữa nhà đăng ký tên miền và đơn vị cung cấp DNS có thẩm quyền. | Tuần 11 Ngày 1 | Tuần 11 Ngày 1 | Hướng dẫn SSL và TLS từ iNET |
+| 2 | Trỏ bản ghi A gốc về địa chỉ public IPv4 hiện tại của EC2. Tìm hiểu lý do tại sao DNS có bảo vệ có thể trả về địa chỉ proxy thay vì địa chỉ gốc của máy chủ. | Tuần 11 Ngày 2 | Tuần 11 Ngày 2 | Hướng dẫn SSL và TLS từ iNET |
+| 3 | Rà soát yêu cầu truy cập HTTP và HTTPS trên EC2. Mở cổng 80 và 443 trong khi vẫn giới hạn cổng SSH cho địa chỉ IP của người vận hành. | Tuần 11 Ngày 3 | Tuần 11 Ngày 3 | Hướng dẫn bắt đầu với Amazon EC2 |
+| 4 | Rà soát chứng chỉ tên miền và kết nối HTTPS đến EC2. Phân biệt chứng chỉ cho người truy cập với chứng chỉ gốc và chế độ Full Strict. | Tuần 11 Ngày 4 | Tuần 11 Ngày 4 | Hướng dẫn SSL và TLS từ iNET |
+| 5 | Xóa bỏ các quy tắc mở cổng ứng dụng trực tiếp không cần thiết sau khi đã truy cập thành công qua tên miền. Xác minh bản demo mô hình vẫn truy cập tốt qua tên miền bảo vệ. | Tuần 11 Ngày 5 | Tuần 11 Ngày 5 | Hướng dẫn bắt đầu với Amazon EC2 |
 
-
-### Kết quả đạt được tuần 11:
-
-* Hiểu AWS là gì và nắm được các nhóm dịch vụ cơ bản: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Đã tạo và cấu hình AWS Free Tier account thành công.
-
-* Làm quen với AWS Management Console và biết cách tìm, truy cập, sử dụng dịch vụ từ giao diện web.
-
-* Cài đặt và cấu hình AWS CLI trên máy tính bao gồm:
-  * Access Key
-  * Secret Key
-  * Region mặc định
-  * ...
-
-* Sử dụng AWS CLI để thực hiện các thao tác cơ bản như:
-
-  * Kiểm tra thông tin tài khoản & cấu hình
-  * Lấy danh sách region
-  * Xem dịch vụ EC2
-  * Tạo và quản lý key pair
-  * Kiểm tra thông tin dịch vụ đang chạy
-  * ...
-
-* Có khả năng kết nối giữa giao diện web và CLI để quản lý tài nguyên AWS song song.
-* ...
-
-
+### Kết quả đạt được:
+- Kết nối thành công tên miền của dự án tới bản demo chạy trên EC2.
+- Thiết lập truy cập HTTPS và kiểm tra việc xác thực chứng chỉ tại máy chủ gốc.
+- Giảm thiểu bề mặt tấn công công khai bằng cách loại bỏ các quy tắc cổng ứng dụng thừa.

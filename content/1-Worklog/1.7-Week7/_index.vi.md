@@ -1,59 +1,31 @@
 ---
-title: "Worklog Tuần 7"
-date: 2024-01-01
-weight: 1
+title: "Nhật ký công việc tuần 7"
+date: 2026-10-16
+weight: 7
 chapter: false
 pre: " <b> 1.7. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
 
+# Nhật ký công việc tuần 07 - Khởi tạo và kết nối máy chủ Amazon EC2
 
-### Mục tiêu tuần 7:
+**Dự án:** Nhận diện bệnh lá cà chua trên AWS  
+**Giai đoạn:** Tuần 07 ngày làm việc 1 đến 5
 
-* Kết nối, làm quen với các thành viên trong First Cloud AI Journey.
-* Hiểu dịch vụ AWS cơ bản, cách dùng console & CLI.
+### Mục tiêu tuần:
+- Khởi tạo một instance EC2 phù hợp cho việc suy luận mô hình bằng CPU.
+- Chuẩn bị ổ đĩa lưu trữ và thiết lập truy cập quản trị an toàn.
+- Nắm rõ các kiểm tra trạng thái (status check) và vòng đời của instance.
 
-### Các công việc cần triển khai trong tuần này:
-| Thứ | Công việc                                                                                                                                                                                   | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu                            |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------- | ----------------------------------------- |
-| 2   | - Làm quen với các thành viên FCAJ <br> - Đọc và lưu ý các nội quy, quy định tại đơn vị thực tập                                                                                             | 11/08/2025   | 11/08/2025      |
-| 3   | - Tìm hiểu AWS và các loại dịch vụ <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                            | 12/08/2025   | 12/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Tạo AWS Free Tier account <br> - Tìm hiểu AWS Console & AWS CLI <br> - **Thực hành:** <br>&emsp; + Tạo AWS account <br>&emsp; + Cài AWS CLI & cấu hình <br> &emsp; + Cách sử dụng AWS CLI | 13/08/2025   | 13/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Tìm hiểu EC2 cơ bản: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - Các cách remote SSH vào EC2 <br> - Tìm hiểu Elastic IP   <br>                  | 14/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Thực hành:** <br>&emsp; + Tạo EC2 instance <br>&emsp; + Kết nối SSH <br>&emsp; + Gắn EBS volume                                                                                         | 15/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
+### Công việc thực hiện trong tuần:
+| Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| --- | --- | --- | --- | --- |
+| 1 | Rà soát các loại instance x86_64 hiện có, yêu cầu bộ nhớ và tính khả dụng theo Region. Chọn tùy chọn phù hợp trong phạm vi ngân sách dự án. | Tuần 07 Ngày 1 | Tuần 07 Ngày 1 | Hướng dẫn bắt đầu với Amazon EC2 |
+| 2 | Khởi chạy instance Amazon Linux 2023 với ổ lưu trữ EBS. Gắn subnet đã chọn, Security Group và EC2 instance profile. | Tuần 07 Ngày 2 | Tuần 07 Ngày 2 | Hướng dẫn bắt đầu với Amazon EC2 |
+| 3 | Chuẩn bị SSH key trên Windows và phân quyền bảo vệ cho file private key. Kết nối bằng đúng tài khoản người dùng và địa chỉ public IPv4 hiện tại. | Tuần 07 Ngày 3 | Tuần 07 Ngày 3 | Hướng dẫn bắt đầu với Amazon EC2 |
+| 4 | Kiểm tra thông tin hệ điều hành, RAM trống, dung lượng CPU và dung lượng ổ đĩa. Xác nhận instance status check đạt trạng thái tốt trước khi chuẩn bị file mô hình. | Tuần 07 Ngày 4 | Tuần 07 Ngày 4 | Hướng dẫn bắt đầu với Amazon EC2 |
+| 5 | Nắm rõ các thao tác Start, Stop, Reboot và Terminate. Ghi nhận tài nguyên nào được giữ lại sau khi Stop và lý do địa chỉ public IPv4 có thể thay đổi sau khi Start. | Tuần 07 Ngày 5 | Tuần 07 Ngày 5 | Hướng dẫn dừng và khởi động EC2 |
 
-
-### Kết quả đạt được tuần 7:
-
-* Hiểu AWS là gì và nắm được các nhóm dịch vụ cơ bản: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Đã tạo và cấu hình AWS Free Tier account thành công.
-
-* Làm quen với AWS Management Console và biết cách tìm, truy cập, sử dụng dịch vụ từ giao diện web.
-
-* Cài đặt và cấu hình AWS CLI trên máy tính bao gồm:
-  * Access Key
-  * Secret Key
-  * Region mặc định
-  * ...
-
-* Sử dụng AWS CLI để thực hiện các thao tác cơ bản như:
-
-  * Kiểm tra thông tin tài khoản & cấu hình
-  * Lấy danh sách region
-  * Xem dịch vụ EC2
-  * Tạo và quản lý key pair
-  * Kiểm tra thông tin dịch vụ đang chạy
-  * ...
-
-* Có khả năng kết nối giữa giao diện web và CLI để quản lý tài nguyên AWS song song.
-* ...
-
-
+### Kết quả đạt được:
+- Chuẩn bị môi trường tính toán EC2 cho suy luận mô hình.
+- Thiết lập truy cập SSH an toàn và đánh giá dung lượng tài nguyên máy chủ.
+- Ghi nhận các thao tác vòng đời máy chủ cùng tác động tới lưu trữ và địa chỉ IP.

@@ -1,57 +1,31 @@
 ---
 title: "Week 5 Worklog"
-date: 2024-01-01
-weight: 1
+date: 2026-10-16
+weight: 5
 chapter: false
 pre: " <b> 1.5. </b> "
 ---
-{{% notice warning %}} 
-⚠️ **Note:** The following information is for reference purposes only. Please **do not copy verbatim** for your own report, including this warning.
-{{% /notice %}}
 
+# Week 05 Worklog - Amazon S3 Model Artifact Storage
 
-### Week 5 Objectives:
+**Project:** Tomato leaf disease detection on AWS  
+**Period:** Week 05 working days 1 to 5
 
-* Connect and get acquainted with members of First Cloud AI Journey.
-* Understand basic AWS services, how to use the console & CLI.
+### Week Objectives:
+- Store the selected model and label mapping in a private S3 bucket.
+- Use a consistent object prefix and verify artifact integrity.
+- Review storage permissions and model release organization.
 
 ### Tasks to be carried out this week:
-| Day | Task                                                                                                                                                                                                   | Start Date | Completion Date | Reference Material                        |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | --------------- | ----------------------------------------- |
-| 2   | - Get acquainted with FCAJ members <br> - Read and take note of internship unit rules and regulations                                                                                                   | 08/11/2025 | 08/11/2025      |
-| 3   | - Learn about AWS and its types of services <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                              | 08/12/2025 | 08/12/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Create AWS Free Tier account <br> - Learn about AWS Console & AWS CLI <br> - **Practice:** <br>&emsp; + Create AWS account <br>&emsp; + Install & configure AWS CLI <br> &emsp; + How to use AWS CLI | 08/13/2025 | 08/13/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Learn basic EC2: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - SSH connection methods to EC2 <br> - Learn about Elastic IP   <br>                            | 08/14/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Practice:** <br>&emsp; + Launch an EC2 instance <br>&emsp; + Connect via SSH <br>&emsp; + Attach an EBS volume                                                                                     | 08/15/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| Day | Task | Start Date | Completion Date | Reference Material |
+| --- | --- | --- | --- | --- |
+| 1 | Create the project S3 bucket in the selected Region. Review Block Public Access and encryption settings before uploading any model artifacts. | W05 D1 | W05 D1 | Amazon S3 user guide |
+| 2 | Organize the model release under mobilenet-distilled-v1/. Keep the checkpoint and class mapping together as one compatible artifact set. | W05 D2 | W05 D2 | Amazon S3 user guide |
+| 3 | Upload model.pth and class_to_idx.json. Review object names, sizes and metadata to ensure that the intended files were stored. | W05 D3 | W05 D3 | Amazon S3 user guide |
+| 4 | Compare the stored artifact names with the intended IAM resource prefix. Review how an incorrect key or insufficient permissions can cause access failures. | W05 D4 | W05 D4 | AWS IAM best practices |
+| 5 | Download the artifact set for an integrity check and compare SHA256 hashes. Review versioning as an option for retaining earlier model artifacts. | W05 D5 | W05 D5 | Amazon S3 user guide |
 
-
-### Week 5 Achievements:
-
-* Understood what AWS is and mastered the basic service groups: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Successfully created and configured an AWS Free Tier account.
-
-* Became familiar with the AWS Management Console and learned how to find, access, and use services via the web interface.
-
-* Installed and configured AWS CLI on the computer, including:
-  * Access Key
-  * Secret Key
-  * Default Region
-  * ...
-
-* Used AWS CLI to perform basic operations such as:
-
-  * Check account & configuration information
-  * Retrieve the list of regions
-  * View EC2 service
-  * Create and manage key pairs
-  * Check information about running services
-  * ...
-
-* Acquired the ability to connect between the web interface and CLI to manage AWS resources in parallel.
-* ...
+### Achievements:
+- Organized the model artifacts in private Amazon S3 storage.
+- Established a consistent prefix for the selected model release.
+- Prepared a checksum-based procedure for validating downloaded artifacts.

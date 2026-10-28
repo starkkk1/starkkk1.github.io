@@ -1,16 +1,11 @@
 ---
 title: "Internship Report"
-date: 2024-01-01
+date: 2026-10-16
 weight: 1
 chapter: false
 ---
 
-    
 # Internship Report
-
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your report, including this warning.
-{{% /notice %}}
 
 ### Student Information:
 &emsp; **Full Name:** Nguyen Van A
@@ -29,16 +24,18 @@ chapter: false
 
 &emsp; **Internship Position:** Workforce Bootcamp - First Cloud AI Journey
 
-&emsp; **Internship Duration:** From 12/08/2025 to 12/11/2025
+&emsp; **Project:** Tomato Leaf Disease Detection on AWS (EC2, S3, CloudWatch)
+
+&emsp; **Internship Duration:** 12 Weeks (August 2025 - November 2025)
 
 ![Your profile picture](/images/avatar.png)
 
 ### Report Content
 
-1.  [Worklog](1-Worklog/)
-2.  [Proposal](2-Proposal/)
-3.  [BlogsPosted](3-BlogsPosted/)
-4.  [Events Participated](4-EventParticipated/)
-5.  [Workshop](5-Workshop/)
-6.  [Self-evaluation](6-Self-evaluation/)
-7.  [Sharing and Feedback](7-Feedback/)
+1. [Worklog](1-Worklog/): 12-week worklog covering dataset preparation, model training, AWS infrastructure, deployment, and cost review.
+2. [Proposal](2-Proposal/): 12-week implementation and validation plan for tomato leaf disease detection on AWS.
+3. [Blogs Posted](3-BlogsPosted/): Technical blogs shared with the AWS study community.
+4. [Events Participated](4-EventParticipated/): Workshops and events attended during the internship program.
+5. [Workshop](5-Workshop/): Step-by-step AWS deployment workshop report on EC2, S3, and CloudWatch.
+6. [Self-evaluation](6-Self-evaluation/): Demonstration of skills, operational troubleshooting lessons, and performance self-assessment.
+7. [Sharing and Feedback](7-Feedback/): Personal reflections, feedback, and suggestions for the First Cloud AI Journey program.

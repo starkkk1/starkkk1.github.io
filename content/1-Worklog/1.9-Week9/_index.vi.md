@@ -1,59 +1,31 @@
 ---
-title: "Worklog Tuần 9"
-date: 2024-01-01
-weight: 1
+title: "Nhật ký công việc tuần 9"
+date: 2026-10-16
+weight: 9
 chapter: false
 pre: " <b> 1.9. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
 
+# Nhật ký công việc tuần 09 - Quản lý nhật ký với Amazon CloudWatch Logs
 
-### Mục tiêu tuần 9:
+**Dự án:** Nhận diện bệnh lá cà chua trên AWS  
+**Giai đoạn:** Tuần 09 ngày làm việc 1 đến 5
 
-* Kết nối, làm quen với các thành viên trong First Cloud AI Journey.
-* Hiểu dịch vụ AWS cơ bản, cách dùng console & CLI.
+### Mục tiêu tuần:
+- Thu thập nhật ký vận hành từ workload chạy trên EC2.
+- Tổ chức các nhóm nhật ký (log group) và rà soát cài đặt thời gian lưu giữ (retention).
+- Khắc phục sự cố truy cập vào log trên cloud.
 
-### Các công việc cần triển khai trong tuần này:
-| Thứ | Công việc                                                                                                                                                                                   | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu                            |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------- | ----------------------------------------- |
-| 2   | - Làm quen với các thành viên FCAJ <br> - Đọc và lưu ý các nội quy, quy định tại đơn vị thực tập                                                                                             | 11/08/2025   | 11/08/2025      |
-| 3   | - Tìm hiểu AWS và các loại dịch vụ <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                            | 12/08/2025   | 12/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Tạo AWS Free Tier account <br> - Tìm hiểu AWS Console & AWS CLI <br> - **Thực hành:** <br>&emsp; + Tạo AWS account <br>&emsp; + Cài AWS CLI & cấu hình <br> &emsp; + Cách sử dụng AWS CLI | 13/08/2025   | 13/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Tìm hiểu EC2 cơ bản: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - Các cách remote SSH vào EC2 <br> - Tìm hiểu Elastic IP   <br>                  | 14/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Thực hành:** <br>&emsp; + Tạo EC2 instance <br>&emsp; + Kết nối SSH <br>&emsp; + Gắn EBS volume                                                                                         | 15/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
+### Công việc thực hiện trong tuần:
+| Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| --- | --- | --- | --- | --- |
+| 1 | Tìm hiểu về CloudWatch log groups, log streams và log events. Xác định các sự kiện khởi tạo mô hình và suy luận hữu ích cho việc chẩn đoán lỗi. | Tuần 09 Ngày 1 | Tuần 09 Ngày 1 | Hướng dẫn CloudWatch Logs |
+| 2 | Cấu hình workload gửi dữ liệu nhật ký vận hành về CloudWatch Logs. Sử dụng log group và log stream có tên gọi rõ ràng cho môi trường dự án. | Tuần 09 Ngày 2 | Tuần 09 Ngày 2 | Hướng dẫn CloudWatch Logs |
+| 3 | Rà soát quyền gửi log trên EC2 role. Phân biệt giữa quyền đẩy log vào hệ thống và quyền tìm kiếm, đọc các sự kiện log đã lưu. | Tuần 09 Ngày 3 | Tuần 09 Ngày 3 | Thực hành tốt nhất cho AWS IAM |
+| 4 | Kiểm tra các thông điệp khởi tạo và log suy luận mẫu. Sử dụng khoảng thời gian và bộ lọc để định vị sự cố mà không để lộ credentials hoặc hình ảnh riêng tư. | Tuần 09 Ngày 4 | Tuần 09 Ngày 4 | Hướng dẫn CloudWatch Logs |
+| 5 | Rà soát mục tiêu lưu giữ 7 ngày và chi phí lưu trữ log. Ghi nhận quyền logs:FilterLogEvents giới hạn cần thiết để tìm kiếm log từ giao diện dòng lệnh. | Tuần 09 Ngày 5 | Tuần 09 Ngày 5 | Hướng dẫn CloudWatch Logs |
 
-
-### Kết quả đạt được tuần 9:
-
-* Hiểu AWS là gì và nắm được các nhóm dịch vụ cơ bản: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Đã tạo và cấu hình AWS Free Tier account thành công.
-
-* Làm quen với AWS Management Console và biết cách tìm, truy cập, sử dụng dịch vụ từ giao diện web.
-
-* Cài đặt và cấu hình AWS CLI trên máy tính bao gồm:
-  * Access Key
-  * Secret Key
-  * Region mặc định
-  * ...
-
-* Sử dụng AWS CLI để thực hiện các thao tác cơ bản như:
-
-  * Kiểm tra thông tin tài khoản & cấu hình
-  * Lấy danh sách region
-  * Xem dịch vụ EC2
-  * Tạo và quản lý key pair
-  * Kiểm tra thông tin dịch vụ đang chạy
-  * ...
-
-* Có khả năng kết nối giữa giao diện web và CLI để quản lý tài nguyên AWS song song.
-* ...
-
-
+### Kết quả đạt được:
+- Tổ chức dữ liệu log vận hành trong CloudWatch cho workload trên EC2.
+- Xây dựng phương pháp lặp lại được để tra cứu các sự kiện log trên cloud.
+- Rà soát thời gian lưu giữ log và các quyền cần thiết để đọc dữ liệu log.

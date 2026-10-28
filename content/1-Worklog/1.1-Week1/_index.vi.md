@@ -1,59 +1,31 @@
 ---
-title: "Worklog Tuần 1"
-date: 2024-01-01
+title: "Nhật ký công việc tuần 1"
+date: 2026-10-16
 weight: 1
 chapter: false
 pre: " <b> 1.1. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
 
+# Nhật ký công việc tuần 01 - Chuẩn bị dữ liệu
 
-### Mục tiêu tuần 1:
+**Dự án:** Nhận diện bệnh lá cà chua trên AWS  
+**Giai đoạn:** Tuần 01 ngày làm việc 1 đến 5
 
-* Kết nối, làm quen với các thành viên trong First Cloud AI Journey.
-* Hiểu dịch vụ AWS cơ bản, cách dùng console & CLI.
+### Mục tiêu tuần:
+- Chuẩn bị ảnh lá cà chua và các nhãn lớp nhất quán.
+- Tạo các phân vùng huấn luyện (training), kiểm định (validation) và kiểm thử (test) có thể tái tạo.
+- Xác định các vấn đề về chất lượng dữ liệu trước khi huấn luyện.
 
-### Các công việc cần triển khai trong tuần này:
-| Thứ | Công việc                                                                                                                                                                                   | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu                            |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------- | ----------------------------------------- |
-| 2   | - Làm quen với các thành viên FCAJ <br> - Đọc và lưu ý các nội quy, quy định tại đơn vị thực tập                                                                                             | 11/08/2025   | 11/08/2025      |
-| 3   | - Tìm hiểu AWS và các loại dịch vụ <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                            | 12/08/2025   | 12/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Tạo AWS Free Tier account <br> - Tìm hiểu AWS Console & AWS CLI <br> - **Thực hành:** <br>&emsp; + Tạo AWS account <br>&emsp; + Cài AWS CLI & cấu hình <br> &emsp; + Cách sử dụng AWS CLI | 13/08/2025   | 13/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Tìm hiểu EC2 cơ bản: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - Các cách remote SSH vào EC2 <br> - Tìm hiểu Elastic IP   <br>                  | 14/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Thực hành:** <br>&emsp; + Tạo EC2 instance <br>&emsp; + Kết nối SSH <br>&emsp; + Gắn EBS volume                                                                                         | 15/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
+### Công việc thực hiện trong tuần:
+| Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| --- | --- | --- | --- | --- |
+| 1 | Rà soát tập dữ liệu lá cà chua, các lớp được hỗ trợ và phạm vi dự án. Ghi nhận nguồn và mục đích của từng phân vùng dữ liệu. | Tuần 01 Ngày 1 | Tuần 01 Ngày 1 | Tài liệu tập dữ liệu và mô hình dự án |
+| 2 | Kiểm tra khả năng đọc ảnh, định dạng file và các thư mục lớp. Xác định các file bị hỏng và nhãn không nhất quán để loại trừ hoặc chỉnh sửa. | Tuần 01 Ngày 2 | Tuần 01 Ngày 2 | Tài liệu tập dữ liệu và mô hình dự án |
+| 3 | Rà soát độ cân bằng lớp và các ảnh trùng lặp. Giữ các mẫu liên quan hoặc trùng lặp trong cùng một phân vùng để giảm rò rỉ dữ liệu (data leakage). | Tuần 01 Ngày 3 | Tuần 01 Ngày 3 | Tài liệu tập dữ liệu và mô hình dự án |
+| 4 | Chuẩn bị phân chia tập train, validation và test. Xác định kích thước ảnh, chuẩn hóa và augmentation cho tập train trong khi giữ nhất quán tiền xử lý đánh giá. | Tuần 01 Ngày 4 | Tuần 01 Ngày 4 | Tài liệu tập dữ liệu và mô hình dự án |
+| 5 | Tạo ánh xạ chỉ số lớp (class index mapping) và bản tóm tắt dữ liệu. Xem lại các ảnh mẫu từ từng phân vùng và ghi nhận các giới hạn chất lượng còn lại. | Tuần 01 Ngày 5 | Tuần 01 Ngày 5 | Tài liệu tập dữ liệu và mô hình dự án |
 
-
-### Kết quả đạt được tuần 1:
-
-* Hiểu AWS là gì và nắm được các nhóm dịch vụ cơ bản: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Đã tạo và cấu hình AWS Free Tier account thành công.
-
-* Làm quen với AWS Management Console và biết cách tìm, truy cập, sử dụng dịch vụ từ giao diện web.
-
-* Cài đặt và cấu hình AWS CLI trên máy tính bao gồm:
-  * Access Key
-  * Secret Key
-  * Region mặc định
-  * ...
-
-* Sử dụng AWS CLI để thực hiện các thao tác cơ bản như:
-
-  * Kiểm tra thông tin tài khoản & cấu hình
-  * Lấy danh sách region
-  * Xem dịch vụ EC2
-  * Tạo và quản lý key pair
-  * Kiểm tra thông tin dịch vụ đang chạy
-  * ...
-
-* Có khả năng kết nối giữa giao diện web và CLI để quản lý tài nguyên AWS song song.
-* ...
-
-
+### Kết quả đạt được:
+- Tổ chức tập dữ liệu lá cà chua có nhãn với các phân vùng đánh giá riêng biệt.
+- Chuẩn bị tiền xử lý nhất quán và bộ ánh xạ chỉ số lớp có thể tái sử dụng.
+- Ghi nhận các kiểm tra chất lượng dữ liệu và các nguồn thiên lệch tiềm ẩn.

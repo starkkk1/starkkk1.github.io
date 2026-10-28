@@ -1,59 +1,31 @@
 ---
-title: "Worklog Tuần 5"
-date: 2024-01-01
-weight: 1
+title: "Nhật ký công việc tuần 5"
+date: 2026-10-16
+weight: 5
 chapter: false
 pre: " <b> 1.5. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
 
+# Nhật ký công việc tuần 05 - Lưu trữ artifacts mô hình trên Amazon S3
 
-### Mục tiêu tuần 5:
+**Dự án:** Nhận diện bệnh lá cà chua trên AWS  
+**Giai đoạn:** Tuần 05 ngày làm việc 1 đến 5
 
-* Kết nối, làm quen với các thành viên trong First Cloud AI Journey.
-* Hiểu dịch vụ AWS cơ bản, cách dùng console & CLI.
+### Mục tiêu tuần:
+- Lưu trữ mô hình và ánh xạ nhãn đã chọn trong S3 bucket riêng tư (private).
+- Sử dụng object prefix nhất quán và xác minh tính toàn vẹn của artifacts.
+- Rà soát quyền lưu trữ và cấu trúc tổ chức bản phát hành mô hình.
 
-### Các công việc cần triển khai trong tuần này:
-| Thứ | Công việc                                                                                                                                                                                   | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu                            |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------- | ----------------------------------------- |
-| 2   | - Làm quen với các thành viên FCAJ <br> - Đọc và lưu ý các nội quy, quy định tại đơn vị thực tập                                                                                             | 11/08/2025   | 11/08/2025      |
-| 3   | - Tìm hiểu AWS và các loại dịch vụ <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                            | 12/08/2025   | 12/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Tạo AWS Free Tier account <br> - Tìm hiểu AWS Console & AWS CLI <br> - **Thực hành:** <br>&emsp; + Tạo AWS account <br>&emsp; + Cài AWS CLI & cấu hình <br> &emsp; + Cách sử dụng AWS CLI | 13/08/2025   | 13/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Tìm hiểu EC2 cơ bản: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - Các cách remote SSH vào EC2 <br> - Tìm hiểu Elastic IP   <br>                  | 14/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Thực hành:** <br>&emsp; + Tạo EC2 instance <br>&emsp; + Kết nối SSH <br>&emsp; + Gắn EBS volume                                                                                         | 15/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
+### Công việc thực hiện trong tuần:
+| Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| --- | --- | --- | --- | --- |
+| 1 | Tạo S3 bucket cho dự án trong Region đã chọn. Kiểm tra cài đặt Block Public Access và mã hóa trước khi tải lên bất kỳ artifact nào. | Tuần 05 Ngày 1 | Tuần 05 Ngày 1 | Hướng dẫn sử dụng Amazon S3 |
+| 2 | Cấu trúc bản phát hành mô hình dưới prefix mobilenet-distilled-v1/. Giữ checkpoint và class mapping cùng nhau như một bộ artifact tương thích. | Tuần 05 Ngày 2 | Tuần 05 Ngày 2 | Hướng dẫn sử dụng Amazon S3 |
+| 3 | Tải lên model.pth và class_to_idx.json. Rà soát tên đối tượng, kích thước và metadata để đảm bảo đúng file dự định. | Tuần 05 Ngày 3 | Tuần 05 Ngày 3 | Hướng dẫn sử dụng Amazon S3 |
+| 4 | Đối chiếu tên artifact đã lưu với resource prefix dự định cấp trong IAM policy. Xem xét cách xử lý khi sai key hoặc thiếu quyền gây lỗi truy cập. | Tuần 05 Ngày 4 | Tuần 05 Ngày 4 | Thực hành tốt nhất cho AWS IAM |
+| 5 | Tải về bộ artifact để kiểm tra tính toàn vẹn và so sánh mã băm SHA256. Tìm hiểu tính năng versioning như một tùy chọn để lưu giữ các artifacts mô hình phiên bản trước. | Tuần 05 Ngày 5 | Tuần 05 Ngày 5 | Hướng dẫn sử dụng Amazon S3 |
 
-
-### Kết quả đạt được tuần 5:
-
-* Hiểu AWS là gì và nắm được các nhóm dịch vụ cơ bản: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Đã tạo và cấu hình AWS Free Tier account thành công.
-
-* Làm quen với AWS Management Console và biết cách tìm, truy cập, sử dụng dịch vụ từ giao diện web.
-
-* Cài đặt và cấu hình AWS CLI trên máy tính bao gồm:
-  * Access Key
-  * Secret Key
-  * Region mặc định
-  * ...
-
-* Sử dụng AWS CLI để thực hiện các thao tác cơ bản như:
-
-  * Kiểm tra thông tin tài khoản & cấu hình
-  * Lấy danh sách region
-  * Xem dịch vụ EC2
-  * Tạo và quản lý key pair
-  * Kiểm tra thông tin dịch vụ đang chạy
-  * ...
-
-* Có khả năng kết nối giữa giao diện web và CLI để quản lý tài nguyên AWS song song.
-* ...
-
-
+### Kết quả đạt được:
+- Tổ chức lưu trữ artifacts mô hình trong Amazon S3 riêng tư.
+- Thiết lập prefix nhất quán cho bản phát hành mô hình đã chọn.
+- Chuẩn bị quy trình đối chiếu checksum để xác minh tính toàn vẹn của artifacts tải về.

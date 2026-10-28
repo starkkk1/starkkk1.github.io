@@ -1,59 +1,31 @@
 ---
-title: "Worklog Tuần 3"
-date: 2024-01-01
-weight: 1
+title: "Nhật ký công việc tuần 3"
+date: 2026-10-16
+weight: 3
 chapter: false
 pre: " <b> 1.3. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
 
+# Nhật ký công việc tuần 03 - Nền tảng AWS và lập kế hoạch chi phí
 
-### Mục tiêu tuần 3:
+**Dự án:** Nhận diện bệnh lá cà chua trên AWS  
+**Giai đoạn:** Tuần 03 ngày làm việc 1 đến 5
 
-* Kết nối, làm quen với các thành viên trong First Cloud AI Journey.
-* Hiểu dịch vụ AWS cơ bản, cách dùng console & CLI.
+### Mục tiêu tuần:
+- Ánh xạ các yêu cầu dự án vào các dịch vụ EC2, S3 và CloudWatch.
+- Chọn Region triển khai và rà soát số dư AWS credit khả dụng.
+- Thiết lập phương án ngân sách cho môi trường học tập tạm thời.
 
-### Các công việc cần triển khai trong tuần này:
-| Thứ | Công việc                                                                                                                                                                                   | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu                            |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------- | ----------------------------------------- |
-| 2   | - Làm quen với các thành viên FCAJ <br> - Đọc và lưu ý các nội quy, quy định tại đơn vị thực tập                                                                                             | 11/08/2025   | 11/08/2025      |
-| 3   | - Tìm hiểu AWS và các loại dịch vụ <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                            | 12/08/2025   | 12/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Tạo AWS Free Tier account <br> - Tìm hiểu AWS Console & AWS CLI <br> - **Thực hành:** <br>&emsp; + Tạo AWS account <br>&emsp; + Cài AWS CLI & cấu hình <br> &emsp; + Cách sử dụng AWS CLI | 13/08/2025   | 13/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Tìm hiểu EC2 cơ bản: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - Các cách remote SSH vào EC2 <br> - Tìm hiểu Elastic IP   <br>                  | 14/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Thực hành:** <br>&emsp; + Tạo EC2 instance <br>&emsp; + Kết nối SSH <br>&emsp; + Gắn EBS volume                                                                                         | 15/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
+### Công việc thực hiện trong tuần:
+| Ngày | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| --- | --- | --- | --- | --- |
+| 1 | Khám phá AWS Console và xác định các dịch vụ điện toán, lưu trữ, mạng và giám sát liên quan đến bản demo machine learning. | Tuần 03 Ngày 1 | Tuần 03 Ngày 1 | Hướng dẫn bắt đầu với Amazon EC2 |
+| 2 | Xác định trách nhiệm của Amazon EC2, Amazon S3 và Amazon CloudWatch. Phác thảo cách lưu trữ mô hình, điện toán và giám sát kết nối với nhau. | Tuần 03 Ngày 2 | Tuần 03 Ngày 2 | Hướng dẫn sử dụng Amazon S3 |
+| 3 | Chọn khu vực Châu Á - Thái Bình Dương (Sydney, ap-southeast-2) để triển khai. Rà soát tính khả dụng của tài nguyên khu vực và duy trì tài nguyên dự án trong cùng một Region nhất quán. | Tuần 03 Ngày 3 | Tuần 03 Ngày 3 | Hướng dẫn bắt đầu với Amazon EC2 |
+| 4 | Rà soát số dư credit, hạn sử dụng và các dịch vụ hợp lệ. Phân biệt điện toán, lưu trữ EBS, public IPv4 và giám sát thành các nguồn chi phí riêng biệt. | Tuần 03 Ngày 4 | Tuần 03 Ngày 4 | Hướng dẫn AWS Budgets |
+| 5 | Chuẩn bị ngân sách chi phí hằng tháng và kế hoạch thông báo. Đặt quy tắc dừng instance giữa các buổi làm việc và rà soát chi phí lưu trữ còn duy trì. | Tuần 03 Ngày 5 | Tuần 03 Ngày 5 | Hướng dẫn AWS Budgets |
 
-
-### Kết quả đạt được tuần 3:
-
-* Hiểu AWS là gì và nắm được các nhóm dịch vụ cơ bản: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Đã tạo và cấu hình AWS Free Tier account thành công.
-
-* Làm quen với AWS Management Console và biết cách tìm, truy cập, sử dụng dịch vụ từ giao diện web.
-
-* Cài đặt và cấu hình AWS CLI trên máy tính bao gồm:
-  * Access Key
-  * Secret Key
-  * Region mặc định
-  * ...
-
-* Sử dụng AWS CLI để thực hiện các thao tác cơ bản như:
-
-  * Kiểm tra thông tin tài khoản & cấu hình
-  * Lấy danh sách region
-  * Xem dịch vụ EC2
-  * Tạo và quản lý key pair
-  * Kiểm tra thông tin dịch vụ đang chạy
-  * ...
-
-* Có khả năng kết nối giữa giao diện web và CLI để quản lý tài nguyên AWS song song.
-* ...
-
-
+### Kết quả đạt được:
+- Xác định kiến trúc AWS tập trung vào EC2, S3 và CloudWatch.
+- Chọn Sydney làm Region của dự án và rà soát các giới hạn credit.
+- Chuẩn bị kế hoạch kiểm soát chi phí cho môi trường học tập.

@@ -1,57 +1,31 @@
 ---
 title: "Week 11 Worklog"
-date: 2024-01-01
-weight: 2
+date: 2026-10-16
+weight: 11
 chapter: false
 pre: " <b> 1.11. </b> "
 ---
-{{% notice warning %}} 
-⚠️ **Note:** The following information is for reference purposes only. Please **do not copy verbatim** for your own report, including this warning.
-{{% /notice %}}
 
+# Week 11 Worklog - Secure Public Access to the EC2 Workload
 
-### Week 11 Objectives:
+**Project:** Tomato leaf disease detection on AWS  
+**Period:** Week 11 working days 1 to 5
 
-* Connect and get acquainted with members of First Cloud AI Journey.
-* Understand basic AWS services, how to use the console & CLI.
+### Week Objectives:
+- Connect the existing domain to the EC2 public address.
+- Enable HTTPS access while retaining domain protection.
+- Reduce unnecessary public exposure through Security Groups.
 
 ### Tasks to be carried out this week:
-| Day | Task                                                                                                                                                                                                   | Start Date | Completion Date | Reference Material                        |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | --------------- | ----------------------------------------- |
-| 2   | - Get acquainted with FCAJ members <br> - Read and take note of internship unit rules and regulations                                                                                                   | 08/11/2025 | 08/11/2025      |
-| 3   | - Learn about AWS and its types of services <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                              | 08/12/2025 | 08/12/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Create AWS Free Tier account <br> - Learn about AWS Console & AWS CLI <br> - **Practice:** <br>&emsp; + Create AWS account <br>&emsp; + Install & configure AWS CLI <br> &emsp; + How to use AWS CLI | 08/13/2025 | 08/13/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Learn basic EC2: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - SSH connection methods to EC2 <br> - Learn about Elastic IP   <br>                            | 08/14/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Practice:** <br>&emsp; + Launch an EC2 instance <br>&emsp; + Connect via SSH <br>&emsp; + Attach an EBS volume                                                                                     | 08/15/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| Day | Task | Start Date | Completion Date | Reference Material |
+| --- | --- | --- | --- | --- |
+| 1 | Review the DNS path for caycachua.id.vn and identify where its records are managed. Distinguish domain registration from authoritative DNS hosting. | W11 D1 | W11 D1 | iNET SSL and TLS guide |
+| 2 | Point the root A record to the current EC2 public IPv4. Review why protected DNS can return proxy addresses instead of the origin address. | W11 D2 | W11 D2 | iNET SSL and TLS guide |
+| 3 | Review HTTP and HTTPS access requirements on EC2. Permit ports 80 and 443 while keeping SSH restricted to the operator address. | W11 D3 | W11 D3 | Amazon EC2 getting started |
+| 4 | Review the domain certificate and HTTPS connection to EC2. Distinguish the visitor certificate from the origin certificate and the Full Strict setting. | W11 D4 | W11 D4 | iNET SSL and TLS guide |
+| 5 | Remove unnecessary public application port rules after successful domain access. Verify that the model demonstration remains reachable through the protected domain. | W11 D5 | W11 D5 | Amazon EC2 getting started |
 
-
-### Week 11 Achievements:
-
-* Understood what AWS is and mastered the basic service groups: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Successfully created and configured an AWS Free Tier account.
-
-* Became familiar with the AWS Management Console and learned how to find, access, and use services via the web interface.
-
-* Installed and configured AWS CLI on the computer, including:
-  * Access Key
-  * Secret Key
-  * Default Region
-  * ...
-
-* Used AWS CLI to perform basic operations such as:
-
-  * Check account & configuration information
-  * Retrieve the list of regions
-  * View EC2 service
-  * Create and manage key pairs
-  * Check information about running services
-  * ...
-
-* Acquired the ability to connect between the web interface and CLI to manage AWS resources in parallel.
-* ...
+### Achievements:
+- Connected the project domain to the EC2-hosted demonstration.
+- Established HTTPS access and reviewed certificate validation at the origin.
+- Reduced public exposure by removing unnecessary application port rules.
