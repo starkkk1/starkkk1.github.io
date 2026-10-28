@@ -1,12 +1,12 @@
 ---
-title: "5.5 Monitoring & Security"
+title: "Testing & Quality"
 date: 2026-10-28T10:00:00+07:00
 weight: 50
 chapter: false
 pre: "<b>5.5. </b>"
 ---
 
-# Monitoring, CloudWatch Alarms & Access Control
+# Testing & Quality
 
 ### 5.5.1 Container Logging & Host Metrics Collection
 

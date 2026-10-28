@@ -1,12 +1,12 @@
 ---
-title: "5.3 Architecture Design & S3 Storage"
+title: "Architecture & Design"
 date: 2026-10-28T10:00:00+07:00
 weight: 30
 chapter: false
 pre: "<b>5.3. </b>"
 ---
 
-# Architecture Design & S3 Model Storage
+# Architecture & Design
 
 ### Architectural Principles: Decoupled Weights from Code
 

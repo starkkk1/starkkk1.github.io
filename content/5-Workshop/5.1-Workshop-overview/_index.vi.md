@@ -1,12 +1,12 @@
 ---
-title: "5.1 Tổng quan Workshop"
+title: "Giới thiệu"
 date: 2026-10-28T10:00:00+07:00
 weight: 10
 chapter: false
 pre: "<b>5.1. </b>"
 ---
 
-# Tổng quan Workshop & Hệ thống Deep Learning
+# Giới thiệu
 
 ### Giới thiệu Dự án Phân loại Bệnh lá Cây trồng
 

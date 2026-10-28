@@ -1,12 +1,12 @@
 ---
-title: "5.6 Clean Up & Operations"
+title: "Operations & Cleanup"
 date: 2026-10-28T10:00:00+07:00
 weight: 60
 chapter: false
 pre: "<b>5.6. </b>"
 ---
 
-# Clean Up and Daily Operations
+# Operations & Cleanup
 
 ### Daily Operational Routine
 

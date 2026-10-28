@@ -1,12 +1,12 @@
 ---
-title: "5.4 Triển khai Container"
+title: "Chiến lược Triển khai"
 date: 2026-10-28T10:00:00+07:00
 weight: 40
 chapter: false
 pre: "<b>5.4. </b>"
 ---
 
-# Triển khai Ứng dụng bằng Container
+# Chiến lược Triển khai
 
 ### 5.4.1 Quy trình Triển khai Tự động (Continuous Delivery)
 

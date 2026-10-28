@@ -1,12 +1,12 @@
 ---
-title: "5.4 Container Deployment"
+title: "Deployment Strategy"
 date: 2026-10-28T10:00:00+07:00
 weight: 40
 chapter: false
 pre: "<b>5.4. </b>"
 ---
 
-# Containerized Application Deployment
+# Deployment Strategy
 
 ### 5.4.1 Continuous Delivery Pipeline
 

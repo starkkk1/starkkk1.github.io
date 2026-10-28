@@ -1,12 +1,12 @@
 ---
-title: "5.3 Thiết kế Kiến trúc & Lưu trữ Model trên S3"
+title: "Kiến trúc & Thiết kế"
 date: 2026-10-28T10:00:00+07:00
 weight: 30
 chapter: false
 pre: "<b>5.3. </b>"
 ---
 
-# Thiết kế Kiến trúc & Lưu trữ Model trên S3
+# Kiến trúc & Thiết kế
 
 ### Nguyên tắc Kiến trúc: Tách rời Trọng số Mô hình khỏi Mã nguồn
 

@@ -1,12 +1,12 @@
 ---
-title: "5.5 Giám sát & Bảo mật"
+title: "Kiểm thử & Chất lượng"
 date: 2026-10-28T10:00:00+07:00
 weight: 50
 chapter: false
 pre: "<b>5.5. </b>"
 ---
 
-# Giám sát Vận hành, Cảnh báo CloudWatch & Kiểm soát Bảo mật
+# Kiểm thử & Chất lượng
 
 ### 5.5.1 Thu thập Nhật ký Container & Metrics Hệ thống
 

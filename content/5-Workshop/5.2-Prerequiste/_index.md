@@ -1,12 +1,12 @@
 ---
-title: "5.2 Prerequisites"
+title: "Prerequisites & Setup"
 date: 2026-10-28T10:00:00+07:00
 weight: 20
 chapter: false
 pre: "<b>5.2. </b>"
 ---
 
-# Prerequisites & Environment Preparation
+# Prerequisites & Setup
 
 Before launching the Plant Disease Detection application on Amazon Web Services, verify the following account permissions, compute infrastructure, and security settings.
 

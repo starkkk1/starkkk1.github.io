@@ -1,12 +1,12 @@
 ---
-title: "5.1 Workshop Overview"
+title: "Introduction"
 date: 2026-10-28T10:00:00+07:00
 weight: 10
 chapter: false
 pre: "<b>5.1. </b>"
 ---
 
-# Workshop Overview & Deep Learning System
+# Introduction
 
 ### Introduction to Plant Disease Detection
 

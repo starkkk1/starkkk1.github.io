@@ -1,12 +1,12 @@
 ---
-title: "5.6 Thu hồi Tài nguyên"
+title: "Vận hành & Thu hồi"
 date: 2026-10-28T10:00:00+07:00
 weight: 60
 chapter: false
 pre: "<b>5.6. </b>"
 ---
 
-# Thu hồi Tài nguyên & Vận hành Hằng ngày
+# Vận hành & Thu hồi
 
 ### Quy trình Vận hành Tiết kiệm Chi phí Hằng ngày
 

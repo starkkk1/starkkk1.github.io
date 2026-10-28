@@ -1,9 +1,9 @@
 ---
-title: "Workshop: Triển khai Phân loại Bệnh lá Cà chua trên AWS"
+title: "Workshop"
 date: 2026-10-28T10:00:00+07:00
 weight: 5
 chapter: false
-pre: "<b>5. </b>"
+pre: " <b> 5. </b> "
 ---
 
 # Báo cáo Workshop Triển khai Ứng dụng trên AWS
@@ -68,15 +68,15 @@ flowchart LR
 
 ### Lộ trình Nội dung Workshop
 
-1. **[5.1 Tổng quan Workshop & Hệ thống Deep Learning](5.1-workshop-overview/)**  
+1. **[5.1 Giới thiệu](5.1-workshop-overview/)**
    Giới thiệu bài toán phân loại 11 bệnh lá cà chua, cơ chế chưng cất tri thức mô hình và tính năng giải thích quyết định bằng Grad-CAM++.
-2. **[5.2 Điều kiện Chuẩn bị & Thiết lập Môi trường](5.2-prerequiste/)**  
+2. **[5.2 Chuẩn bị & Cài đặt](5.2-prerequiste/)**
    Cấu hình tài khoản AWS, thiết lập mạng VPC, phân quyền Security Group theo IP máy khách, IAM Instance Profile và cài đặt Docker Engine.
-3. **[5.3 Thiết kế Kiến trúc & Lưu trữ Model trên S3](5.3-architecture-design/)**  
+3. **[5.3 Kiến trúc & Thiết kế](5.3-architecture-design/)**
    Kiến trúc tách rời tệp trọng số mô hình ra S3, cấu hình bảo mật bucket, xác thực danh tính assumed-role và kiểm tra tính toàn vẹn SHA256.
-4. **[5.4 Triển khai Ứng dụng bằng Container](5.4-deployment-strategy/)**  
+4. **[5.4 Chiến lược Triển khai](5.4-deployment-strategy/)**
    Đóng gói Docker nhiều giai đoạn, thiết lập môi trường thực thi, triển khai Next.js standalone và kiểm thử suy luận với ảnh lá thực tế.
-5. **[5.5 Giám sát Vận hành & Kiểm soát Truy cập](5.5-quality-assurance/)**  
+5. **[5.5 Kiểm thử & Chất lượng](5.5-quality-assurance/)**
    Cấu hình ghi log JSON có cấu trúc qua awslogs driver, đo đạc RAM máy chủ bằng CloudWatch Agent, tạo cảnh báo RAM qua SNS và bảo mật quyền tối thiểu.
-6. **[5.6 Thu hồi Tài nguyên & Vận hành Hằng ngày](5.6-operations-cleanup/)**  
+6. **[5.6 Vận hành & Thu hồi](5.6-operations-cleanup/)**
    Quy trình bật/tắt container mỗi ngày, quản lý thay đổi IP public khi dừng máy ảo và quy trình giải phóng hoàn toàn tài nguyên đám mây.
