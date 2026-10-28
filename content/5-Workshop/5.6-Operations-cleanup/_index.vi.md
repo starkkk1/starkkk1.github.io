@@ -6,7 +6,7 @@ chapter: false
 pre: "<b>5.6. </b>"
 ---
 
-# 5.6 Thu hồi Tài nguyên & Vận hành Hằng ngày
+# Thu hồi Tài nguyên & Vận hành Hằng ngày
 
 ### Quy trình Vận hành Tiết kiệm Chi phí Hằng ngày
 

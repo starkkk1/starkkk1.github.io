@@ -6,7 +6,7 @@ chapter: false
 pre: "<b>5.1. </b>"
 ---
 
-# 5.1 Tổng quan Workshop & Hệ thống Deep Learning
+# Tổng quan Workshop & Hệ thống Deep Learning
 
 ### Giới thiệu Dự án Phân loại Bệnh lá Cây trồng
 

@@ -6,7 +6,7 @@ chapter: false
 pre: "<b>5.4. </b>"
 ---
 
-# 5.4 Triển khai Ứng dụng bằng Container
+# Triển khai Ứng dụng bằng Container
 
 ### 5.4.1 Quy trình Triển khai Tự động (Continuous Delivery)
 

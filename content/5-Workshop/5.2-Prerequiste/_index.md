@@ -6,7 +6,7 @@ chapter: false
 pre: "<b>5.2. </b>"
 ---
 
-# 5.2 Prerequisites & Environment Preparation
+# Prerequisites & Environment Preparation
 
 Before launching the Plant Disease Detection application on Amazon Web Services, verify the following account permissions, compute infrastructure, and security settings.
 

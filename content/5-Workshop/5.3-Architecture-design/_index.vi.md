@@ -6,7 +6,7 @@ chapter: false
 pre: "<b>5.3. </b>"
 ---
 
-# 5.3 Thiết kế Kiến trúc & Lưu trữ Model trên S3
+# Thiết kế Kiến trúc & Lưu trữ Model trên S3
 
 ### Nguyên tắc Kiến trúc: Tách rời Trọng số Mô hình khỏi Mã nguồn
 

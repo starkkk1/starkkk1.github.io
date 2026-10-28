@@ -6,7 +6,7 @@ chapter: false
 pre: "<b>5.1. </b>"
 ---
 
-# 5.1 Workshop Overview & Deep Learning System
+# Workshop Overview & Deep Learning System
 
 ### Introduction to Plant Disease Detection
 

@@ -6,7 +6,7 @@ chapter: false
 pre: "<b>5.3. </b>"
 ---
 
-# 5.3 Architecture Design & S3 Model Storage
+# Architecture Design & S3 Model Storage
 
 ### Architectural Principles: Decoupled Weights from Code
 

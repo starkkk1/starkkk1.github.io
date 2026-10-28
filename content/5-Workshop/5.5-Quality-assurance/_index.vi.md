@@ -6,7 +6,7 @@ chapter: false
 pre: "<b>5.5. </b>"
 ---
 
-# 5.5 Giám sát Vận hành, Cảnh báo CloudWatch & Kiểm soát Bảo mật
+# Giám sát Vận hành, Cảnh báo CloudWatch & Kiểm soát Bảo mật
 
 ### 5.5.1 Thu thập Nhật ký Container & Metrics Hệ thống
 

@@ -6,7 +6,7 @@ chapter: false
 pre: "<b>5.4. </b>"
 ---
 
-# 5.4 Containerized Application Deployment
+# Containerized Application Deployment
 
 ### 5.4.1 Continuous Delivery Pipeline
 

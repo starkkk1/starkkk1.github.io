@@ -6,7 +6,7 @@ chapter: false
 pre: "<b>5.2. </b>"
 ---
 
-# 5.2 Điều kiện chuẩn bị & Thiết lập Môi trường
+# Điều kiện chuẩn bị & Thiết lập Môi trường
 
 Trước khi triển khai ứng dụng Nhận diện Bệnh lá Cây trồng lên Amazon Web Services, cần chuẩn bị đầy đủ tài khoản AWS, quyền hạn IAM, cấu hình mạng VPC và cài đặt các công cụ cần thiết.
 

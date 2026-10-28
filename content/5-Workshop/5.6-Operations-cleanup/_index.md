@@ -6,7 +6,7 @@ chapter: false
 pre: "<b>5.6. </b>"
 ---
 
-# 5.6 Clean Up and Daily Operations
+# Clean Up and Daily Operations
 
 ### Daily Operational Routine
 

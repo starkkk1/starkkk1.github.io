@@ -6,7 +6,7 @@ chapter: false
 pre: "<b>5.5. </b>"
 ---
 
-# 5.5 Monitoring, CloudWatch Alarms & Access Control
+# Monitoring, CloudWatch Alarms & Access Control
 
 ### 5.5.1 Container Logging & Host Metrics Collection
 
