@@ -70,22 +70,22 @@ Dùng CloudWatch Logs cho hai container và Agent metrics cho RAM cùng đĩa. G
 
 ### 5 Tiến độ và các mốc bàn giao
 
-Mỗi tuần phân bổ 20 giờ làm việc, tổng cộng 240 giờ. Đây là kế hoạch đề xuất mười hai tuần, không phải ghi lại ngày công đã thực hiện. Runtime EC2 được dự toán riêng ở tổng 240 giờ; không bắt buộc trùng từng giờ làm việc.
+Mỗi tuần phân bổ 20 giờ làm việc, tổng cộng 240 giờ. Lịch đề xuất chạy từ ngày 7/9 đến 27/11/2026; ngày làm việc cuối là 27/11, trước hạn 30/11. Đây là kế hoạch, không phải ghi lại ngày công đã thực hiện. Runtime EC2 được dự toán riêng ở tổng 240 giờ; không bắt buộc trùng từng giờ làm việc.
 
-| Tuần | Công việc | Bằng chứng |
+| Tuần và ngày dự kiến | Công việc | Bằng chứng |
 | --- | --- | --- |
-| 1 20 h | Phạm vi và tiêu chí nghiệm thu | Chốt phạm vi kiến trúc |
-| 2 20 h | Audit model preprocessing và nhãn | Manifest artifacts và hash |
-| 3 20 h | Hoàn thiện validation và lỗi API | Hợp đồng API và tests |
-| 4 20 h | Kiểm tra frontend và giải thích | Luồng browser local được xác minh |
-| 5 20 h | Đóng gói container production | Hai image qua smoke tests |
-| 6 20 h | Hoàn thiện CI và phát hành GHCR | Digest release được phát hành |
-| 7 20 h | Chuẩn bị IAM mạng và ngân sách | Role EC2 và kết nối giới hạn |
-| 8 20 h | Lưu và tải artifacts từ S3 | Hash tải về khớp |
-| 9 20 h | Triển khai EC2 và inference thật | Nghiệm thu desktop và điện thoại |
-| 10 20 h | Cấu hình CloudWatch và alarm RAM | Kiểm tra metrics log và email |
-| 11 20 h | Diễn tập rollback và đo latency | Bằng chứng phục hồi và hiệu năng |
-| 12 20 h | Hoàn thiện báo cáo demo và cleanup | Bàn giao và rà soát chi phí |
+| 1 · 7–11/9 | Phạm vi và tiêu chí nghiệm thu | Chốt phạm vi kiến trúc |
+| 2 · 14–18/9 | Audit model preprocessing và nhãn | Manifest artifacts và hash |
+| 3 · 21–25/9 | Hoàn thiện validation và lỗi API | Hợp đồng API và tests |
+| 4 · 28/9–2/10 | Kiểm tra frontend và giải thích | Luồng browser local được xác minh |
+| 5 · 5–9/10 | Đóng gói container production | Hai image qua smoke tests |
+| 6 · 12–16/10 | Hoàn thiện CI và phát hành GHCR | Digest release được phát hành |
+| 7 · 19–23/10 | Chuẩn bị IAM mạng và ngân sách | Role EC2 và kết nối giới hạn |
+| 8 · 26–30/10 | Lưu và tải artifacts từ S3 | Hash tải về khớp |
+| 9 · 2–6/11 | Triển khai EC2 và inference thật | Nghiệm thu desktop và điện thoại |
+| 10 · 9–13/11 | Cấu hình CloudWatch và alarm RAM | Kiểm tra metrics log và email |
+| 11 · 16–20/11 | Diễn tập rollback và đo latency | Bằng chứng phục hồi và hiệu năng |
+| 12 · 23–27/11 | Hoàn thiện báo cáo demo và cleanup | Bàn giao và rà soát chi phí |
 
 
 ### 6 Ước tính ngân sách

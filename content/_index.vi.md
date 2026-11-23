@@ -8,13 +8,13 @@ chapter: false
 # Báo cáo thực tập
 
 ### Thông tin sinh viên:
-&emsp; **Họ và tên:** Nguyễn Văn A
+&emsp; **Họ và tên:** Tran Hung Anh
 
 &emsp; **Số điện thoại:** 0989888999
 
 &emsp; **Email:** Anguyenvan@gmail.com
 
-&emsp; **Trường:** Đại học Sư phạm Kỹ thuật TP.HCM
+&emsp; **Trường:** FPT University
 
 &emsp; **Ngành:** Công nghệ thông tin
 
@@ -26,13 +26,13 @@ chapter: false
 
 &emsp; **Dự án:** Nhận diện bệnh lá cà chua trên AWS (EC2, S3, CloudWatch)
 
-&emsp; **Thời gian thực tập:** 12 Tuần (Từ tháng 08/2025 đến tháng 11/2025)
+&emsp; **Thời gian thực tập:** 12 tuần (tháng 9–11/2026; ngày làm việc cuối dự kiến 27/11)
 
-![Ảnh đại diện của bạn](/images/avatar.png)
+![Ảnh chân dung của Tran Hung Anh](/images/profile.jpg)
 
 ### Nội dung báo cáo
 
-1. [Nhật ký công việc](1-Worklog/): Nhật ký 12 tuần ghi nhận chi tiết quá trình chuẩn bị dữ liệu, huấn luyện mô hình, hạ tầng AWS, triển khai container và rà soát chi phí.
+1. [Nhật ký công việc](1-Worklog/): 11 tuần nhật ký ghi nhận quá trình chuẩn bị dữ liệu, huấn luyện mô hình, hạ tầng AWS, triển khai container và bảo mật truy cập công khai.
 2. [Đề xuất dự án](2-Proposal/): Kế hoạch triển khai và xác minh trong 12 tuần cho ứng dụng nhận diện bệnh lá cà chua trên AWS.
 3. [Các bài blogs đã đăng](3-BlogsPosted/): Các bài viết kỹ thuật chia sẻ trên AWS Study Group.
 4. [Các events đã tham gia](4-EventParticipated/): Các sự kiện và workshop công nghệ đã tham dự trong kỳ thực tập.

@@ -70,22 +70,22 @@ Use CloudWatch Logs for both containers and Agent metrics for RAM and disk. Reta
 
 ### 5 Timelines and milestones
 
-Each week receives 20 planned working hours, totaling 240 hours. This is a proposed twelve-week schedule, not a reconstruction of dates already worked. EC2 runtime is separately capped at a planning total of 240 hours; it need not match every working hour.
+Each week receives 20 planned working hours, totaling 240 hours. The proposed schedule runs from September 7 through November 27, 2026, with November 27 as the final working day, ahead of the November 30 cutoff. This is a planned schedule, not a reconstruction of dates already worked. EC2 runtime is separately capped at a planning total of 240 hours; it need not match every working hour.
 
-| Week | Work package | Milestone evidence |
+| Week and target dates | Work package | Milestone evidence |
 | --- | --- | --- |
-| 1 20 h | Scope and acceptance criteria | Architecture scope agreed |
-| 2 20 h | Audit model preprocessing and labels | Artifact manifest and hashes |
-| 3 20 h | Harden API validation and errors | API contract and tests |
-| 4 20 h | Validate frontend and explanations | Browser workflow verified locally |
-| 5 20 h | Package production containers | Two images pass smoke tests |
-| 6 20 h | Complete CI and GHCR delivery | Published release digests |
-| 7 20 h | Prepare AWS IAM network and budget | EC2 role and restricted connectivity |
-| 8 20 h | Store and retrieve S3 artifacts | Download hashes match |
-| 9 20 h | Deploy EC2 and test real inference | Desktop and phone acceptance |
-| 10 20 h | Configure CloudWatch and RAM alarm | Metrics logs and email test |
-| 11 20 h | Rehearse rollback and measure latency | Recovery and performance evidence |
-| 12 20 h | Finalize report demo and cleanup | Handover and cost review |
+| 1 · Sep 7–11 | Scope and acceptance criteria | Architecture scope agreed |
+| 2 · Sep 14–18 | Audit model preprocessing and labels | Artifact manifest and hashes |
+| 3 · Sep 21–25 | Harden API validation and errors | API contract and tests |
+| 4 · Sep 28–Oct 2 | Validate frontend and explanations | Browser workflow verified locally |
+| 5 · Oct 5–9 | Package production containers | Two images pass smoke tests |
+| 6 · Oct 12–16 | Complete CI and GHCR delivery | Published release digests |
+| 7 · Oct 19–23 | Prepare AWS IAM network and budget | EC2 role and restricted connectivity |
+| 8 · Oct 26–30 | Store and retrieve S3 artifacts | Download hashes match |
+| 9 · Nov 2–6 | Deploy EC2 and test real inference | Desktop and phone acceptance |
+| 10 · Nov 9–13 | Configure CloudWatch and RAM alarm | Metrics logs and email test |
+| 11 · Nov 16–20 | Rehearse rollback and measure latency | Recovery and performance evidence |
+| 12 · Nov 23–27 | Finalize report demo and cleanup | Handover and cost review |
 
 
 ### 6 Budget estimation

@@ -12,6 +12,7 @@ pre: " <b> 5. </b> "
 > **Region:** Asia Pacific (Sydney) `ap-southeast-2`  
 > **Source Repository:** [starkkk1/plant-disease-detection](https://github.com/starkkk1/plant-disease-detection)  
 > **Deployment Status:** Containerized Production Demonstration on AWS
+> **Target Workshop Completion:** November 27, 2026 (before the November 30 deadline)
 
 ---
 

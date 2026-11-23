@@ -8,7 +8,7 @@ pre: " <b> 1. </b> "
 
 # Nhật ký công việc thực tập
 
-Phần này ghi nhận toàn bộ nhật ký công việc trong 12 tuần thực tập thuộc dự án **Nhận diện bệnh lá cà chua trên AWS (Tomato Leaf Disease Detection on AWS)**. Trong suốt 12 tuần, dự án đã tiến triển bài bản từ khâu chuẩn bị dữ liệu, huấn luyện mô hình nhẹ, đến việc triển khai container hóa trên AWS EC2, lưu trữ artifacts mô hình trên S3, thiết lập giám sát với CloudWatch và rà soát tối ưu chi phí vận hành.
+Phần này gồm 11 tuần nhật ký công việc trong báo cáo thực tập dự án **Nhận diện bệnh lá cà chua trên AWS (Tomato Leaf Disease Detection on AWS)**. Các tuần ghi nhận quá trình chuẩn bị dữ liệu, huấn luyện mô hình, xây dựng hạ tầng AWS, triển khai, giám sát và bảo mật truy cập công khai. Đề xuất dự án 12 tuần vẫn là kế hoạch, không đồng nghĩa với việc có đủ 12 tuần nhật ký tại đây.
 
 ### Tổng quan nhật ký các tuần:
 - **Tuần 1:** [Tuần 1 - Chuẩn bị dữ liệu](1.1-week1/)
@@ -22,4 +22,3 @@ Phần này ghi nhận toàn bộ nhật ký công việc trong 12 tuần thực
 - **Tuần 9:** [Tuần 9 - Quản lý nhật ký với Amazon CloudWatch Logs](1.9-week9/)
 - **Tuần 10:** [Tuần 10 - Thu thập metrics CloudWatch và cảnh báo RAM](1.10-week10/)
 - **Tuần 11:** [Tuần 11 - Bảo mật truy cập công khai cho ứng dụng EC2](1.11-week11/)
-- **Tuần 12:** [Tuần 12 - Rà soát chi phí vận hành AWS và bàn giao](1.12-week12/)

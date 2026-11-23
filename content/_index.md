@@ -26,13 +26,13 @@ chapter: false
 
 &emsp; **Project:** Tomato Leaf Disease Detection on AWS (EC2, S3, CloudWatch)
 
-&emsp; **Internship Duration:** 12 Weeks (September 2026 - December 2026)
+&emsp; **Internship Duration:** 12 Weeks (September–November 2026; planned final working day: November 27)
 
-![Your profile picture](/images/avatar.png)
+![Photo of Tran Hung Anh](/images/profile.jpg)
 
 ### Report Content
 
-1. [Worklog](1-Worklog/): 12-week worklog covering dataset preparation, model training, AWS infrastructure, deployment, and cost review.
+1. [Worklog](1-Worklog/): 11 weekly worklogs covering dataset preparation, model training, AWS infrastructure, deployment, and secure public access.
 2. [Proposal](2-Proposal/): 12-week implementation and validation plan for tomato leaf disease detection on AWS.
 3. [Blogs Posted](3-BlogsPosted/): Technical blogs shared with the AWS study community.
 4. [Events Participated](4-EventParticipated/): Workshops and events attended during the internship program.

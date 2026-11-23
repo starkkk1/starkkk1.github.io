@@ -8,7 +8,7 @@ pre: " <b> 1. </b> "
 
 # Internship Worklog
 
-This section documents the 12-week internship worklog for the **Tomato Leaf Disease Detection on AWS** project. Over the course of twelve weeks, the project progressed systematically from dataset preparation and lightweight model training to containerized AWS deployment on EC2, private model artifact storage on S3, operational monitoring with CloudWatch, and cost-controlled production operations.
+This section contains the eleven weekly worklogs included in the **Tomato Leaf Disease Detection on AWS** internship report. They cover dataset preparation, model training, AWS infrastructure, deployment, monitoring, and secure public access. The separate twelve-week project proposal remains a planned schedule, not a claim that twelve worklogs are included here.
 
 ### Weekly Worklog Overview:
 - **Week 1:** [Week 1 - Dataset Preparation](1.1-week1/)
@@ -22,4 +22,3 @@ This section documents the 12-week internship worklog for the **Tomato Leaf Dise
 - **Week 9:** [Week 9 - Amazon CloudWatch Logs](1.9-week9/)
 - **Week 10:** [Week 10 - CloudWatch Metrics and RAM Alerting](1.10-week10/)
 - **Week 11:** [Week 11 - Secure Public Access to the EC2 Workload](1.11-week11/)
-- **Week 12:** [Week 12 - AWS Operations Cost Review and Handover](1.12-week12/)

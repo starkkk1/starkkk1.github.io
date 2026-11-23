@@ -12,6 +12,7 @@ pre: " <b> 5. </b> "
 > **Khu vực (Region):** Châu Á - Thái Bình Dương (Sydney) `ap-southeast-2`  
 > **Kho mã nguồn:** [starkkk1/plant-disease-detection](https://github.com/starkkk1/plant-disease-detection)  
 > **Trạng thái triển khai:** Bản demo chạy container hoàn chỉnh trên hạ tầng AWS
+> **Mốc hoàn tất workshop dự kiến:** 27/11/2026 (trước hạn 30/11)
 
 ---
 
