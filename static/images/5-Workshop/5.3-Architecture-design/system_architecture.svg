@@ -1,639 +1,163 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 920" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1080" viewBox="0 0 1600 1080" role="img" aria-labelledby="title desc">
+  <title id="title">Plant Disease Detection — AWS architecture</title>
+  <desc id="desc">Architecture for a tomato leaf diagnosis app: GitHub Actions publishes images to GHCR for manual deployment to a single EC2 host; private S3 model artifacts are verified and mounted read-only; Next.js and FastAPI serve users; CloudWatch monitors logs and host metrics and sends RAM alarms through SNS.</desc>
   <defs>
-    <!-- Card Drop Shadow -->
-    <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="115%">
-      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0F172A" flood-opacity="0.08"/>
-    </filter>
-    <filter id="badgeShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.25"/>
-    </filter>
-
-    <!-- Arrow Markers -->
-    <marker id="arrowGreen" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#16A34A"/>
-    </marker>
-    <marker id="arrowOrange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#EA580C"/>
-    </marker>
-    <marker id="arrowPurple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#7C3AED"/>
-    </marker>
-    <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#0284C7"/>
-    </marker>
-    <marker id="arrowMagenta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#C026D3"/>
-    </marker>
-    <marker id="arrowRed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#DC2626"/>
-    </marker>
-    <marker id="arrowGray" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#475569"/>
-    </marker>
-
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0f172a" flood-opacity=".10"/></filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker>
+    <marker id="greenArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#39814a"/></marker>
+    <marker id="orangeArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#d97706"/></marker>
+    <marker id="purpleArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#7c3aed"/></marker>
     <style>
-      .font-sans { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-      .title-cloud { font-size: 15px; font-weight: 700; fill: #232F3E; }
-      .title-region { font-size: 13.5px; font-weight: 600; fill: #00758F; }
-      .box-title { font-size: 12.5px; font-weight: 700; }
-      .node-title { font-size: 12px; font-weight: 700; fill: #0F172A; }
-      .node-sub { font-size: 10px; font-weight: 500; fill: #64748B; }
-      .edge-label { font-size: 9.5px; font-weight: 600; }
-      .badge-text { font-size: 10.5px; font-weight: 800; fill: #FFFFFF; text-anchor: middle; dominant-baseline: central; }
+      text{font-family:Arial,Helvetica,sans-serif;fill:#172033}.title{font-size:25px;font-weight:700}.sub{font-size:14px;fill:#526075}.zone-title{font-size:17px;font-weight:700}.zone-sub{font-size:12px;fill:#526075}.node{fill:#fff;stroke:#cbd5e1;stroke-width:1.5;rx:12;filter:url(#shadow)}.node-title{font-size:15px;font-weight:700}.node-text{font-size:12px;fill:#475569}.small{font-size:11px;fill:#475569}.tag{font-size:11px;font-weight:700}.flow{fill:none;stroke:#64748b;stroke-width:2.2;marker-end:url(#arrow)}.flow-green{fill:none;stroke:#39814a;stroke-width:2.4;marker-end:url(#greenArrow)}.flow-orange{fill:none;stroke:#d97706;stroke-width:2.4;marker-end:url(#orangeArrow)}.flow-purple{fill:none;stroke:#7c3aed;stroke-width:2.4;marker-end:url(#purpleArrow)}.dash{stroke-dasharray:7 6}.badge{fill:#273449;stroke:#fff;stroke-width:2}.badge-text{fill:#fff;font-size:12px;font-weight:700;text-anchor:middle;dominant-baseline:central}.label{font-size:11px;font-weight:700;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
     </style>
   </defs>
+  <rect width="1600" height="1080" fill="#fff"/>
 
-  <!-- Background Canvas -->
-  <rect width="1440" height="920" fill="#FAFBFC"/>
-
-  <!-- ======================================================== -->
-  <!-- 1. EXTERNAL ACTORS & SERVICES                            -->
-  <!-- ======================================================== -->
-
-  <!-- Left Top: Offline ML Model Training & Distillation Audit -->
-  <g transform="translate(18, 140)">
-    <rect x="0" y="0" width="132" height="96" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.2" filter="url(#cardShadow)"/>
-    <!-- ML Icon -->
-    <rect x="10" y="10" width="24" height="24" rx="5" fill="#EE4C2C"/>
-    <path d="M 16 16 L 26 22 L 16 28 Z" fill="#FFFFFF"/>
-    <text x="40" y="21" class="font-sans" font-size="10.5" font-weight="700" fill="#0F172A">Offline ML Pipeline</text>
-    <text x="40" y="32" class="font-sans" font-size="8.5" font-weight="600" fill="#64748B">Knowledge Distill</text>
-    
-    <rect x="8" y="42" width="116" height="22" rx="3" fill="#F8FAFC" stroke="#E2E8F0"/>
-    <text x="14" y="56" class="font-sans" font-size="8" fill="#475569">Teacher: ConvNeXt-Tiny</text>
-
-    <rect x="8" y="68" width="116" height="22" rx="3" fill="#F8FAFC" stroke="#E2E8F0"/>
-    <text x="14" y="82" class="font-sans" font-size="8" fill="#475569">Student: MobileNetV3</text>
+  <!-- External actors and delivery pipeline -->
+  <text x="45" y="44" class="title">Plant Disease Detection</text>
+  <text x="45" y="68" class="sub">System architecture · baseline deployment documented for AWS Sydney (ap-southeast-2)</text>
+  <text x="1080" y="38" class="node-title">Developer</text>
+  <text x="1080" y="57" class="small">pushes source changes</text>
+  <g>
+    <rect x="45" y="104" width="155" height="76" class="node"/>
+    <text x="122" y="133" text-anchor="middle" class="node-title">Offline training</text>
+    <text x="122" y="153" text-anchor="middle" class="node-text">ConvNeXt-Tiny teacher</text>
+    <text x="122" y="168" text-anchor="middle" class="small">→ distilled MobileNetV3</text>
   </g>
-
-  <!-- Left Bottom: Users & Field Agronomists -->
-  <g transform="translate(25, 630)">
-    <circle cx="55" cy="22" r="14" fill="#2563EB"/>
-    <path d="M 32 56 C 32 42 42 38 55 38 C 68 38 78 42 78 56 Z" fill="#2563EB"/>
-    <circle cx="72" cy="20" r="11" fill="#60A5FA"/>
-    <path d="M 56 56 C 56 44 64 41 74 41 C 84 41 90 45 90 56 Z" fill="#60A5FA"/>
-    <text x="55" y="75" text-anchor="middle" class="font-sans" font-size="11.5" font-weight="700" fill="#0F172A">Users &amp; Farmers</text>
-    <text x="55" y="89" text-anchor="middle" class="font-sans" font-size="9" fill="#64748B">Field Leaf Upload UI</text>
-    <rect x="8" y="98" width="94" height="20" rx="4" fill="#EFF6FF" stroke="#BFDBFE"/>
-    <text x="55" y="111" text-anchor="middle" class="font-sans" font-size="8" font-weight="600" fill="#1D4ED8">Mobile / Desktop</text>
+  <g>
+    <rect x="295" y="104" width="160" height="76" class="node"/>
+    <text x="375" y="135" text-anchor="middle" class="node-title">GitHub repository</text>
+    <text x="375" y="157" text-anchor="middle" class="node-text">Application source</text>
   </g>
-
-  <!-- Right: Developer & GitHub Repository -->
-  <g transform="translate(1312, 340)">
-    <!-- Developer Avatar -->
-    <circle cx="45" cy="20" r="14" fill="#334155"/>
-    <path d="M 23 54 C 23 40 33 36 45 36 C 57 36 67 40 67 54 Z" fill="#334155"/>
-    <text x="45" y="72" text-anchor="middle" class="font-sans" font-size="11.5" font-weight="700" fill="#0F172A">Developer</text>
-    <text x="45" y="85" text-anchor="middle" class="font-sans" font-size="9.5" fill="#64748B">Repository Owner</text>
-
-    <!-- GitHub Box -->
-    <g transform="translate(10, 110)">
-      <rect x="0" y="0" width="70" height="70" rx="8" fill="#24292F" filter="url(#cardShadow)"/>
-      <path d="M 35 12 C 22.84 12 13 21.84 13 34 C 13 43.74 19.3 51.96 28.05 54.9 C 29.26 55.12 29.7 54.37 29.7 53.72 C 29.7 53.14 29.68 51.18 29.67 49.05 C 23.54 50.39 22.25 46.35 22.25 46.35 C 21.25 43.81 19.8 43.14 19.8 43.14 C 17.81 41.78 19.95 41.81 19.95 41.81 C 22.15 41.96 23.32 44.06 23.32 44.06 C 25.28 47.42 28.47 46.45 29.72 45.89 C 29.92 44.47 30.49 43.5 31.12 42.95 C 26.23 42.4 21.08 40.51 21.08 32.08 C 21.08 29.68 21.94 27.71 23.35 26.17 C 23.12 25.62 22.36 23.37 23.57 20.35 C 23.57 20.35 25.42 19.76 29.63 22.62 C 31.39 22.12 33.27 21.88 35.14 21.87 C 37.01 21.88 38.9 22.12 40.66 22.62 C 44.88 19.76 46.72 20.35 46.72 20.35 C 47.93 23.37 47.18 25.62 46.95 26.17 C 48.36 27.71 49.21 29.68 49.21 32.08 C 49.21 40.54 44.05 42.39 39.15 42.93 C 39.93 43.6 40.63 44.95 40.63 46.99 C 40.63 49.92 40.61 52.27 40.61 53.72 C 40.61 54.39 41.05 55.15 42.28 54.9 C 51.02 51.95 57.3 43.72 57.3 34 C 57.3 21.84 47.46 12 35 12 Z" fill="#FFFFFF"/>
-      <text x="35" y="82" text-anchor="middle" class="font-sans" font-size="9.5" font-weight="700" fill="#24292F">GitHub Repo</text>
-    </g>
+  <g>
+    <rect x="540" y="104" width="175" height="76" class="node"/>
+    <text x="627" y="135" text-anchor="middle" class="node-title">GitHub Actions</text>
+    <text x="627" y="157" text-anchor="middle" class="node-text">Tests · builds · publishes</text>
   </g>
-
-  <!-- ======================================================== -->
-  <!-- 2. AWS CLOUD BOUNDARY                                    -->
-  <!-- ======================================================== -->
-  <rect x="165" y="20" width="1135" height="880" rx="10" fill="#FFFFFF" stroke="#718096" stroke-width="1.8"/>
-  
-  <!-- AWS Cloud Header -->
-  <g transform="translate(182, 34)">
-    <rect x="0" y="0" width="28" height="18" rx="3" fill="#232F3E"/>
-    <text x="5" y="13" class="font-sans" font-size="9.5" font-weight="900" fill="#FF9900">aws</text>
-    <text x="36" y="14" class="font-sans title-cloud">AWS Cloud</text>
+  <g>
+    <rect x="800" y="104" width="175" height="76" class="node"/>
+    <text x="887" y="135" text-anchor="middle" class="node-title">GitHub Container Registry</text>
+    <text x="887" y="157" text-anchor="middle" class="node-text">Frontend and API images</text>
   </g>
-
-  <!-- ======================================================== -->
-  <!-- 3. AWS REGION BOUNDARY                                   -->
-  <!-- ======================================================== -->
-  <rect x="180" y="62" width="1105" height="825" rx="8" fill="#F8FAFC" stroke="#00A4A6" stroke-width="1.8" stroke-dasharray="6 4"/>
-  
-  <!-- Region Header -->
-  <g transform="translate(196, 74)">
-    <circle cx="8" cy="8" r="7" fill="#00A4A6"/>
-    <rect x="6" y="6" width="4" height="4" fill="#FFFFFF"/>
-    <text x="22" y="12" class="font-sans title-region">Region ap-southeast-2 (Sydney)</text>
+  <g>
+    <rect x="1080" y="104" width="205" height="76" class="node"/>
+    <text x="1182" y="135" text-anchor="middle" class="node-title">Operator release step</text>
+    <text x="1182" y="157" text-anchor="middle" class="node-text">Manual image pull / deployment</text>
   </g>
+  <path d="M1080 65H375V99" class="flow-orange"/><circle cx="730" cy="65" r="14" class="badge"/><text x="730" y="65" class="badge-text">1</text>
+  <path d="M455 142H535" class="flow-orange"/><circle cx="495" cy="125" r="14" class="badge"/><text x="495" y="125" class="badge-text">2</text><text x="495" y="166" text-anchor="middle" class="label">webhook</text>
+  <path d="M715 142H795" class="flow-orange"/><circle cx="755" cy="125" r="14" class="badge"/><text x="755" y="125" class="badge-text">3</text>
+  <path d="M975 142H1075" class="flow-orange"/><text x="1025" y="127" text-anchor="middle" class="label">images published</text>
+  <path d="M1182 180V226H1320V612" class="flow-orange"/><circle cx="1320" cy="397" r="14" class="badge"/><text x="1320" y="397" class="badge-text">8</text>
 
-  <!-- ======================================================== -->
-  <!-- 4. BOX 1: MODEL ARTIFACT & STORAGE PIPELINE (GREEN)      -->
-  <!-- ======================================================== -->
-  <g transform="translate(198, 102)">
-    <rect x="0" y="0" width="765" height="198" rx="8" fill="#EBF7ED" stroke="#4CAF50" stroke-width="1.5" stroke-dasharray="5 3"/>
-    
-    <!-- Title -->
-    <g transform="translate(16, 14)">
-      <circle cx="8" cy="8" r="7" fill="#2E7D32"/>
-      <path d="M 5 8 L 7 10 L 11 6" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"/>
-      <text x="22" y="12" class="font-sans box-title" fill="#1B5E20">Model Checkpoint &amp; Artifact Storage Pipeline (Amazon S3 &#x2192; EC2 Host)</text>
-    </g>
+  <!-- AWS boundary -->
+  <rect x="220" y="215" width="1340" height="820" rx="12" fill="#fff" stroke="#475569" stroke-width="2"/>
+  <rect x="220" y="215" width="1340" height="45" rx="12" fill="#f8fafc"/>
+  <path d="M220 260H1560" stroke="#cbd5e1"/>
+  <text x="246" y="244" font-size="17" font-weight="700">AWS Cloud</text>
+  <text x="1440" y="244" text-anchor="end" class="sub">Region ap-southeast-2 · Sydney</text>
 
-    <!-- Node 1: S3 Bucket -->
-    <g transform="translate(40, 42)">
-      <rect x="0" y="0" width="200" height="138" rx="8" fill="#FFFFFF" stroke="#4CAF50" stroke-width="1.5" filter="url(#cardShadow)"/>
-      <g transform="translate(14, 14)">
-        <rect x="0" y="0" width="34" height="34" rx="6" fill="#3F8624"/>
-        <path d="M 9 10 C 9 8 25 8 25 10 L 25 22 C 25 24 9 24 9 22 Z" fill="none" stroke="#FFFFFF" stroke-width="2"/>
-        <ellipse cx="17" cy="11" rx="8" ry="3" fill="#FFFFFF"/>
-      </g>
-      <text x="56" y="26" class="font-sans node-title">Amazon S3 Bucket</text>
-      <text x="56" y="39" class="font-sans node-sub">plant-disease-model-artifacts</text>
-      
-      <rect x="12" y="58" width="176" height="30" rx="4" fill="#F1F8F1" stroke="#C8E6C9" stroke-width="1"/>
-      <text x="20" y="73" class="font-sans" font-size="9" font-weight="700" fill="#2E7D32">&#x2022; model.pth (~6.0 MiB)</text>
-      <text x="20" y="83" class="font-sans" font-size="8" fill="#558B2F">PyTorch Distilled Weights</text>
-      
-      <rect x="12" y="94" width="176" height="30" rx="4" fill="#F1F8F1" stroke="#C8E6C9" stroke-width="1"/>
-      <text x="20" y="109" class="font-sans" font-size="9" font-weight="700" fill="#2E7D32">&#x2022; class_to_idx.json (~1.2 KiB)</text>
-      <text x="20" y="119" class="font-sans" font-size="8" fill="#558B2F">11 Tomato Disease Classes</text>
-    </g>
+  <!-- Model artifact lane -->
+  <rect x="245" y="280" width="790" height="260" rx="12" fill="#eff8ef" stroke="#79a879" stroke-width="1.7" stroke-dasharray="7 5"/>
+  <text x="268" y="310" class="zone-title" fill="#28633a">1 · Model artifacts &amp; integrity</text>
+  <text x="268" y="330" class="zone-sub">Weights are stored privately and fetched by the EC2 host during deployment.</text>
+  <rect x="280" y="360" width="205" height="130" class="node"/>
+  <text x="382" y="389" text-anchor="middle" class="node-title">Amazon S3</text>
+  <text x="382" y="411" text-anchor="middle" class="node-text">Private, versioned artifacts</text>
+  <text x="382" y="438" text-anchor="middle" class="small">model.pth · class_to_idx.json</text>
+  <text x="382" y="460" text-anchor="middle" class="small">mobilenet-distilled-v1/</text>
+  <rect x="600" y="360" width="205" height="130" class="node"/>
+  <text x="702" y="389" text-anchor="middle" class="node-title">EC2 host storage</text>
+  <text x="702" y="412" text-anchor="middle" class="node-text">Download with instance role</text>
+  <text x="702" y="440" text-anchor="middle" class="small">SHA256 integrity check</text>
+  <text x="702" y="462" text-anchor="middle" class="small">Versioned checkpoint directory</text>
+  <rect x="865" y="373" width="145" height="104" class="node"/>
+  <text x="937" y="402" text-anchor="middle" class="node-title">Read-only mount</text>
+  <text x="937" y="426" text-anchor="middle" class="small">/app/artifacts:ro</text>
+  <text x="937" y="449" text-anchor="middle" class="small">API container</text>
+  <path d="M485 425H595" class="flow-green"/><circle cx="540" cy="407" r="14" class="badge"/><text x="540" y="407" class="badge-text">5</text><text x="540" y="449" text-anchor="middle" class="label">aws s3 cp · IAM</text>
+  <path d="M805 425H860" class="flow-green"/><circle cx="833" cy="407" r="14" class="badge"/><text x="833" y="407" class="badge-text">6–7</text><text x="833" y="449" text-anchor="middle" class="label">verify · mount :ro</text>
+  <path d="M122 180V390H275" class="flow-green"/><circle cx="242" cy="390" r="14" class="badge"/><text x="242" y="390" class="badge-text">4</text><text x="164" y="373" class="label">release artifacts</text>
 
-    <!-- Node 2: EC2 Host Filesystem & SHA256 Check -->
-    <g transform="translate(365, 42)">
-      <rect x="0" y="0" width="200" height="138" rx="8" fill="#FFFFFF" stroke="#00758F" stroke-width="1.5" filter="url(#cardShadow)"/>
-      <g transform="translate(14, 14)">
-        <rect x="0" y="0" width="34" height="34" rx="6" fill="#00758F"/>
-        <path d="M 8 11 L 14 11 L 17 14 L 26 14 L 26 23 L 8 23 Z" fill="#FFFFFF"/>
-      </g>
-      <text x="56" y="26" class="font-sans node-title">EC2 Host Filesystem</text>
-      <text x="56" y="39" class="font-sans node-sub">/home/ec2-user/checkpoints/v1</text>
-      
-      <rect x="12" y="58" width="176" height="30" rx="4" fill="#E6F4F7" stroke="#B2E0E6" stroke-width="1"/>
-      <text x="20" y="73" class="font-sans" font-size="9" font-weight="700" fill="#005B6E">&#x2714; SHA256 Hash Matching</text>
-      <text x="20" y="83" class="font-sans" font-size="8" fill="#00758F">Digest: 05e72798a741...</text>
-      
-      <rect x="12" y="94" width="176" height="30" rx="4" fill="#E6F4F7" stroke="#B2E0E6" stroke-width="1"/>
-      <text x="20" y="109" class="font-sans" font-size="9" font-weight="700" fill="#005B6E">&#x2714; Integrity Validated</text>
-      <text x="20" y="119" class="font-sans" font-size="8" fill="#00758F">Rejects Tampered Artifacts</text>
-    </g>
+  <!-- Operations lane -->
+  <rect x="1060" y="280" width="475" height="430" rx="12" fill="#f8fafc" stroke="#64748b" stroke-width="1.7" stroke-dasharray="7 5"/>
+  <text x="1083" y="310" class="zone-title">4 · Operations &amp; security</text>
+  <rect x="1085" y="337" width="425" height="76" class="node"/>
+  <text x="1105" y="363" class="node-title">AWS IAM instance profile</text>
+  <text x="1105" y="385" class="node-text">Scoped S3 GetObject + CloudWatch agent permissions</text>
+  <rect x="1085" y="430" width="425" height="76" class="node"/>
+  <text x="1105" y="456" class="node-title">CloudWatch Logs</text>
+  <text x="1105" y="478" class="node-text">Docker awslogs · frontend and backend · 7-day retention</text>
+  <rect x="1085" y="523" width="195" height="78" class="node"/>
+  <text x="1182" y="550" text-anchor="middle" class="node-title">CloudWatch Agent</text>
+  <text x="1182" y="573" text-anchor="middle" class="small">RAM + disk · every 60 s</text>
+  <rect x="1085" y="620" width="195" height="66" class="node"/>
+  <text x="1182" y="646" text-anchor="middle" class="node-title">CloudWatch Metrics</text>
+  <text x="1182" y="667" text-anchor="middle" class="small">PlantDisease/Host</text>
+  <rect x="1310" y="523" width="200" height="78" class="node"/>
+  <text x="1410" y="550" text-anchor="middle" class="node-title">CloudWatch RAM Alarm</text>
+  <text x="1410" y="573" text-anchor="middle" class="small">&gt;85% · 3 × 1-minute periods</text>
+  <rect x="1310" y="620" width="200" height="66" class="node"/>
+  <text x="1410" y="646" text-anchor="middle" class="node-title">Amazon SNS</text>
+  <text x="1410" y="667" text-anchor="middle" class="small">Confirmed email subscription</text>
+  <path d="M1182 601V615" class="flow"/><circle cx="1154" cy="608" r="13" class="badge"/><text x="1154" y="608" class="badge-text">16</text>
+  <path d="M1280 653H1295V562H1305" class="flow"/><circle cx="1292" cy="653" r="13" class="badge"/><text x="1292" y="653" class="badge-text">17</text>
+  <path d="M1410 601V615" class="flow"/><circle cx="1440" cy="608" r="13" class="badge"/><text x="1440" y="608" class="badge-text">18</text>
+  <path d="M1010 465H1050V375H1080" class="flow dash"/><text x="1038" y="453" text-anchor="middle" class="label" transform="rotate(-90 1038 453)">instance role</text>
+  <path d="M1000 650H1078V468" class="flow dash"/><circle cx="1040" cy="650" r="14" class="badge"/><text x="1040" y="650" class="badge-text">15</text>
+  <path d="M1000 674H1050V561H1080" class="flow dash"/>
 
-    <!-- Node 3: Docker Volume Mount -->
-    <g transform="translate(620, 68)">
-      <rect x="0" y="0" width="130" height="86" rx="6" fill="#FFFFFF" stroke="#64748B" stroke-width="1.2" stroke-dasharray="3 2" filter="url(#cardShadow)"/>
-      <text x="65" y="24" text-anchor="middle" class="font-sans node-title" font-size="11">Docker Volume</text>
-      <rect x="10" y="34" width="110" height="26" rx="4" fill="#FEE2E2" stroke="#FCA5A5" stroke-width="1"/>
-      <text x="65" y="51" text-anchor="middle" class="font-sans" font-size="9" font-weight="700" fill="#991B1B">/app/artifacts :ro</text>
-      <text x="65" y="74" text-anchor="middle" class="font-sans" font-size="8" fill="#64748B">Read-Only Isolation</text>
-    </g>
+  <!-- Runtime lane -->
+  <rect x="245" y="565" width="790" height="430" rx="12" fill="#f5effb" stroke="#9b79b9" stroke-width="1.7" stroke-dasharray="7 5"/>
+  <text x="268" y="595" class="zone-title" fill="#633b87">3 · Web application &amp; AI inference</text>
+  <text x="268" y="615" class="zone-sub">One Amazon Linux 2023 EC2 host · Docker · CPU inference</text>
+  <rect x="275" y="658" width="145" height="172" class="node"/>
+  <text x="347" y="687" text-anchor="middle" class="node-title">Security Group</text>
+  <text x="347" y="710" text-anchor="middle" class="small">Public subnet</text>
+  <text x="347" y="742" text-anchor="middle" class="tag" fill="#6d28d9">:3000 Web UI</text>
+  <text x="347" y="764" text-anchor="middle" class="tag" fill="#6d28d9">:8000 API</text>
+  <text x="347" y="790" text-anchor="middle" class="small">Ingress source restricted</text>
+  <text x="347" y="807" text-anchor="middle" class="small">to approved IP /32</text>
+  <rect x="480" y="658" width="220" height="172" class="node"/>
+  <text x="590" y="687" text-anchor="middle" class="node-title">Next.js frontend</text>
+  <text x="590" y="710" text-anchor="middle" class="node-text">Standalone container · :3000</text>
+  <text x="590" y="742" text-anchor="middle" class="small">Leaf photo upload (JPEG / PNG)</text>
+  <text x="590" y="764" text-anchor="middle" class="small">Responsive browser UI</text>
+  <text x="590" y="797" text-anchor="middle" class="small">Returns diagnosis and heatmap</text>
+  <rect x="760" y="658" width="245" height="172" class="node"/>
+  <text x="882" y="687" text-anchor="middle" class="node-title">FastAPI inference API</text>
+  <text x="882" y="710" text-anchor="middle" class="node-text">PyTorch CPU container · :8000</text>
+  <circle cx="790" cy="739" r="11" class="badge"/><text x="790" y="739" class="badge-text">12</text>
+  <text x="894" y="742" text-anchor="middle" class="small">MobileNetV3-Small · 11 classes</text>
+  <circle cx="790" cy="766" r="11" class="badge"/><text x="790" y="766" class="badge-text">13</text>
+  <text x="894" y="769" text-anchor="middle" class="small">Grad-CAM++ explainability</text>
+  <text x="882" y="797" text-anchor="middle" class="small">JSON + heatmap overlay response</text>
+  <path d="M420 744H475" class="flow-purple"/><circle cx="447" cy="724" r="14" class="badge"/><text x="447" y="724" class="badge-text">9</text>
+  <path d="M700 744H755" class="flow-purple"/><circle cx="727" cy="724" r="14" class="badge"/><text x="727" y="724" class="badge-text">11</text><text x="727" y="769" text-anchor="middle" class="label">POST /predict</text>
+  <path d="M760 788H700" class="flow-purple"/><circle cx="729" cy="806" r="14" class="badge"/><text x="729" y="806" class="badge-text">14</text>
+  <text x="590" y="900" text-anchor="middle" class="label">Prediction and explanation are computed in the FastAPI process.</text>
+  <rect x="300" y="923" width="680" height="48" rx="9" fill="#fff" stroke="#ddd2eb"/>
+  <text x="640" y="944" text-anchor="middle" class="tag" fill="#53317c">Model checkpoint is loaded from the read-only artifact mount at API startup</text>
+  <text x="640" y="961" text-anchor="middle" class="small">Uploaded user images are processed for inference and are not persisted to S3 in this baseline.</text>
+  <path d="M937 477V650" class="flow-green"/><circle cx="937" cy="560" r="14" class="badge"/><text x="937" y="560" class="badge-text">7</text>
 
-    <!-- Arrows inside Box 1 -->
-    <path d="M 240 111 L 363 111" fill="none" stroke="#2E7D32" stroke-width="2" marker-end="url(#arrowGreen)"/>
-    <text x="302" y="101" text-anchor="middle" class="font-sans edge-label" fill="#2E7D32">aws s3 cp</text>
+  <!-- Users / ingress -->
+  <rect x="35" y="690" width="150" height="92" class="node"/>
+  <text x="110" y="721" text-anchor="middle" class="node-title">Users</text>
+  <text x="110" y="744" text-anchor="middle" class="node-text">Farmers · agronomists</text>
+  <text x="110" y="765" text-anchor="middle" class="small">Mobile / desktop browser</text>
+  <path d="M185 736H268" class="flow-purple"/><circle cx="226" cy="716" r="14" class="badge"/><text x="226" y="716" class="badge-text">9</text><text x="226" y="759" text-anchor="middle" class="label">HTTP · restricted ingress</text>
+  <path d="M185 752H235V850H882V835" class="flow-purple dash"/><text x="530" y="843" text-anchor="middle" class="label">API access at the same EC2 host · :8000</text>
+  <path d="M347 658V632H590V653" class="flow-purple"/><circle cx="455" cy="632" r="14" class="badge"/><text x="455" y="632" class="badge-text">10</text>
 
-    <path d="M 565 111 L 618 111" fill="none" stroke="#00758F" stroke-width="2" marker-end="url(#arrowBlue)"/>
-    <text x="591" y="101" text-anchor="middle" class="font-sans edge-label" fill="#00758F">:ro mount</text>
-  </g>
+  <!-- Notes / boundary choices -->
+  <rect x="1060" y="735" width="475" height="230" rx="12" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="1085" y="772" class="node-title">Deployment boundaries</text>
+  <text x="1085" y="805" class="node-text">• Single EC2 host; no load balancer or autoscaling.</text>
+  <text x="1085" y="832" class="node-text">• Public subnet with inbound rules locked to an approved /32.</text>
+  <text x="1085" y="859" class="node-text">• S3 is read during deployment; no S3 image-upload pipeline.</text>
+  <text x="1085" y="886" class="node-text">• Images are built and published automatically; EC2 rollout is manual.</text>
+  <text x="1085" y="930" class="small">Diagram reflects the documented baseline, not unverified AWS live state.</text>
 
-  <!-- Number 4: S3 Stores weights -->
-  <g transform="translate(230, 138)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">4</text>
-  </g>
-  <!-- Number 5: IAM Role Authorizes Download -->
-  <g transform="translate(490, 203)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">5</text>
-  </g>
-  <!-- Number 6: SHA256 Integrity Verification -->
-  <g transform="translate(718, 203)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">6</text>
-  </g>
-  <!-- Number 7: Read-Only Container Mount -->
-  <g transform="translate(778, 203)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">7</text>
-  </g>
-
-
-  <!-- ======================================================== -->
-  <!-- 5. BOX 2: CI/CD & CONTAINER DELIVERY PIPELINE (ORANGE)   -->
-  <!-- ======================================================== -->
-  <g transform="translate(198, 315)">
-    <rect x="0" y="0" width="765" height="195" rx="8" fill="#FFF4E5" stroke="#FF9800" stroke-width="1.5" stroke-dasharray="5 3"/>
-    
-    <!-- Title -->
-    <g transform="translate(16, 14)">
-      <circle cx="8" cy="8" r="7" fill="#D97706"/>
-      <path d="M 5 8 L 7 10 L 11 6" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"/>
-      <text x="22" y="12" class="font-sans box-title" fill="#B45309">Continuous Delivery &amp; Container Packaging (GitHub Actions &#x2192; GHCR &#x2192; EC2)</text>
-    </g>
-
-    <!-- Node 1: GitHub Actions CI -->
-    <g transform="translate(40, 40)">
-      <rect x="0" y="0" width="200" height="136" rx="8" fill="#FFFFFF" stroke="#D97706" stroke-width="1.5" filter="url(#cardShadow)"/>
-      <g transform="translate(14, 14)">
-        <rect x="0" y="0" width="34" height="34" rx="6" fill="#2088FF"/>
-        <path d="M 8 17 L 14 11 L 20 17 L 26 11" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
-      </g>
-      <text x="56" y="26" class="font-sans node-title">GitHub Actions</text>
-      <text x="56" y="39" class="font-sans node-sub">CI Pipeline (.github/workflows)</text>
-      
-      <rect x="12" y="56" width="176" height="30" rx="4" fill="#FEF3C7" stroke="#FDE68A" stroke-width="1"/>
-      <text x="20" y="71" class="font-sans" font-size="8.5" font-weight="700" fill="#92400E">&#x2022; PyTest Suite (FastAPI + ML)</text>
-      <text x="20" y="81" class="font-sans" font-size="8" fill="#B45309">Transforms &amp; Schema Tests</text>
-
-      <rect x="12" y="92" width="176" height="30" rx="4" fill="#FEF3C7" stroke="#FDE68A" stroke-width="1"/>
-      <text x="20" y="107" class="font-sans" font-size="8.5" font-weight="700" fill="#92400E">&#x2022; Next.js Standalone Build</text>
-      <text x="20" y="117" class="font-sans" font-size="8" fill="#B45309">Production Optimization</text>
-    </g>
-
-    <!-- Node 2: GHCR Registry -->
-    <g transform="translate(365, 40)">
-      <rect x="0" y="0" width="200" height="136" rx="8" fill="#FFFFFF" stroke="#0284C7" stroke-width="1.5" filter="url(#cardShadow)"/>
-      <g transform="translate(14, 14)">
-        <rect x="0" y="0" width="34" height="34" rx="6" fill="#0EA5E9"/>
-        <rect x="8" y="8" width="18" height="18" fill="none" stroke="#FFFFFF" stroke-width="2"/>
-        <line x1="8" y1="14" x2="26" y2="14" stroke="#FFFFFF" stroke-width="1.5"/>
-        <line x1="17" y1="14" x2="17" y2="26" stroke="#FFFFFF" stroke-width="1.5"/>
-      </g>
-      <text x="56" y="26" class="font-sans node-title">GitHub Container Reg.</text>
-      <text x="56" y="39" class="font-sans node-sub">ghcr.io/starkkk1</text>
-      
-      <rect x="12" y="56" width="176" height="30" rx="4" fill="#E0F2FE" stroke="#BAE6FD" stroke-width="1"/>
-      <text x="20" y="71" class="font-sans" font-size="8.5" font-weight="700" fill="#0369A1">&#x2022; plant-disease-api</text>
-      <text x="20" y="81" class="font-sans" font-size="8" fill="#0284C7">sha256:f61be1570a83...</text>
-
-      <rect x="12" y="92" width="176" height="30" rx="4" fill="#E0F2FE" stroke="#BAE6FD" stroke-width="1"/>
-      <text x="20" y="107" class="font-sans" font-size="8.5" font-weight="700" fill="#0369A1">&#x2022; plant-disease-frontend</text>
-      <text x="20" y="117" class="font-sans" font-size="8" fill="#0284C7">sha256:ec211d132416...</text>
-    </g>
-
-    <!-- Node 3: Docker Runtime Pull -->
-    <g transform="translate(620, 65)">
-      <rect x="0" y="0" width="130" height="90" rx="8" fill="#FFFFFF" stroke="#2496ED" stroke-width="1.5" filter="url(#cardShadow)"/>
-      <g transform="translate(10, 10)">
-        <rect x="0" y="0" width="28" height="28" rx="5" fill="#2496ED"/>
-        <rect x="6" y="8" width="4" height="4" fill="#FFFFFF"/>
-        <rect x="11" y="8" width="4" height="4" fill="#FFFFFF"/>
-        <rect x="16" y="8" width="4" height="4" fill="#FFFFFF"/>
-        <rect x="11" y="13" width="4" height="4" fill="#FFFFFF"/>
-        <path d="M 5 18 C 8 23 20 23 24 18 Z" fill="#FFFFFF"/>
-      </g>
-      <text x="44" y="22" class="font-sans node-title" font-size="11">Docker Engine</text>
-      <text x="44" y="34" class="font-sans node-sub">AL2023 Host</text>
-      
-      <rect x="8" y="46" width="114" height="30" rx="4" fill="#F0F9FF" stroke="#B9E6FE" stroke-width="1"/>
-      <text x="65" y="62" text-anchor="middle" class="font-sans" font-size="9" font-weight="700" fill="#0284C7">Run Containers</text>
-      <text x="65" y="72" text-anchor="middle" class="font-sans" font-size="7.5" fill="#0369A1">Isolated Execution</text>
-    </g>
-
-    <!-- Arrows inside Box 2 -->
-    <path d="M 240 108 L 363 108" fill="none" stroke="#D97706" stroke-width="2" marker-end="url(#arrowOrange)"/>
-    <text x="302" y="98" text-anchor="middle" class="font-sans edge-label" fill="#D97706">docker push</text>
-
-    <path d="M 565 108 L 618 108" fill="none" stroke="#0284C7" stroke-width="2" marker-end="url(#arrowBlue)"/>
-    <text x="591" y="98" text-anchor="middle" class="font-sans edge-label" fill="#0284C7">docker pull</text>
-  </g>
-
-  <!-- Number 3: Docker push to GHCR -->
-  <g transform="translate(490, 413)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">3</text>
-  </g>
-  <!-- Number 8: EC2 pulls container images -->
-  <g transform="translate(778, 413)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">8</text>
-  </g>
-
-
-  <!-- ======================================================== -->
-  <!-- 6. BOX 3: WEB & AI DIAGNOSTICS INFERENCE RUNTIME (PURPLE) -->
-  <!-- ======================================================== -->
-  <g transform="translate(198, 524)">
-    <rect x="0" y="0" width="765" height="348" rx="8" fill="#F5EDFB" stroke="#9C27B0" stroke-width="1.5" stroke-dasharray="5 3"/>
-    
-    <!-- Title -->
-    <g transform="translate(16, 14)">
-      <circle cx="8" cy="8" r="7" fill="#7C3AED"/>
-      <path d="M 5 8 L 7 10 L 11 6" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"/>
-      <text x="22" y="12" class="font-sans box-title" fill="#5B21B6">Web Application &amp; AI Inference Runtime (Amazon EC2 Instance Container Stack)</text>
-    </g>
-
-    <!-- Sub-container: Ingress & Security Group -->
-    <g transform="translate(20, 42)">
-      <rect x="0" y="0" width="140" height="288" rx="8" fill="#FFFFFF" stroke="#8B5CF6" stroke-width="1.2" stroke-dasharray="3 2" filter="url(#cardShadow)"/>
-      <text x="70" y="24" text-anchor="middle" class="font-sans node-title" font-size="11">Security Group</text>
-      <text x="70" y="38" text-anchor="middle" class="font-sans node-sub">plant-disease-sg</text>
-
-      <g transform="translate(12, 54)">
-        <rect x="0" y="0" width="116" height="58" rx="5" fill="#EDE9FE" stroke="#DDD6FE" stroke-width="1"/>
-        <text x="58" y="20" text-anchor="middle" class="font-sans" font-size="10.5" font-weight="700" fill="#6D28D9">Port 3000</text>
-        <text x="58" y="34" text-anchor="middle" class="font-sans" font-size="8.5" font-weight="600" fill="#5B21B6">Next.js Web UI</text>
-        <text x="58" y="47" text-anchor="middle" class="font-sans" font-size="7.5" fill="#7C3AED">Source: &lt;IP&gt;/32</text>
-      </g>
-
-      <g transform="translate(12, 126)">
-        <rect x="0" y="0" width="116" height="58" rx="5" fill="#EDE9FE" stroke="#DDD6FE" stroke-width="1"/>
-        <text x="58" y="20" text-anchor="middle" class="font-sans" font-size="10.5" font-weight="700" fill="#6D28D9">Port 8000</text>
-        <text x="58" y="34" text-anchor="middle" class="font-sans" font-size="8.5" font-weight="600" fill="#5B21B6">FastAPI Inference</text>
-        <text x="58" y="47" text-anchor="middle" class="font-sans" font-size="7.5" fill="#7C3AED">Source: &lt;IP&gt;/32</text>
-      </g>
-
-      <g transform="translate(12, 198)">
-        <rect x="0" y="0" width="116" height="54" rx="5" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1"/>
-        <text x="58" y="20" text-anchor="middle" class="font-sans" font-size="10" font-weight="700" fill="#475569">Port 22 (SSH)</text>
-        <text x="58" y="34" text-anchor="middle" class="font-sans" font-size="8.5" fill="#64748B">Admin Shell Access</text>
-        <text x="58" y="46" text-anchor="middle" class="font-sans" font-size="7.5" fill="#64748B">Source: &lt;IP&gt;/32</text>
-      </g>
-    </g>
-
-    <!-- Node 1: Next.js Frontend Container -->
-    <g transform="translate(185, 42)">
-      <rect x="0" y="0" width="205" height="175" rx="8" fill="#FFFFFF" stroke="#000000" stroke-width="1.5" filter="url(#cardShadow)"/>
-      <g transform="translate(14, 14)">
-        <circle cx="16" cy="16" r="16" fill="#000000"/>
-        <text x="16" y="22" text-anchor="middle" font-family="Arial" font-size="18" font-weight="900" fill="#FFFFFF">N</text>
-      </g>
-      <text x="56" y="26" class="font-sans node-title">Next.js Frontend</text>
-      <text x="56" y="39" class="font-sans node-sub">Standalone Container (:3000)</text>
-
-      <rect x="12" y="55" width="181" height="26" rx="4" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
-      <text x="20" y="72" class="font-sans" font-size="8.5" font-weight="600" fill="#334155">&#x2022; Non-root user: nextjs (UID 1001)</text>
-
-      <rect x="12" y="86" width="181" height="26" rx="4" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
-      <text x="20" y="103" class="font-sans" font-size="8.5" font-weight="600" fill="#334155">&#x2022; Client-side Multipart Upload</text>
-
-      <rect x="12" y="117" width="181" height="26" rx="4" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
-      <text x="20" y="134" class="font-sans" font-size="8.5" font-weight="600" fill="#334155">&#x2022; Grad-CAM++ Visual Inspector</text>
-
-      <rect x="12" y="148" width="181" height="20" rx="3" fill="#F1F5F9"/>
-      <text x="20" y="162" class="font-sans" font-size="8" fill="#64748B">Serving on http://0.0.0.0:3000</text>
-    </g>
-
-    <!-- Node 2: FastAPI CPU Inference Service -->
-    <g transform="translate(445, 42)">
-      <rect x="0" y="0" width="305" height="288" rx="8" fill="#FFFFFF" stroke="#009688" stroke-width="1.8" filter="url(#cardShadow)"/>
-      <g transform="translate(14, 14)">
-        <circle cx="16" cy="16" r="16" fill="#059669"/>
-        <path d="M 17 8 L 11 18 L 16 18 L 15 24 L 22 14 L 17 14 Z" fill="#FFFFFF"/>
-      </g>
-      <text x="56" y="26" class="font-sans node-title">FastAPI Inference Service</text>
-      <text x="56" y="39" class="font-sans node-sub">PyTorch CPU Container (:8000)</text>
-
-      <!-- Inner Component 1: MobileNetV3 -->
-      <g transform="translate(12, 54)">
-        <rect x="0" y="0" width="281" height="106" rx="6" fill="#F0FDF4" stroke="#86EFAC" stroke-width="1.2"/>
-        <g transform="translate(10, 8)">
-          <rect x="0" y="0" width="22" height="22" rx="4" fill="#EE4C2C"/>
-          <path d="M 11 4 C 11 4 17 9 17 14 C 17 17 14 19 11 19 C 8 19 5 17 5 14 C 5 9 11 4 11 4 Z" fill="#FFFFFF"/>
-        </g>
-        <text x="38" y="18" class="font-sans" font-size="11" font-weight="700" fill="#166534">MobileNetV3-Small Distilled</text>
-        <text x="38" y="30" class="font-sans" font-size="8.5" fill="#15803D">&#x2022; 11 Output Classes | 29.23 ms CPU Latency</text>
-        
-        <rect x="10" y="38" width="261" height="20" rx="3" fill="#DCFCE7"/>
-        <text x="18" y="52" class="font-sans" font-size="8.5" font-weight="600" fill="#166534">Model Size: ~6.0 MiB (94.7% compact)</text>
-
-        <rect x="10" y="62" width="261" height="20" rx="3" fill="#DCFCE7"/>
-        <text x="18" y="76" class="font-sans" font-size="8.5" font-weight="600" fill="#166534">PyTorch Intra-op Parallelism: 2 Cores</text>
-
-        <rect x="10" y="85" width="261" height="16" rx="3" fill="#E8F5E9"/>
-        <text x="18" y="97" class="font-sans" font-size="7.5" fill="#2E7D32">Loaded strictly once at process startup</text>
-      </g>
-
-      <!-- Inner Component 2: Grad-CAM++ -->
-      <g transform="translate(12, 168)">
-        <rect x="0" y="0" width="281" height="106" rx="6" fill="#FFFBEB" stroke="#FDE68A" stroke-width="1.2"/>
-        <g transform="translate(10, 8)">
-          <rect x="0" y="0" width="22" height="22" rx="4" fill="#F59E0B"/>
-          <circle cx="11" cy="9" r="6" fill="#FFFFFF"/>
-          <rect x="8" y="14" width="6" height="4" fill="#FFFFFF"/>
-        </g>
-        <text x="38" y="18" class="font-sans" font-size="11" font-weight="700" fill="#92400E">Grad-CAM++ Explainability Engine</text>
-        <text x="38" y="30" class="font-sans" font-size="8.5" fill="#B45309">&#x2022; Generalized Class Activation Mapping</text>
-
-        <rect x="10" y="38" width="261" height="20" rx="3" fill="#FEF3C7"/>
-        <text x="18" y="52" class="font-sans" font-size="8.5" font-weight="600" fill="#92400E">Highlights necrotic leaf lesion contours</text>
-
-        <rect x="10" y="62" width="261" height="20" rx="3" fill="#FEF3C7"/>
-        <text x="18" y="76" class="font-sans" font-size="8.5" font-weight="600" fill="#92400E">Generates transparent heatmap overlay PNG</text>
-
-        <rect x="10" y="85" width="261" height="16" rx="3" fill="#FFF9C4"/>
-        <text x="18" y="97" class="font-sans" font-size="7.5" fill="#B78103">Empowers agronomists to audit diagnosis</text>
-      </g>
-    </g>
-
-    <!-- Communication between Frontend and Backend -->
-    <path d="M 390 105 L 443 105" fill="none" stroke="#7C3AED" stroke-width="2.2" marker-end="url(#arrowPurple)"/>
-    <text x="417" y="96" text-anchor="middle" class="font-sans edge-label" fill="#7C3AED">POST /predict</text>
-    
-    <path d="M 443 135 L 392 135" fill="none" stroke="#7C3AED" stroke-width="1.8" stroke-dasharray="4 2" marker-end="url(#arrowPurple)"/>
-    <text x="417" y="150" text-anchor="middle" class="font-sans edge-label" fill="#7C3AED">JSON + Heatmap</text>
-
-    <!-- Connection from Security Group to Next.js -->
-    <path d="M 160 115 L 183 115" fill="none" stroke="#7C3AED" stroke-width="2" marker-end="url(#arrowPurple)"/>
-  </g>
-
-  <!-- Number 9: User accesses web UI -->
-  <g transform="translate(195, 630)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">9</text>
-  </g>
-  <!-- Number 10: User uploads leaf photo -->
-  <g transform="translate(195, 680)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">10</text>
-  </g>
-  <!-- Number 11: Frontend invokes /predict -->
-  <g transform="translate(605, 618)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">11</text>
-  </g>
-  <!-- Number 12: MobileNetV3 runs inference -->
-  <g transform="translate(915, 630)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">12</text>
-  </g>
-  <!-- Number 13: Grad-CAM++ generates heatmaps -->
-  <g transform="translate(915, 745)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">13</text>
-  </g>
-  <!-- Number 14: Response delivered back to UI -->
-  <g transform="translate(605, 668)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">14</text>
-  </g>
-
-
-  <!-- ======================================================== -->
-  <!-- 7. BOX 4: OPERATIONS & SECURITY SIDEBAR (GRAY)           -->
-  <!-- ======================================================== -->
-  <g transform="translate(982, 102)">
-    <rect x="0" y="0" width="288" height="770" rx="8" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5" stroke-dasharray="5 3"/>
-    
-    <!-- Title -->
-    <g transform="translate(16, 14)">
-      <circle cx="8" cy="8" r="7" fill="#475569"/>
-      <path d="M 5 8 L 7 10 L 11 6" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"/>
-      <text x="22" y="12" class="font-sans box-title" fill="#0F172A">Operations &amp; Security</text>
-    </g>
-
-    <!-- Item 1: AWS IAM Instance Profile -->
-    <g transform="translate(14, 40)">
-      <rect x="0" y="0" width="260" height="88" rx="6" fill="#FFFFFF" stroke="#DC2626" stroke-width="1.2" filter="url(#cardShadow)"/>
-      <g transform="translate(12, 12)">
-        <rect x="0" y="0" width="28" height="28" rx="5" fill="#DC2626"/>
-        <circle cx="14" cy="12" r="5" fill="none" stroke="#FFFFFF" stroke-width="2"/>
-        <path d="M 10 16 L 18 16 L 18 23 L 10 23 Z" fill="#FFFFFF"/>
-      </g>
-      <text x="48" y="24" class="font-sans node-title">AWS IAM Instance Profile</text>
-      <text x="48" y="38" class="font-sans node-sub">plant-disease-ec2-role</text>
-      <text x="14" y="58" class="font-sans" font-size="8.5" fill="#475569">&#x2022; Scoped s3:GetObject on checkpoints</text>
-      <text x="14" y="72" class="font-sans" font-size="8.5" fill="#475569">&#x2022; CloudWatchAgentServerPolicy</text>
-    </g>
-
-    <!-- Item 2: Amazon VPC & Security Group -->
-    <g transform="translate(14, 138)">
-      <rect x="0" y="0" width="260" height="88" rx="6" fill="#FFFFFF" stroke="#7C3AED" stroke-width="1.2" filter="url(#cardShadow)"/>
-      <g transform="translate(12, 12)">
-        <rect x="0" y="0" width="28" height="28" rx="5" fill="#7C3AED"/>
-        <path d="M 14 6 L 22 10 L 22 18 C 22 23 14 26 14 26 C 14 26 6 23 6 18 L 6 10 Z" fill="#FFFFFF"/>
-      </g>
-      <text x="48" y="24" class="font-sans node-title">Amazon VPC &amp; Firewall</text>
-      <text x="48" y="38" class="font-sans node-sub">Public Subnet + Internet Gateway</text>
-      <text x="14" y="58" class="font-sans" font-size="8.5" fill="#475569">&#x2022; Ingress Ports: 22, 3000, 8000</text>
-      <text x="14" y="72" class="font-sans" font-size="8.5" fill="#475569">&#x2022; Restricted to &lt;OPERATOR_IP&gt;/32</text>
-    </g>
-
-    <!-- Item 3: CloudWatch Logs -->
-    <g transform="translate(14, 236)">
-      <rect x="0" y="0" width="260" height="92" rx="6" fill="#FFFFFF" stroke="#D946EF" stroke-width="1.2" filter="url(#cardShadow)"/>
-      <g transform="translate(12, 12)">
-        <rect x="0" y="0" width="28" height="28" rx="5" fill="#C026D3"/>
-        <circle cx="14" cy="14" r="8" fill="none" stroke="#FFFFFF" stroke-width="2"/>
-        <line x1="14" y1="14" x2="19" y2="10" stroke="#FFFFFF" stroke-width="2"/>
-      </g>
-      <text x="48" y="24" class="font-sans node-title">Amazon CloudWatch Logs</text>
-      <text x="48" y="38" class="font-sans node-sub">Docker awslogs Driver (7d retention)</text>
-      <text x="14" y="58" class="font-sans" font-size="8.5" fill="#475569">&#x2022; /plant-disease/backend (FastAPI JSON)</text>
-      <text x="14" y="72" class="font-sans" font-size="8.5" fill="#475569">&#x2022; /plant-disease/frontend (Next.js server)</text>
-    </g>
-
-    <!-- Item 4: CloudWatch Agent Metrics -->
-    <g transform="translate(14, 338)">
-      <rect x="0" y="0" width="260" height="92" rx="6" fill="#FFFFFF" stroke="#0284C7" stroke-width="1.2" filter="url(#cardShadow)"/>
-      <g transform="translate(12, 12)">
-        <rect x="0" y="0" width="28" height="28" rx="5" fill="#0284C7"/>
-        <path d="M 7 21 A 10 10 0 0 1 21 21 Z" fill="none" stroke="#FFFFFF" stroke-width="2"/>
-        <line x1="14" y1="21" x2="18" y2="15" stroke="#FFFFFF" stroke-width="2"/>
-      </g>
-      <text x="48" y="24" class="font-sans node-title">CloudWatch Host Agent</text>
-      <text x="48" y="38" class="font-sans node-sub">Namespace: PlantDisease/Host</text>
-      <text x="14" y="58" class="font-sans" font-size="8.5" fill="#475569">&#x2022; mem_used_percent (60s interval)</text>
-      <text x="14" y="72" class="font-sans" font-size="8.5" fill="#475569">&#x2022; disk_used_percent (Root partition)</text>
-    </g>
-
-    <!-- Item 5: CloudWatch Alarm -->
-    <g transform="translate(14, 440)">
-      <rect x="0" y="0" width="260" height="92" rx="6" fill="#FFFFFF" stroke="#EF4444" stroke-width="1.5" filter="url(#cardShadow)"/>
-      <g transform="translate(12, 12)">
-        <rect x="0" y="0" width="28" height="28" rx="5" fill="#EF4444"/>
-        <path d="M 14 6 C 11 6 9 9 9 13 L 7 18 L 21 18 L 19 13 C 19 9 17 6 14 6 Z" fill="#FFFFFF"/>
-        <circle cx="14" cy="21" r="2" fill="#FFFFFF"/>
-      </g>
-      <text x="48" y="24" class="font-sans node-title">CloudWatch RAM Alarm</text>
-      <text x="48" y="38" class="font-sans node-sub">PlantDisease-HighMemoryUtilization</text>
-      <text x="14" y="58" class="font-sans" font-size="8.5" font-weight="700" fill="#DC2626">&#x2022; Threshold: Average mem &gt; 85%</text>
-      <text x="14" y="72" class="font-sans" font-size="8.5" fill="#475569">&#x2022; Evaluation: 3 consecutive 1-min breaches</text>
-    </g>
-
-    <!-- Item 6: Amazon SNS Topic -->
-    <g transform="translate(14, 542)">
-      <rect x="0" y="0" width="260" height="90" rx="6" fill="#FFFFFF" stroke="#E11D48" stroke-width="1.2" filter="url(#cardShadow)"/>
-      <g transform="translate(12, 12)">
-        <rect x="0" y="0" width="28" height="28" rx="5" fill="#E11D48"/>
-        <circle cx="14" cy="14" r="4" fill="#FFFFFF"/>
-        <path d="M 8 10 C 6 12 6 16 8 18" fill="none" stroke="#FFFFFF" stroke-width="1.8"/>
-        <path d="M 20 10 C 22 12 22 16 20 18" fill="none" stroke="#FFFFFF" stroke-width="1.8"/>
-      </g>
-      <text x="48" y="24" class="font-sans node-title">Amazon SNS Topic</text>
-      <text x="48" y="38" class="font-sans node-sub">plant-disease-alerts</text>
-      <text x="14" y="58" class="font-sans" font-size="8.5" fill="#475569">&#x2022; Protocol: Email Subscription</text>
-      <text x="14" y="72" class="font-sans" font-size="8.5" fill="#475569">&#x2022; Dispatches host memory alerts</text>
-    </g>
-
-    <!-- Item 7: AWS Budgets -->
-    <g transform="translate(14, 642)">
-      <rect x="0" y="0" width="260" height="90" rx="6" fill="#FFFFFF" stroke="#10B981" stroke-width="1.2" filter="url(#cardShadow)"/>
-      <g transform="translate(12, 12)">
-        <rect x="0" y="0" width="28" height="28" rx="5" fill="#059669"/>
-        <rect x="6" y="8" width="16" height="12" rx="2" fill="none" stroke="#FFFFFF" stroke-width="1.8"/>
-        <text x="14" y="18" text-anchor="middle" font-family="Arial" font-size="10" font-weight="900" fill="#FFFFFF">$</text>
-      </g>
-      <text x="48" y="24" class="font-sans node-title">AWS Budgets</text>
-      <text x="48" y="38" class="font-sans node-sub">Credit &amp; Cost Governance</text>
-      <text x="14" y="58" class="font-sans" font-size="8.5" fill="#475569">&#x2022; Tracks $100 AWS Credit Sandbox</text>
-      <text x="14" y="72" class="font-sans" font-size="8.5" fill="#475569">&#x2022; Spending threshold alerts (80%, 100%)</text>
-    </g>
-
-    <!-- Arrow between Alarm and SNS -->
-    <path d="M 144 533 L 144 540" fill="none" stroke="#EF4444" stroke-width="2" marker-end="url(#arrowMagenta)"/>
-  </g>
-
-  <!-- Number 15: Docker awslogs streams logs -->
-  <g transform="translate(968, 385)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">15</text>
-  </g>
-  <!-- Number 16: CloudWatch Agent reports telemetry -->
-  <g transform="translate(968, 485)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">16</text>
-  </g>
-  <!-- Number 17: CloudWatch Alarm breaches >85% -->
-  <g transform="translate(1115, 638)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">17</text>
-  </g>
-  <!-- Number 18: SNS sends email alert -->
-  <g transform="translate(1256, 695)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">18</text>
-  </g>
-
-  <!-- ======================================================== -->
-  <!-- 8. EXTERNAL INTERACTION PATHS & CONNECTIONS              -->
-  <!-- ======================================================== -->
-
-  <!-- Flow 1: Developer -> GitHub -->
-  <path d="M 1357 410 L 1357 448" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#arrowGray)"/>
-  <text x="1374" y="432" class="font-sans edge-label" fill="#334155">git push</text>
-
-  <!-- Number 1: Developer pushes code -->
-  <g transform="translate(1347, 420)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">1</text>
-  </g>
-
-  <!-- Flow 2: GitHub -> GitHub Actions CI -->
-  <path d="M 1320 485 C 1100 485, 780 485, 440 425" fill="none" stroke="#D97706" stroke-width="1.8" stroke-dasharray="4 3" marker-end="url(#arrowOrange)"/>
-  <text x="1235" y="475" class="font-sans edge-label" fill="#D97706">Webhook Trigger</text>
-
-  <!-- Number 2: GitHub webhook triggers CI -->
-  <g transform="translate(1260, 475)" filter="url(#badgeShadow)">
-    <circle cx="10" cy="10" r="10" fill="#0F172A"/>
-    <text x="10" y="10" class="font-sans badge-text">2</text>
-  </g>
-
-  <!-- Flow: Offline Training Model -> S3 Bucket -->
-  <path d="M 150 188 L 236 188" fill="none" stroke="#2E7D32" stroke-width="2" marker-end="url(#arrowGreen)"/>
-  <text x="193" y="178" text-anchor="middle" class="font-sans edge-label" fill="#2E7D32">Artifact Upload</text>
-
-  <!-- Flow: Users -> Security Group Port 3000 -->
-  <path d="M 115 690 C 150 690, 170 648, 216 648" fill="none" stroke="#7C3AED" stroke-width="2.2" marker-end="url(#arrowPurple)"/>
-  <text x="160" y="662" text-anchor="middle" class="font-sans edge-label" fill="#7C3AED">HTTP :3000</text>
-
-  <!-- Flow: Docker Volume -> FastAPI Container -->
-  <path d="M 885 258 L 885 564" fill="none" stroke="#00758F" stroke-width="1.8" stroke-dasharray="3 2" marker-end="url(#arrowBlue)"/>
-  <text x="912" y="415" class="font-sans edge-label" fill="#00758F" transform="rotate(90, 912, 415)">read-only volume mount</text>
-
-  <!-- Flow: FastAPI Logs -> CloudWatch Logs -->
-  <path d="M 955 745 C 975 745, 975 390, 994 390" fill="none" stroke="#D946EF" stroke-width="1.8" stroke-dasharray="4 2" marker-end="url(#arrowMagenta)"/>
-
+  <!-- log and metrics flows -->
 </svg>

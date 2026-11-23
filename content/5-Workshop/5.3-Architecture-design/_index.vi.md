@@ -13,86 +13,11 @@ pre: "<b>5.3. </b>"
 Hệ thống **Plant Disease Detection** kết hợp quy trình phát triển và vận hành học máy (MLOps) tiên tiến với hạ tầng điện toán đám mây tối ưu trên nền tảng Amazon Web Services (AWS). Được thiết kế để phục vụ chẩn đoán bệnh học thời gian thực trên lá cà chua có khả năng giải thích quyết định (Explainable AI), kiến trúc hệ thống tại khu vực **Sydney (`ap-southeast-2`)** được phân tách thành 4 phân hệ cốt lõi cùng quy trình phân phối liên tục (CI/CD) và giám sát vận hành:
 
 1. **Phân hệ Lưu trữ Trọng số & Tách rời Artifacts (Amazon S3 &rarr; Máy chủ EC2):** Tách biệt các tệp trọng số mạng nơ-ron nhị phân khỏi container image, đảm bảo tính toàn vẹn mật mã học SHA256 tại thời điểm chạy.
-2. **Quy trình Phân phối Liên tục & Đóng gói Container (GitHub Actions &rarr; GHCR &rarr; EC2):** Tự động hóa kiểm thử mã nguồn, đóng gói đa giai đoạn (multi-stage) và phát hành container image theo mã băm digest bất biến.
+2. **Quy trình Phân phối Liên tục & Đóng gói Container (GitHub Actions &rarr; GHCR &rarr; EC2):** Tự động kiểm thử và phát hành container image frontend cùng API lên GHCR; kỹ sư vận hành triển khai phiên bản lên EC2 theo quy trình thủ công.
 3. **Phân hệ Thực thi Web & Suy luận Trí tuệ Nhân tạo (Docker Stack trên EC2):** Chạy giao diện người dùng tương tác Next.js và dịch vụ suy luận FastAPI PyTorch CPU tích hợp công nghệ giải thích Grad-CAM++.
 4. **Phân hệ Vận hành, An ninh & Giám sát Hệ thống:** Áp dụng nguyên tắc đặc quyền tối thiểu với IAM Role, Security Group khóa địa chỉ IP client, thu thập log với CloudWatch Logs, đo đạc RAM tùy biến với CloudWatch Agent và kích hoạt cảnh báo email qua Amazon SNS.
 
 ![Kiến trúc Toàn diện Hệ thống Nhận diện Bệnh Cây trồng](/images/5-Workshop/5.3-Architecture-design/system_architecture.svg?width=100%)
-
-```mermaid
-flowchart TD
-    %% Định nghĩa phong cách
-    classDef greenBox fill:#EBF7ED,stroke:#4CAF50,stroke-width:1.5px,stroke-dasharray: 5 5;
-    classDef orangeBox fill:#FFF4E5,stroke:#FF9800,stroke-width:1.5px,stroke-dasharray: 5 5;
-    classDef purpleBox fill:#F5EDFB,stroke:#9C27B0,stroke-width:1.5px,stroke-dasharray: 5 5;
-    classDef grayBox fill:#F8FAFC,stroke:#64748B,stroke-width:1.5px,stroke-dasharray: 5 5;
-    classDef card fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1.5px;
-    classDef actor fill:#F1F5F9,stroke:#475569,stroke-width:1.5px;
-
-    subgraph AWS_Cloud ["AWS Cloud (Sydney ap-southeast-2)"]
-        
-        subgraph Pipeline_Model ["1. Phân hệ Lưu trữ & Nạp Trọng số (Amazon S3 → EC2 Host)"]
-            S3["Amazon S3 Bucket<br/><b>(Bucket Trọng số Bảo mật)</b><br/>• model.pth (~6.0 MiB)<br/>• class_to_idx.json"]:::card
-            HostFS["Thư mục Máy chủ EC2<br/><b>checkpoints/v1</b><br/>• Đã xác thực mã băm SHA256"]:::card
-            DockerVol["Docker Read-Only Volume<br/><b>/app/artifacts :ro</b>"]:::card
-            
-            S3 -->|"❺ aws s3 cp (IAM Role)"| HostFS
-            HostFS -->|"❻ Kiểm tra SHA256"| HostFS
-            HostFS -->|"❼ Gắn kết :ro"| DockerVol
-        end
-        
-        subgraph Pipeline_CD ["2. Phân phối Liên tục & Đóng gói Container (GitHub Actions → GHCR → EC2)"]
-            GHA["GitHub Actions CI<br/>• Kiểm thử PyTest (Schemas & Model)<br/>• Build Next.js Standalone"]:::card
-            GHCR["GitHub Container Registry<br/>• plant-disease-api:digest<br/>• plant-disease-frontend:digest"]:::card
-            DockerEngine["Docker Engine<br/>Máy chủ Amazon Linux 2023"]:::card
-            
-            GHA -->|"❸ docker push"| GHCR
-            GHCR -->|"❽ docker pull"| DockerEngine
-        end
-
-        subgraph Runtime_App ["3. Thực thi Web & Suy luận AI (Docker Container Stack trên EC2)"]
-            SG["Security Group: plant-disease-sg<br/>• Port 3000 (Giao diện Web /32)<br/>• Port 8000 (API Suy luận /32)<br/>• Port 22 (SSH Quản trị /32)"]:::card
-            Frontend["Container Next.js Frontend (:3000)<br/>• Non-root User (nextjs UID 1001)<br/>• Giao diện tải ảnh phản hồi đa thiết bị"]:::card
-            Backend["FastAPI CPU Inference Engine (:8000)<br/>• Giới hạn 2 luồng CPU PyTorch<br/>• <b>MobileNetV3-Small Chưng cất</b> (11 Nhãn)<br/>• <b>Engine Giải thích Grad-CAM++</b>"]:::card
-            
-            SG -->|"❾ Truy cập Cổng 3000"| Frontend
-            Frontend -->|"⓫ Gửi HTTP POST /predict"| Backend
-            Backend -->|"⓬ MobileNetV3 (29.23 ms)"| Backend
-            Backend -->|"⓭ Grad-CAM++ Tạo Heatmap"| Backend
-            Backend -->|"⓮ Kết quả JSON + Ảnh Heatmap"| Frontend
-            DockerVol -.->|"Gắn kết Volume Trọng số"| Backend
-        end
-
-        subgraph Ops_Security ["4. Vận hành, An ninh & Giám sát"]
-            IAM["IAM Instance Profile (Role)<br/>• Quyền s3:GetObject giới hạn<br/>• CloudWatchAgentServerPolicy"]:::card
-            CW_Logs["Amazon CloudWatch Logs<br/>• /plant-disease/backend<br/>• /plant-disease/frontend (7 ngày)"]:::card
-            CW_Agent["CloudWatch Host Agent<br/>• mem_used_percent (chu kỳ 60s)<br/>• disk_used_percent"]:::card
-            CW_Alarm["CloudWatch RAM Alarm<br/><b>PlantDisease-HighMemoryUtilization</b><br/>• mem_used_percent > 85% (3 phút)"]:::card
-            SNS["Amazon SNS Topic<br/><b>plant-disease-alerts</b><br/>• Gửi Email Cảnh báo Tự động"]:::card
-            Budgets["AWS Budgets<br/>• Kiểm soát Chi phí ($100 Credit)"]:::card
-
-            CW_Agent -->|"⓰ Gửi số liệu RAM/Disk"| CW_Alarm
-            CW_Alarm -->|"⓱ Kích hoạt Cảnh báo (>85%)"| SNS
-            SNS -->|"⓲ Gửi Email đến Quản trị viên"| SNS
-        end
-    end
-
-    Dev["Kỹ sư Phát triển<br/>(Git Push / CI/CD)"]:::actor
-    Users["Người dùng & Nhà nông học<br/>(Điện thoại / Trình duyệt)"]:::actor
-    OfflineTrain["Huấn luyện Ngoại tuyến<br/>ConvNeXt-Tiny → MobileNetV3"]:::actor
-
-    OfflineTrain -->|"❹ Lưu trữ Trọng số Phát hành"| S3
-    Dev -->|"❶ git push"| GHA
-    Users -->|"❿ Tải ảnh lá bệnh lên"| SG
-    Backend -->|"⓯ Docker awslogs Driver"| CW_Logs
-    IAM -.->|"Cấp quyền truy cập"| HostFS
-
-    %% Gán class màu sắc
-    class Pipeline_Model greenBox;
-    class Pipeline_CD orangeBox;
-    class Runtime_App purpleBox;
-    class Ops_Security grayBox;
-```
 
 ---
 

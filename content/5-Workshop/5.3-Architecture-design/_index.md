@@ -13,86 +13,11 @@ pre: "<b>5.3. </b>"
 The **Plant Disease Detection** system combines modern machine learning engineering (MLOps) with cloud-native infrastructure on Amazon Web Services (AWS). Designed to deliver real-time, explainable agricultural diagnostics for tomato crops, the architecture is structured into four primary subsystems within the **Sydney (`ap-southeast-2`)** region, accompanied by automated continuous delivery and operations governance:
 
 1. **Model Checkpoint & Artifact Storage Pipeline (Amazon S3 &rarr; EC2 Host):** Securely decouples multi-megabyte neural network weights from application container images, verifying cryptographic integrity at runtime.
-2. **Continuous Delivery & Container Packaging (GitHub Actions &rarr; GHCR &rarr; EC2):** Automatically tests, packages, and promotes immutable, digest-pinned multi-stage container images.
+2. **Continuous Delivery & Container Packaging (GitHub Actions &rarr; GHCR &rarr; EC2):** Runs automated tests and publishes frontend and API container images to GHCR; an operator deploys releases to EC2 manually.
 3. **Web Application & AI Diagnostics Runtime (EC2 Single Host Stack):** Hosts a responsive Next.js frontend and a high-performance PyTorch CPU FastAPI inference service featuring Grad-CAM++ explainability.
 4. **Operations, Observability & Security:** Implements least-privilege AWS IAM instance profiles, client-locked Security Groups, Amazon CloudWatch structured logging, custom host RAM metrics, and proactive Amazon SNS incident alarms.
 
 ![Plant Disease Detection End-to-End System Architecture](/images/5-Workshop/5.3-Architecture-design/system_architecture.svg?width=100%)
-
-```mermaid
-flowchart TD
-    %% Node Styles
-    classDef greenBox fill:#EBF7ED,stroke:#4CAF50,stroke-width:1.5px,stroke-dasharray: 5 5;
-    classDef orangeBox fill:#FFF4E5,stroke:#FF9800,stroke-width:1.5px,stroke-dasharray: 5 5;
-    classDef purpleBox fill:#F5EDFB,stroke:#9C27B0,stroke-width:1.5px,stroke-dasharray: 5 5;
-    classDef grayBox fill:#F8FAFC,stroke:#64748B,stroke-width:1.5px,stroke-dasharray: 5 5;
-    classDef card fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1.5px;
-    classDef actor fill:#F1F5F9,stroke:#475569,stroke-width:1.5px;
-
-    subgraph AWS_Cloud ["AWS Cloud (Sydney ap-southeast-2)"]
-        
-        subgraph Pipeline_Model ["1. Model Checkpoint & Artifact Pipeline (Amazon S3 → EC2 Host)"]
-            S3["Amazon S3 Bucket<br/><b>(Private Checkpoints)</b><br/>• model.pth (~6.0 MiB)<br/>• class_to_idx.json"]:::card
-            HostFS["EC2 Host Filesystem<br/><b>checkpoints/v1</b><br/>• SHA256 Hash Verified"]:::card
-            DockerVol["Docker Read-Only Volume<br/><b>/app/artifacts :ro</b>"]:::card
-            
-            S3 -->|"❺ aws s3 cp (IAM Auth)"| HostFS
-            HostFS -->|"❻ Validate SHA256"| HostFS
-            HostFS -->|"❼ Mount :ro"| DockerVol
-        end
-        
-        subgraph Pipeline_CD ["2. CI/CD & Container Delivery Pipeline (GitHub Actions → GHCR → EC2)"]
-            GHA["GitHub Actions CI<br/>• PyTest Suite (Schemas & Transforms)<br/>• Next.js Standalone Build"]:::card
-            GHCR["GitHub Container Registry<br/>• plant-disease-api:digest<br/>• plant-disease-frontend:digest"]:::card
-            DockerEngine["Docker Engine<br/>Amazon Linux 2023 Host"]:::card
-            
-            GHA -->|"❸ docker push"| GHCR
-            GHCR -->|"❽ docker pull"| DockerEngine
-        end
-
-        subgraph Runtime_App ["3. Web App & AI Diagnostics Inference Runtime (Amazon EC2 Container Stack)"]
-            SG["Security Group: plant-disease-sg<br/>• Port 3000 (Web UI /32)<br/>• Port 8000 (REST API /32)<br/>• Port 22 (SSH Admin /32)"]:::card
-            Frontend["Next.js Frontend Container (:3000)<br/>• Non-root User (nextjs UID 1001)<br/>• Responsive Leaf Upload UI"]:::card
-            Backend["FastAPI CPU Inference Engine (:8000)<br/>• PyTorch CPU (2 Guarded Cores)<br/>• <b>MobileNetV3-Small Distilled</b> (11 Classes)<br/>• <b>Grad-CAM++ Explainability Engine</b>"]:::card
-            
-            SG -->|"❾ HTTP Ingress Port 3000"| Frontend
-            Frontend -->|"⓫ HTTP POST /predict"| Backend
-            Backend -->|"⓬ MobileNetV3 (29.23 ms)"| Backend
-            Backend -->|"⓭ Grad-CAM++ Heatmap"| Backend
-            Backend -->|"⓮ JSON + Heatmap Overlay"| Frontend
-            DockerVol -.->|"Mount Model Checkpoints"| Backend
-        end
-
-        subgraph Ops_Security ["4. Operations & Security"]
-            IAM["AWS IAM Instance Profile<br/>• Scoped s3:GetObject<br/>• CloudWatchAgentServerPolicy"]:::card
-            CW_Logs["Amazon CloudWatch Logs<br/>• /plant-disease/backend<br/>• /plant-disease/frontend (7d)"]:::card
-            CW_Agent["CloudWatch Host Agent<br/>• mem_used_percent (60s interval)<br/>• disk_used_percent"]:::card
-            CW_Alarm["CloudWatch RAM Alarm<br/><b>PlantDisease-HighMemoryUtilization</b><br/>• mem_used_percent > 85% (3 min)"]:::card
-            SNS["Amazon SNS Topic<br/><b>plant-disease-alerts</b><br/>• Verified Email Protocol"]:::card
-            Budgets["AWS Budgets<br/>• $100 Credit Sandbox Governance"]:::card
-
-            CW_Agent -->|"⓰ Host Telemetry"| CW_Alarm
-            CW_Alarm -->|"⓱ Trigger Alarm (>85%)"| SNS
-            SNS -->|"⓲ Email Alert to Operator"| SNS
-        end
-    end
-
-    Dev["Developer<br/>(Git / CD)"]:::actor
-    Users["Field Users & Agronomists<br/>(Mobile & Desktop Browsers)"]:::actor
-    OfflineTrain["Offline ML Training<br/>ConvNeXt-Tiny → MobileNetV3"]:::actor
-
-    OfflineTrain -->|"❹ Store Release Artifacts"| S3
-    Dev -->|"❶ git push"| GHA
-    Users -->|"❿ Upload Leaf Photo"| SG
-    Backend -->|"⓯ Docker awslogs Driver"| CW_Logs
-    IAM -.->|"Grant Permissions"| HostFS
-
-    %% Assign classes
-    class Pipeline_Model greenBox;
-    class Pipeline_CD orangeBox;
-    class Runtime_App purpleBox;
-    class Ops_Security grayBox;
-```
 
 ---
 
