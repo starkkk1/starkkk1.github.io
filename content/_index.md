@@ -8,11 +8,11 @@ chapter: false
 # Internship Report
 
 ### Student Information:
-&emsp; **Full Name:** Nguyen Van A
+&emsp; **Full Name:** Tran Hung Anh
 
-&emsp; **Phone Number:** 0989888999 
+&emsp; **Phone Number:** 0946984808
 
-&emsp; **Email:** Anguyenvan@gmail.com
+&emsp; **Email:** tranhunganh215@gmail.com
 
 &emsp; **University:** Ho Chi Minh City University of Technology and Education
 
@@ -26,7 +26,7 @@ chapter: false
 
 &emsp; **Project:** Tomato Leaf Disease Detection on AWS (EC2, S3, CloudWatch)
 
-&emsp; **Internship Duration:** 12 Weeks (August 2025 - November 2025)
+&emsp; **Internship Duration:** 12 Weeks (September 2026 - December 2026)
 
 ![Your profile picture](/images/avatar.png)
 
