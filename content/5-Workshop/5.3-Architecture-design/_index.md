@@ -17,34 +17,27 @@ The **Plant Disease Detection** system combines modern machine learning engineer
 3. **Web Application & AI Diagnostics Runtime (EC2 Single Host Stack):** Hosts a responsive Next.js frontend and a high-performance PyTorch CPU FastAPI inference service featuring Grad-CAM++ explainability.
 4. **Operations, Observability & Security:** Implements least-privilege AWS IAM instance profiles, client-locked Security Groups, Amazon CloudWatch structured logging, custom host RAM metrics, and proactive Amazon SNS incident alarms.
 
-![Plant Disease Detection End-to-End System Architecture](/images/5-Workshop/5.3-Architecture-design/system_architecture.svg?width=100%)
+![Plant Disease Detection End-to-End System Architecture](/images/5-Workshop/5.3-Architecture-design/system_architecture.jpg?width=100%)
 
 ---
 
 ### End-to-End Operational Lifecycle & Sequence Flow
 
-The interaction sequence across the 18 numbered steps shown in the architecture diagram is detailed below:
+The interaction sequence across the 11 numbered steps shown in the architecture diagram is detailed below:
 
 | Step # | Subsystem / Boundary | Source Component | Destination Component | Protocol / Mechanism | Technical Action & Description |
 |:---:|---|---|---|---|---|
-| **❶** | Source Control | Developer | GitHub Repository | `git push` | Developer commits tested code and configurations to `master` branch. |
-| **❷** | Continuous Integration | GitHub Repository | GitHub Actions | Webhook Trigger | Repository push activates automated CI pipeline defined in `.github/workflows/ci.yml`. |
-| **❸** | Container Publishing | GitHub Actions | GitHub Container Registry (GHCR) | `docker push` | CI builds multi-stage production images and publishes digest-pinned artifacts. |
-| **❹** | Artifact Storage | Offline Training Pipeline | Amazon S3 Bucket | HTTPS S3 Upload | Offline knowledge distillation exports release `model.pth` and `class_to_idx.json`. |
-| **❺** | Artifact Retrieval | Amazon S3 Bucket | EC2 Host Directory | `aws s3 cp` | EC2 host downloads release artifacts authorized via IAM instance profile credentials. |
-| **❻** | Integrity Audit | EC2 Host Filesystem | Host Verification Script | `sha256sum` | Host validates cryptographic SHA256 checksums against the immutable audit manifest. |
-| **❼** | Container Isolation | EC2 Host Directory | FastAPI Container | Docker `:ro` Volume | Host mounts `checkpoints/v1` read-only to `/app/artifacts` preventing checkpoint corruption. |
-| **❽** | Image Delivery | GHCR | Docker Engine (EC2) | `docker pull` | EC2 host pulls immutable container images by digest hash (`sha256:...`). |
-| **❾** | User Ingress | Farmers & Agronomists | Amazon VPC Security Group | HTTP (`:3000`) | External client accesses Next.js web application through locked security group ingress. |
-| **❿** | Image Submission | Client Browser | Next.js Frontend | HTTP Multipart | User uploads tomato leaf photo (`tomato-leaf.jpg`) via interactive web interface. |
-| **⓫** | Inference Dispatch | Next.js Frontend | FastAPI Backend Container | HTTP POST (`:8000`) | Frontend proxies diagnostic request to `/predict` on the private container port. |
-| **⓬** | Neural Classification | FastAPI Inference Engine | MobileNetV3-Small Runtime | PyTorch CPU (2 Threads) | Model performs 11-class single-forward pass inference in **29.23 ms** CPU latency. |
-| **⓭** | Explainability Mapping | PyTorch Backend | Grad-CAM++ Engine | Gradient Feature Maps | Generates pixel activation heatmaps highlighting necrotic lesion boundaries. |
-| **⓮** | Diagnostic Payload | FastAPI Backend | Next.js Web UI | JSON + PNG Overlay | Returns ranked classification probabilities and transparent explainability heatmap. |
-| **⓯** | Container Logging | Docker Engine | Amazon CloudWatch Logs | Docker `awslogs` Driver | Streams structured JSON access logs to `/plant-disease/backend` and `/plant-disease/frontend`. |
-| **⓰** | Telemetry Sampling | CloudWatch Agent | CloudWatch Metrics | Custom Metric Emission | Host daemon collects OS memory (`mem_used_percent`) and disk metrics every 60s. |
-| **⓱** | Threshold Evaluation | CloudWatch Metrics | CloudWatch Alarm | Metric Threshold Breach | Alarm triggers when average host memory exceeds 85% for 3 consecutive minutes. |
-| **⓲** | Incident Notification | CloudWatch Alarm | Amazon SNS Topic | Email Subscription Protocol | SNS immediately delivers high-priority memory saturation notification to operator inbox. |
+| **①** | Client Ingress | Users / Browser | VPC / Internet Gateway | `HTTP :3000 / :8000` | Approved client IPs access web UI and API ports through the VPC Internet Gateway and Security Group (`TCP 22, 3000, 8000`). |
+| **②** | Web Frontend | Internet Gateway | `frontend` Container (EC2) | `GET :3000 (UI)` | Serves the Next.js standalone UI (`node server.js`) running as a non-root user. |
+| **③** | AI Inference API | Internet Gateway / Browser | `backend` Container (EC2) | `POST :8000 (API)` | FastAPI + Uvicorn (1 worker) exposes `/health`, `/predict`, `/explain` using MobileNetV3-Small (KD) on CPU (`2 threads`, `1 slot`) with `/app/artifacts` mounted read-only (`ro`). |
+| **④** | Source Control & CI | Developer (also operator) | GitHub (`master` branch) | `git push` &rarr; trigger | Pushing to `master` triggers GitHub Actions (`pytest · build · smoke`). |
+| **⑤** | Container Publishing | GitHub Actions | GHCR | `publish` | CI builds and publishes digest-pinned `api` and `frontend` container images to GitHub Container Registry. |
+| **⑥** | Manual Deployment | GHCR | Amazon EC2 (AL2023 `x86_64`) | `docker pull @sha256 digest` | Operator manually pulls immutable container images over SSH and recreates the containers on EC2. |
+| **⑦** | Offline Training Upload | Local Workstation | Amazon S3 (Private Bucket) | `upload` | Training & audit workflow (`audit_models.py`, Kaggle tomato set) uploads `mobilenet-distilled-v1/model.pth` (~6 MiB) and `class_to_idx.json` (no VPC endpoint). |
+| **⑧** | Artifact Retrieval | Amazon S3 | EC2 Host &rarr; `backend` | `aws s3 cp + sha256` | EC2 uses its AWS IAM instance profile (no static keys) to download weights, verify SHA256 hashes, and mount `/app/artifacts (ro)`. |
+| **⑨** | Logging & Telemetry | EC2 Containers & CloudWatch Agent | Amazon CloudWatch | `awslogs` + host metrics | Containers stream `awslogs` and CloudWatch Agent reports `mem + disk` every 60 s. |
+| **⑩** | Threshold Alarm | Amazon CloudWatch | Amazon SNS (`plant-disease-alerts`) | `RAM > 85%, 3 × 1 min` | CloudWatch Alarm triggers when host RAM exceeds 85% across three consecutive 1-minute periods. |
+| **⑪** | Incident Notification | Amazon SNS | Developer / Operator | `email alert` | SNS dispatches an email alert directly to the operator's inbox. |
 
 ---
 

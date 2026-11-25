@@ -17,34 +17,27 @@ Hệ thống **Plant Disease Detection** kết hợp quy trình phát triển v�
 3. **Phân hệ Thực thi Web & Suy luận Trí tuệ Nhân tạo (Docker Stack trên EC2):** Chạy giao diện người dùng tương tác Next.js và dịch vụ suy luận FastAPI PyTorch CPU tích hợp công nghệ giải thích Grad-CAM++.
 4. **Phân hệ Vận hành, An ninh & Giám sát Hệ thống:** Áp dụng nguyên tắc đặc quyền tối thiểu với IAM Role, Security Group khóa địa chỉ IP client, thu thập log với CloudWatch Logs, đo đạc RAM tùy biến với CloudWatch Agent và kích hoạt cảnh báo email qua Amazon SNS.
 
-![Kiến trúc Toàn diện Hệ thống Nhận diện Bệnh Cây trồng](/images/5-Workshop/5.3-Architecture-design/system_architecture.svg?width=100%)
+![Kiến trúc Toàn diện Hệ thống Nhận diện Bệnh Cây trồng](/images/5-Workshop/5.3-Architecture-design/system_architecture.jpg?width=100%)
 
 ---
 
-### Bảng Mô tả 18 Bước Vận hành Hệ thống Chi tiết
+### Bảng Mô tả 11 Bước Vận hành Hệ thống Chi tiết
 
-Chuỗi tương tác xuyên suốt 18 bước được đánh số trên sơ đồ kiến trúc như sau:
+Chuỗi tương tác xuyên suốt 11 bước được đánh số trên sơ đồ kiến trúc như sau:
 
 | Bước # | Phân hệ / Ranh giới | Thành phần Khởi phát | Thành phần Tiếp nhận | Giao thức / Cơ chế | Mô tả Kỹ thuật Chi tiết |
 |:---:|---|---|---|---|---|
-| **❶** | Quản lý Mã nguồn | Kỹ sư Phát triển | GitHub Repository | `git push` | Kỹ sư đẩy mã nguồn và cấu hình đã qua kiểm thử lên nhánh chính `master`. |
-| **❷** | Tích hợp Liên tục | GitHub Repository | GitHub Actions | Webhook Trigger | Sự kiện push tự động kích hoạt workflow CI định nghĩa tại `.github/workflows/ci.yml`. |
-| **❸** | Đóng gói Container | GitHub Actions | GitHub Container Registry (GHCR) | `docker push` | CI xây dựng Docker image đa giai đoạn và đẩy lên GHCR kèm mã băm digest bất biến. |
-| **❹** | Lưu trữ Artifacts | Pipeline Huấn luyện | Amazon S3 Bucket | HTTPS S3 Upload | Quá trình chưng cất tri thức ngoại tuyến lưu trữ tệp checkpoint `model.pth` và `class_to_idx.json`. |
-| **❺** | Tiếp nhận Trọng số | Amazon S3 Bucket | Thư mục Máy chủ EC2 | `aws s3 cp` | Máy chủ EC2 tải tệp trọng số từ S3 thông qua quyền hạn từ IAM Instance Profile. |
-| **❻** | Kiểm định Toàn vẹn | Thư mục Máy chủ EC2 | Script Kiểm thử Host | `sha256sum` | Kiểm tra mã băm SHA256 của tệp tải về so với bản kiểm định gốc trước khi nạp. |
-| **❼** | Cách ly Container | Thư mục Máy chủ EC2 | Container FastAPI | Docker `:ro` Volume | Gắn kết thư mục `checkpoints/v1` ở chế độ chỉ đọc vào `/app/artifacts` của container. |
-| **❽** | Triển khai Image | GHCR | Docker Engine (EC2) | `docker pull` | Máy chủ EC2 kéo image từ GHCR theo mã digest hash bất biến (`sha256:...`). |
-| **❾** | Truy cập Người dùng | Nông dân & Nhà nông học | Security Group (VPC) | HTTP (`:3000`) | Thiết bị người dùng truy cập web frontend qua cổng 3000 được mở giới hạn IP. |
-| **❿** | Tải ảnh Bệnh học | Trình duyệt Client | Container Next.js | HTTP Multipart | Người dùng chụp hoặc tải tệp ảnh lá cà chua (`tomato-leaf.jpg`) lên giao diện web. |
-| **⓫** | Chuyển tiếp Suy luận | Container Next.js | Container FastAPI | HTTP POST (`:8000`) | Giao diện web chuyển tiếp yêu cầu chẩn đoán đến API nội bộ qua endpoint `/predict`. |
-| **⓬** | Suy luận Nơ-ron | Engine Suy luận FastAPI | MobileNetV3-Small Runtime | PyTorch CPU (2 Cores) | Mô hình thực thi lan truyền tiến phân loại 11 bệnh học với độ trễ cực nhanh **29.23 ms**. |
-| **⓭** | Trích xuất Giải thích | PyTorch Backend | Engine Grad-CAM++ | Gradient Feature Maps | Tính toán trọng số gradient tại lớp tích chập cuối để tạo bản đồ nhiệt vùng hoại tử. |
-| **⓮** | Trả kết quả Chẩn đoán | Backend FastAPI | Giao diện Next.js | JSON + PNG Overlay | Phản hồi danh sách xác suất bệnh cùng ảnh heatmap phủ lớp trong suốt cho nông dân. |
-| **⓯** | Ghi log Tập trung | Docker Engine | Amazon CloudWatch Logs | Docker `awslogs` Driver | Chuyển luồng log stdout/stderr dạng JSON vào log group `/plant-disease/backend` và `/plant-disease/frontend`. |
-| **⓰** | Đo đạc Tài nguyên Host | CloudWatch Agent | CloudWatch Metrics | Custom Metric Daemon | Daemon trên host đọc thông số RAM (`mem_used_percent`) và ổ đĩa theo chu kỳ 60 giây. |
-| **⓱** | Đánh giá Ngưỡng Tràn | CloudWatch Metrics | CloudWatch RAM Alarm | Cảnh báo Vi phạm Ngưỡng | Kích hoạt trạng thái báo động khi tỷ lệ sử dụng RAM vượt quá 85% trong 3 phút liên tiếp. |
-| **⓲** | Phát thông báo Sự cố | CloudWatch RAM Alarm | Amazon SNS Topic | Email Subscription | Amazon SNS lập tức gửi thư cảnh báo khẩn cấp đến hộp thư điện tử của kỹ sư vận hành. |
+| **①** | Truy cập Client | Users / Browser | VPC / Internet Gateway | `HTTP :3000 / :8000` | Các địa chỉ IP được phê duyệt truy cập giao diện Web và API qua Internet Gateway và Security Group (`TCP 22, 3000, 8000`). |
+| **②** | Giao diện Web | Internet Gateway | Container `frontend` (EC2) | `GET :3000 (UI)` | Phục vụ giao diện Next.js standalone (`node server.js`) chạy dưới tài khoản non-root user. |
+| **③** | API Suy luận AI | Internet Gateway / Browser | Container `backend` (EC2) | `POST :8000 (API)` | FastAPI + Uvicorn (1 worker) cung cấp `/health`, `/predict`, `/explain` chạy MobileNetV3-Small (KD) trên CPU (`2 threads`, `1 slot`) với `/app/artifacts` gắn chỉ đọc (`ro`). |
+| **④** | Mã nguồn & CI | Developer (kiêm vận hành) | GitHub (nhánh `master`) | `git push` &rarr; trigger | Đẩy code lên `master` kích hoạt GitHub Actions (`pytest · build · smoke`). |
+| **⑤** | Phát hành Image | GitHub Actions | GHCR | `publish` | CI build và đẩy các container image `api` và `frontend` lên GitHub Container Registry. |
+| **⑥** | Triển khai Thủ công | GHCR | Amazon EC2 (AL2023 `x86_64`) | `docker pull @sha256 digest` | Kỹ sư vận hành kết nối SSH để kéo image theo mã digest bất biến và khởi chạy lại container trên EC2. |
+| **⑦** | Tải lên Trọng số | Local Workstation | Amazon S3 (Private Bucket) | `upload` | Quy trình huấn luyện & kiểm định (`audit_models.py`, tập dữ liệu cà chua Kaggle) tải `mobilenet-distilled-v1/model.pth` (~6 MiB) và `class_to_idx.json` lên S3 (không dùng VPC endpoint). |
+| **⑧** | Nạp Trọng số | Amazon S3 | Máy chủ EC2 &rarr; `backend` | `aws s3 cp + sha256` | EC2 sử dụng IAM instance profile (không lưu key tĩnh) để tải tệp trọng số, kiểm tra mã băm SHA256 và gắn `/app/artifacts (ro)`. |
+| **⑨** | Ghi log & Giám sát | EC2 Containers & CloudWatch Agent | Amazon CloudWatch | `awslogs` + host metrics | Container đẩy log qua `awslogs` và CloudWatch Agent gửi thông số `mem + disk` mỗi 60 giây. |
+| **⑩** | Cảnh báo Ngưỡng | Amazon CloudWatch | Amazon SNS (`plant-disease-alerts`) | `RAM > 85%, 3 × 1 min` | CloudWatch Alarm kích hoạt khi mức sử dụng RAM vượt 85% trong 3 chu kỳ 1 phút liên tiếp. |
+| **⑪** | Thông báo Sự cố | Amazon SNS | Developer / Operator | `email alert` | SNS gửi email cảnh báo tức thời đến hộp thư của kỹ sư vận hành. |
 
 ---
 
