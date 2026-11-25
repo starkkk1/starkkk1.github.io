@@ -1,125 +1,42 @@
 ---
 title: "Event 2"
-date: 2024-01-01
-weight: 1
+date: 2026-11-24
+weight: 2
 chapter: false
 pre: " <b> 4.2. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
+# AWS Cloud & AI Day 2026: HCMC Watch Party
 
-# Bài thu hoạch “GenAI-powered App-DB Modernization workshop”
+> **Sự kiện:** AWS Cloud & AI Day 2026: HCMC Watch Party  
+> **Thời gian:** Năm 2026 (Sự kiện Watch Party trọn ngày)  
+> **Địa điểm:** Văn phòng AWS tại Thành phố Hồ Chí Minh (do cộng đồng AWS Study Group tổ chức)  
+> **Vai trò:** Người tham dự
 
-### Mục Đích Của Sự Kiện
+Khi AWS Cloud & AI Day 2026 diễn ra tại Hà Nội, em không thể bay ra tham dự trực tiếp nên đã đăng ký tham gia buổi Watch Party tại văn phòng AWS ở Thành phố Hồ Chí Minh do cộng đồng AWS Study Group tổ chức. Ban đầu em chỉ định xem livestream và cảm nhận không khí sự kiện, nhưng hóa ra phần giá trị nhất của cả ngày lại đến từ những cuộc trò chuyện trao đổi trong giờ giải lao.
 
-- Chia sẻ best practices trong thiết kế ứng dụng hiện đại
-- Giới thiệu phương pháp DDD và event-driven architecture
-- Hướng dẫn lựa chọn compute services phù hợp
-- Giới thiệu công cụ AI hỗ trợ development lifecycle
+Khán phòng chật kín với hơn 300 lập trình viên và kỹ sư đã gác lại công việc thường nhật để tham dự trọn vẹn cả ngày. Không khí rất cởi mở và sôi nổi mỗi khi màn hình chuyển sang giờ nghỉ giữa phiên, khi mọi người lập tức quay sang thảo luận về những nội dung vừa được nghe.
 
-### Danh Sách Diễn Giả
+---
 
-- **Jignesh Shah** - Director, Open Source Databases
-- **Erica Liu** - Sr. GTM Specialist, AppMod
-- **Fabrianne Effendi** - Assc. Specialist SA, Serverless Amazon Web Services
+### Những Điểm Nổi Bật Nhất
 
-### Nội Dung Nổi Bật
+- **Ba Điểm Trọng Tâm từ Bài Keynote:** Em đặc biệt chú ý đến ba chủ đề lớn: sự trỗi dậy của **Agentic AI** (nơi AI vượt ra khỏi việc trả lời prompt đơn lẻ để tự động thực thi các quy trình nhiều bước); tầm quan trọng sống còn của một **nền tảng dữ liệu (data foundation)** vững chắc làm điều kiện tiên quyết để ứng dụng AI vào thực tế; và các chiến lược **hiện đại hóa hạ tầng đám mây** cho doanh nghiệp.
+- **Giá Trị Thực Tế Tại Các Phiên Thảo Luận Bàn Tròn:** Thật bất ngờ là những góc nhìn sâu sắc nhất lại không đến từ sân khấu chính. Trong các phiên thảo luận nhóm nhỏ, các Solution Architects và lập trình viên đã chia sẻ rất thẳng thắn về thực tế khi đưa một AI Agent từ bản thử nghiệm (POC) lên môi trường production, cũng như các phương pháp tối ưu chi phí cloud. Việc được nghe các kỹ sư đi trước kể lại những vướng mắc thực tế thấm thía hơn nhiều so với việc đọc slide — phần lớn thời gian em ngồi chăm chú ghi chép lại.
 
-#### Đưa ra các ảnh hưởng tiêu cực của kiến trúc ứng dụng cũ
+---
 
-- Thời gian release sản phẩm lâu → Mất doanh thu/bỏ lỡ cơ hội
-- Hoạt động kém hiệu quả → Mất năng suất, tốn kém chi phí
-- Không tuân thủ các quy định về bảo mật → Mất an ninh, uy tín
+### 4 Bài Học Em Áp Dụng Vào Công Việc Của Mình
 
-#### Chuyển đổi sang kiến trúc ứng dụng mới - Microservice Architecture
+1. **Một bản demo chạy được mới chỉ là vạch xuất phát:** Nghe mọi người phân tích các hệ thống triển khai thực tế giúp em nhận ra khoảng cách rất lớn giữa một AI Agent chạy mượt trên máy cá nhân và việc vận hành ổn định trên production. Với dự án cá nhân nhỏ của mình, em dự định bổ sung những phần trước đây mình từng bỏ qua: ghi log để truy vết hành động của agent, siết chặt quyền truy cập (least privilege) và thiết lập giám sát để phát hiện khi agent xử lý sai.
+2. **Dữ liệu quyết định giới hạn trần của những gì AI có thể làm:** Việc nhấn mạnh vào nền tảng dữ liệu khiến em nhìn lại dự án hiện tại của mình một cách thẳng thắn: dữ liệu còn rời rạc và quy ước đặt tên thiếu nhất quán ở nhiều chỗ. Tuần này em sẽ gom gọn và chuẩn hóa lại tập dữ liệu trước khi nghĩ đến việc nâng cấp mô hình hay làm cho agent "thông minh" hơn.
+3. **Chi phí là một bài toán kiến trúc, không phải việc làm sau cùng:** Trước nay em chỉ quan tâm làm sao để hệ thống chạy được. Các buổi thảo luận giúp em thấy kỹ sư chuyên nghiệp luôn tính toán chi phí ngay từ lúc vẽ sơ đồ kiến trúc, thay vì cuối tháng mới giật mình khi nhìn hóa đơn. Em sẽ tập thói quen ước tính chi phí cho mọi dự án — kể cả dự án học tập — và đối chiếu lại với mức sử dụng thực tế sau 30 ngày.
+4. **Đừng ngại bắt chuyện tại các sự kiện:** Bản tính em vốn hơi ngại mở lời với người lạ, nhưng lần này em đã chủ động hỏi thăm công việc của vài anh chị ngồi cạnh. Những cuộc trò chuyện đó mang lại cho em góc nhìn thực tiễn hơn nhiều so với việc tự cày tài liệu một mình ở nhà. Mục tiêu của em ở các sự kiện tiếp theo rất đơn giản: làm quen ít nhất hai người mới và giữ liên lạc trao đổi sau sự kiện.
 
-Chuyển đổi thành hệ thống modular – từng chức năng là một **dịch vụ độc lập** giao tiếp với nhau qua **sự kiện** với 3 trụ cột cốt lõi:
+---
 
-- **Queue Management**: Xử lý tác vụ bất đồng bộ
-- **Caching Strategy:** Tối ưu performance
-- **Message Handling:** Giao tiếp linh hoạt giữa services
+### Tổng Kết & Bước Tiếp Theo
 
-#### Domain-Driven Design (DDD)
+Em rời sự kiện với cảm giác đã bắt kịp được xu hướng chuyển dịch của ngành, nhưng bài học lớn nhất lại nằm ở cách chúng ta học: tự xem một bài keynote một mình và cùng xem giữa một cộng đồng mang lại hai trải nghiệm hoàn toàn khác nhau.
 
-- **Phương pháp 4 bước**: Xác định domain events → sắp xếp timeline → identify actors → xác định bounded contexts
-- **Case study bookstore**: Minh họa cách áp dụng DDD thực tế
-- **Context mapping**: 7 patterns tích hợp bounded contexts
-
-#### Event-Driven Architecture
-
-- **3 patterns tích hợp**: Publish/Subscribe, Point-to-point, Streaming
-- **Lợi ích**: Loose coupling, scalability, resilience
-- **So sánh sync vs async**: Hiểu rõ trade-offs (sự đánh đổi)
-
-#### Compute Evolution
-
-- **Shared Responsibility Model**: Từ EC2 → ECS → Fargate → Lambda
-- **Serverless benefits**: No server management, auto-scaling, pay-for-value
-- **Functions vs Containers**: Criteria lựa chọn phù hợp
-
-#### Amazon Q Developer
-
-- **SDLC automation**: Từ planning đến maintenance
-- **Code transformation**: Java upgrade, .NET modernization
-- **AWS Transform agents**: VMware, Mainframe, .NET migration
-
-### Những Gì Học Được
-
-#### Tư Duy Thiết Kế
-
-- **Business-first approach**: Luôn bắt đầu từ business domain, không phải technology
-- **Ubiquitous language**: Importance của common vocabulary giữa business và tech teams
-- **Bounded contexts**: Cách identify và manage complexity trong large systems
-
-#### Kiến Trúc Kỹ Thuật
-
-- **Event storming technique**: Phương pháp thực tế để mô hình hóa quy trình kinh doanh
-- Sử dụng **Event-driven communication** thay vì synchronous calls
-- **Integration patterns**: Hiểu khi nào dùng sync, async, pub/sub, streaming
-- **Compute spectrum**: Criteria chọn từ VM → containers → serverless
-
-#### Chiến Lược Hiện Đại Hóa
-
-- **Phased approach**: Không rush, phải có roadmap rõ ràng
-- **7Rs framework**: Nhiều con đường khác nhau tùy thuộc vào đặc điểm của mỗi ứng dụng
-- **ROI measurement**: Cost reduction + business agility
-
-### Ứng Dụng Vào Công Việc
-
-- **Áp dụng DDD** cho project hiện tại: Event storming sessions với business team
-- **Refactor microservices**: Sử dụng bounded contexts để identify service boundaries
-- **Implement event-driven patterns**: Thay thế một số sync calls bằng async messaging
-- **Serverless adoption**: Pilot AWS Lambda cho một số use cases phù hợp
-- **Try Amazon Q Developer**: Integrate vào development workflow để boost productivity
-
-### Trải nghiệm trong event
-
-Tham gia workshop **“GenAI-powered App-DB Modernization”** là một trải nghiệm rất bổ ích, giúp tôi có cái nhìn toàn diện về cách hiện đại hóa ứng dụng và cơ sở dữ liệu bằng các phương pháp và công cụ hiện đại. Một số trải nghiệm nổi bật:
-
-#### Học hỏi từ các diễn giả có chuyên môn cao
-- Các diễn giả đến từ AWS và các tổ chức công nghệ lớn đã chia sẻ **best practices** trong thiết kế ứng dụng hiện đại.
-- Qua các case study thực tế, tôi hiểu rõ hơn cách áp dụng **Domain-Driven Design (DDD)** và **Event-Driven Architecture** vào các project lớn.
-
-#### Trải nghiệm kỹ thuật thực tế
-- Tham gia các phiên trình bày về **event storming** giúp tôi hình dung cách **mô hình hóa quy trình kinh doanh** thành các domain events.
-- Học cách **phân tách microservices** và xác định **bounded contexts** để quản lý sự phức tạp của hệ thống lớn.
-- Hiểu rõ trade-offs giữa **synchronous và asynchronous communication** cũng như các pattern tích hợp như **pub/sub, point-to-point, streaming**.
-
-#### Ứng dụng công cụ hiện đại
-- Trực tiếp tìm hiểu về **Amazon Q Developer**, công cụ AI hỗ trợ SDLC từ lập kế hoạch đến maintenance.
-- Học cách **tự động hóa code transformation** và pilot serverless với **AWS Lambda**, từ đó nâng cao năng suất phát triển.
-
-#### Kết nối và trao đổi
-- Workshop tạo cơ hội trao đổi trực tiếp với các chuyên gia, đồng nghiệp và team business, giúp **nâng cao ngôn ngữ chung (ubiquitous language)** giữa business và tech.
-- Qua các ví dụ thực tế, tôi nhận ra tầm quan trọng của **business-first approach**, luôn bắt đầu từ nhu cầu kinh doanh thay vì chỉ tập trung vào công nghệ.
-
-#### Bài học rút ra
-- Việc áp dụng DDD và event-driven patterns giúp giảm **coupling**, tăng **scalability** và **resilience** cho hệ thống.
-- Chiến lược hiện đại hóa cần **phased approach** và đo lường **ROI**, không nên vội vàng chuyển đổi toàn bộ hệ thống.
-- Các công cụ AI như Amazon Q Developer có thể **boost productivity** nếu được tích hợp vào workflow phát triển hiện tại.
-
-#### Một số hình ảnh khi tham gia sự kiện
-* Thêm các hình ảnh của các bạn tại đây
-> Tổng thể, sự kiện không chỉ cung cấp kiến thức kỹ thuật mà còn giúp tôi thay đổi cách tư duy về thiết kế ứng dụng, hiện đại hóa hệ thống và phối hợp hiệu quả hơn giữa các team.
+Bước đầu tiên trong tuần này của em là rà soát lại dự án AI Agent cá nhân theo ba trụ cột: **logging, dữ liệu và chi phí**. Nếu bạn đang tự học và cảm thấy bế tắc, hãy thử tìm đến một cộng đồng công nghệ gần nơi mình ở — có những người bạn đồng hành để trao đổi ý tưởng sẽ giúp bài học thấm nhanh hơn rất nhiều.
