@@ -46,7 +46,7 @@ The underlying neural network is trained to classify images into **11 distinct o
 To balance high predictive accuracy with cost-effective cloud hosting on resource-constrained AWS EC2 CPU instances, the research compared several model architectures and adopted **Knowledge Distillation**:
 
 ```mermaid
-flowchart TD
+graph TD
     Teacher["Teacher Model: ConvNeXt-Tiny<br/>(Heavyweight, High Capacity ~114 MiB)"]
     Student["Student Model: MobileNetV3-Small<br/>(Lightweight, CPU-Optimized ~6 MiB)"]
     
@@ -90,5 +90,5 @@ The operational lifecycle connects code repository automation to AWS infrastruct
 1. **Automated Continuous Delivery:** Commits to the `master` branch in GitHub trigger GitHub Actions workflows that execute Python unit tests, Next.js build verification, and build production container images published to **GHCR (GitHub Container Registry)**.
 2. **Decoupled Checkpoint Storage:** Model weights (`model.pth`) and class label mappings (`class_to_idx.json`) are maintained in a secure, private **Amazon S3** bucket under the prefix `mobilenet-distilled-v1/`.
 3. **Containerized EC2 Host:** A single Amazon Linux 2023 EC2 instance pulls container images and mounts S3 model artifacts read-only into `/app/artifacts`.
-4. **Networking & Ingress:** The browser connects to the Next.js frontend on port `3000`, which communicates seamlessly with the FastAPI backend on port `8000`.
+4. **Networking & Ingress:** The browser connects to the Next.js frontend on port `3000` and calls the FastAPI backend on port `8000` (`/health`, `/predict`, `/explain`) via the VPC Internet Gateway and Security Group rules restricted to approved source IPs (with `CORS_ORIGINS` configured).
 5. **Observability:** Container standard output and error streams are captured via the Docker `awslogs` driver into CloudWatch Logs. The **CloudWatch Agent** collects fine-grained host memory and disk utilization, reporting metrics to automated alarm triggers.

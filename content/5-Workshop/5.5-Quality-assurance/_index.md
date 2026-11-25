@@ -132,11 +132,11 @@ aws cloudwatch put-metric-alarm \
 The architecture adheres strictly to AWS Well-Architected security best practices:
 
 ```mermaid
-flowchart TD
-    subgraph Security_Best_Practices ["Security Controls Applied"]
+graph TD
+    subgraph Security Controls Applied
         P1["S3 Private Bucket: Block All Public Access enabled"]
-        P2["IAM Instance Profile: No hardcoded credentials"]
-        P3["Security Group: Ingress locked to operator /32"]
+        P2["IAM Instance Profile: No static access keys"]
+        P3["Security Group: Ingress locked to approved source IPs /32"]
         P4["Container Isolation: Read-Only volume mounts"]
         P5["Non-Root Execution: User nextjs & appuser"]
     end

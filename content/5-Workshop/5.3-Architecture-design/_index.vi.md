@@ -52,21 +52,21 @@ Kiến trúc **Plant Disease Detection** tách biệt hoàn toàn giữa mã ngu
 3. **Tiếp nhận An toàn khi Triển khai:** Khi máy chủ khởi chạy, instance profile IAM cấp quyền tải tệp, kiểm tra mã băm SHA256 và gắn kết ổ đĩa chỉ đọc (**read-only volume** `/app/artifacts:ro`) vào container FastAPI.
 
 #### Phân hệ 2: Tích hợp Liên tục & Phân phối Bất biến
-Mọi thao tác đẩy commit lên GitHub đều kích hoạt quy trình CI/CD tự động:
+Mọi thao tác đẩy commit lên nhánh `master` trên GitHub đều kích hoạt quy trình CI/CD tự động (`pytest · build · smoke`):
 - **Bộ Kiểm thử PyTest Tự động:** Kiểm định tính đúng đắn của logic tiền xử lý tensor, giải mã ảnh PIL và kiểm tra định dạng dữ liệu đầu ra JSON.
-- **Tối ưu hóa Next.js Standalone:** Biên dịch TypeScript và đóng gói máy chủ Node.js 20 độc lập với kích thước nhỏ gọn.
-- **Gắn mã Digest Cố định:** Các image đẩy lên GitHub Container Registry (GHCR) được kéo về EC2 theo mã băm digest bất biến (`sha256:f61be157...` và `sha256:ec211d13...`), loại bỏ hoàn toàn rủi ro sai lệch do ghi đè tag `:latest`.
+- **Tối ưu hóa Next.js Standalone & Smoke Test:** Biên dịch TypeScript, đóng gói máy chủ Node.js 20 độc lập và chạy kiểm thử smoke container.
+- **Gắn mã Digest Cố định:** Các image (`api + frontend`) đẩy lên GitHub Container Registry (GHCR) và được kéo thủ công qua SSH về EC2 theo mã băm digest bất biến (`@sha256:f61be157...` và `@sha256:ec211d13...`), loại bỏ hoàn toàn rủi ro sai lệch do ghi đè tag `:latest`.
 
 #### Phân hệ 3: Môi trường Container Thực thi Web & Suy luận AI
-Phân hệ tính toán chạy trên một máy chủ ảo EC2 Amazon Linux 2023 với hai container độc lập:
-- **Next.js Standalone Frontend (`:3000`):** Chạy dưới tài khoản không có quyền root `nextjs` (UID 1001), phục vụ giao diện người dùng đáp ứng đa nền tảng (Mobile/Desktop).
-- **FastAPI Backend (`:8000`):** Dịch vụ Python 3.12 giới hạn số luồng xử lý PyTorch CPU ở mức 2 core (`MODEL_THREADS=2`), ngăn chặn tình trạng chiếm dụng cạn kiệt tài nguyên máy chủ khi lưu lượng tăng đột biến.
+Phân hệ tính toán chạy trên một máy chủ ảo EC2 Amazon Linux 2023 (`x86_64`) với hai container độc lập:
+- **Next.js Standalone Frontend (`:3000`):** Chạy `node server.js` dưới tài khoản không có quyền root `nextjs` (UID 1001), phục vụ giao diện người dùng đáp ứng đa nền tảng (Mobile/Desktop).
+- **FastAPI Backend (`:8000`):** Dịch vụ Python 3.12 + Uvicorn (`1 worker`) cung cấp các endpoint `/health`, `/predict`, `/explain`, giới hạn số luồng xử lý PyTorch CPU ở mức 2 core (`MODEL_THREADS=2`) và `1 slot` thực thi tuần tự để ngăn chặn quá tải CPU.
 - **MobileNetV3-Small Chưng cất Tri thức:** Giữ lại hơn 96% độ chính xác của mô hình giáo viên ConvNeXt-Tiny nhưng giảm dung lượng tới 94.7% (chỉ còn ~6 MiB) và đạt tốc độ suy luận CPU ấn tượng **29.23 ms**.
-- **Công nghệ Giải thích Grad-CAM++:** Phân tích gradient lớp tích chập cuối cùng để sinh ra bản đồ nhiệt trực quan hóa, giúp người dùng nhận biết chính xác mô hình tập trung vào vết hoại tử hay viền lá úa.
+- **Công nghệ Giải thích Grad-CAM++:** Phân tích gradient lớp tích chập cuối cùng qua `/explain` để sinh ra bản đồ nhiệt trực quan hóa, giúp người dùng nhận biết chính xác mô hình tập trung vào vết hoại tử hay viền lá úa.
 
 #### Phân hệ 4: Vận hành, An ninh Phân quyền Tối thiểu & Giám sát
-- **IAM Instance Profile:** Cấp quyền chính xác `s3:GetObject` trên tiền tố tệp trọng số và policy `CloudWatchAgentServerPolicy`, loại bỏ hoàn toàn việc lưu trữ Access Key tĩnh trên máy ảo.
-- **Amazon VPC & Security Groups:** Tường lửa bảo vệ chỉ cho phép truy cập các cổng `22` (SSH), `3000` (Web UI) và `8000` (API) từ duy nhất địa chỉ IPv4 của kỹ sư vận hành (`<OPERATOR_IP>/32`).
+- **IAM Instance Profile:** Sử dụng instance role không lưu khóa truy cập tĩnh, cấp quyền `s3:GetObject` trên bucket trọng số và policy `CloudWatchAgentServerPolicy`.
+- **Amazon VPC & Security Groups:** Tường lửa bảo vệ chỉ cho phép truy cập các cổng `22` (SSH), `3000` (Web UI) và `8000` (API) từ các IP nguồn được phê duyệt (`/32`).
 - **Amazon CloudWatch Logs:** Thu thập toàn bộ luồng log stdout/stderr với chính sách lưu trữ **7 ngày**, cân đối giữa nhu cầu khắc phục sự cố và tối ưu chi phí lưu trữ.
 - **CloudWatch Agent & Alarm:** Thu thập mức sử dụng RAM thực tế (`mem_used_percent`) trong namespace `PlantDisease/Host`. Chuông báo động kích hoạt khi RAM **vượt quá 85% trong 3 phút liên tục**, gửi email cảnh báo qua **Amazon SNS**.
 

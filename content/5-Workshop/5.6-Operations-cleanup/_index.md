@@ -56,7 +56,7 @@ sudo docker start plant-disease-frontend
 At the conclusion of the workshop or project lifecycle, execute the following teardown procedure to ensure zero residual billing across your AWS account:
 
 ```mermaid
-flowchart TD
+graph TD
     Step1["1. Terminate EC2 Instance<br/>(Automatically deletes attached root EBS volume)"]
     Step2["2. Delete EBS Snapshots & Unattached Volumes"]
     Step3["3. Delete CloudWatch Log Groups<br/>(/plant-disease/backend, /plant-disease/frontend)"]
@@ -64,7 +64,11 @@ flowchart TD
     Step5["5. Empty and Delete S3 Bucket Artifacts<br/>(mobilenet-distilled-v1/)"]
     Step6["6. Release Elastic IP Address (if assigned)"]
     
-    Step1 --> Step2 --> Step3 --> Step4 --> Step5 --> Step6
+    Step1 --> Step2
+    Step2 --> Step3
+    Step3 --> Step4
+    Step4 --> Step5
+    Step5 --> Step6
 ```
 
 #### Step-by-Step Deletion Commands:

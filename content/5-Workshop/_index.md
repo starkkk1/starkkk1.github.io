@@ -43,26 +43,31 @@ A single **Amazon EC2** instance hosts a responsive **Next.js** web frontend and
 ### End-to-End Operational Pipeline
 
 ```mermaid
-flowchart LR
-    Dev[Developer / Git Push] --> GHA[GitHub Actions CI/CD]
-    GHA -->|Build & Test| GHCR[GitHub Packages / GHCR]
-    
-    subgraph AWS_Cloud ["AWS Cloud (ap-southeast-2)"]
-        subgraph EC2_Host ["Amazon EC2 Instance"]
-            FE["Next.js Frontend Container (:3000)"]
-            BE["FastAPI Backend Container (:8000)"]
-            CW_Agent["CloudWatch Agent (Host Metrics)"]
-            FE -->|Inference Call| BE
+graph LR
+    Dev["Developer / Git Push"] -->|push master| GHA["GitHub Actions: pytest, build, smoke"]
+    GHA -->|publish| GHCR["GHCR: api + frontend"]
+    Local["Local Workstation: Training & Audit"] -->|upload| S3
+
+    subgraph AWS Cloud ap-southeast-2
+        subgraph EC2 Host Amazon Linux 2023
+            FE["frontend: Next.js :3000"]
+            BE["backend: FastAPI :8000"]
+            CW_Agent["CloudWatch Agent: 60s"]
         end
-        
-        S3["Amazon S3 Bucket (Private Checkpoints)"] -->|Mount Read-Only| BE
-        BE -->|stdout / stderr| CW_Logs["CloudWatch Logs (/plant-disease)"]
-        CW_Agent -->|mem_used_percent| CW_Alarm["CloudWatch RAM Alarm (>85%)"]
-        CW_Alarm -->|Trigger| SNS["Amazon SNS Topic (Email Alert)"]
+
+        S3["Amazon S3: Private Bucket"] -->|aws s3 cp + sha256| BE
+        IAM["AWS IAM: Instance Role"] -.->|instance profile| BE
+        FE -->|awslogs| CW["Amazon CloudWatch"]
+        BE -->|awslogs| CW
+        CW_Agent -->|mem + disk| CW
+        CW -->|RAM > 85pct, 3x1 min| SNS["Amazon SNS: plant-disease-alerts"]
     end
-    
-    GHCR -->|Deploy Images| EC2_Host
-    Client["User Mobile / Desktop Browser"] -->|HTTP :3000| FE
+
+    GHCR -->|manual docker pull sha256| FE
+    GHCR -->|manual docker pull sha256| BE
+    Client["Users / Browser"] -->|GET :3000| FE
+    Client -->|POST :8000| BE
+    SNS -->|email alert| Dev
 ```
 
 ---

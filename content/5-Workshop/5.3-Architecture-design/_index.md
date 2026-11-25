@@ -52,21 +52,21 @@ The architecture decouples application runtime code from model checkpoints:
 3. **Read-Only Container Mount:** During deployment, the host pulls the model artifacts via IAM role permissions, audits SHA256 hashes, and mounts `/home/ec2-user/checkpoints/v1` as a **read-only volume** (`/app/artifacts:ro`) into the FastAPI container.
 
 #### Subsystem 2: Continuous Integration & Immutable Delivery
-Every commit to the code repository triggers an automated GitHub Actions workflow:
+Every push to the `master` branch triggers an automated GitHub Actions workflow (`pytest · build · smoke`):
 - **PyTest Schema & Transform Suite:** Validates input tensor normalization, PIL image decoding, and JSON response contracts.
-- **Next.js Standalone Optimization:** Compiles TypeScript and packages a minimal Node.js 20 production server.
-- **Digest-Pinned Images:** Images are published to GitHub Container Registry (GHCR) and pulled on EC2 by immutable digest hash (`sha256:f61be157...` and `sha256:ec211d13...`), preventing mutable tag poisoning.
+- **Next.js Standalone Optimization & Smoke Tests:** Compiles TypeScript, packages a minimal Node.js 20 production server, and runs container smoke checks.
+- **Digest-Pinned Images:** Images (`api + frontend`) are published to GitHub Container Registry (GHCR) and pulled manually over SSH onto EC2 by immutable digest hash (`@sha256:f61be157...` and `@sha256:ec211d13...`), preventing mutable tag discrepancies.
 
 #### Subsystem 3: Containerized Web & AI Diagnostics Runtime
-The compute layer runs on an Amazon Linux 2023 EC2 instance hosting two isolated containers:
-- **Next.js Standalone Frontend (`:3000`):** Operates as low-privilege user `nextjs` (UID 1001), serving responsive mobile and desktop client interfaces.
-- **FastAPI Backend (`:8000`):** Python 3.12 service with PyTorch CPU intra-op thread allocation restricted to 2 cores (`MODEL_THREADS=2`), preventing CPU saturation during heavy traffic bursts.
+The compute layer runs on an Amazon Linux 2023 (`x86_64`) EC2 instance hosting two isolated containers:
+- **Next.js Standalone Frontend (`:3000`):** Runs `node server.js` as low-privilege non-root user `nextjs` (UID 1001), serving responsive mobile and desktop client interfaces.
+- **FastAPI Backend (`:8000`):** Python 3.12 + Uvicorn (`1 worker`) exposing `/health`, `/predict`, and `/explain`, with PyTorch CPU intra-op thread allocation restricted to 2 cores (`MODEL_THREADS=2`) and a single bounded execution slot (`1 slot`) to prevent CPU saturation.
 - **MobileNetV3-Small Distilled:** Retains over 96% of the ConvNeXt-Tiny teacher accuracy with a 94.7% smaller memory footprint (~6 MiB) and an ultra-fast **29.23 ms** CPU inference speed.
-- **Grad-CAM++ Explainability:** Computes second-order gradient-weighted activations over the final convolutional layer, empowering agricultural inspectors to visually verify necrotic spots and chlorosis margins.
+- **Grad-CAM++ Explainability:** Computes second-order gradient-weighted activations over the final convolutional layer via `/explain`, empowering agricultural inspectors to visually verify necrotic spots and chlorosis margins.
 
 #### Subsystem 4: Operations, Least-Privilege Security & Observability
-- **AWS IAM Instance Profile:** Scoped strictly to `s3:GetObject` on the model bucket and `CloudWatchAgentServerPolicy`, eliminating static access keys and secret keys from server disks.
-- **Amazon VPC & Security Groups:** Inbound firewall restricts ports `22` (SSH), `3000` (Web UI), and `8000` (API) exclusively to the operator's approved public IP (`<OPERATOR_IP>/32`).
+- **AWS IAM Instance Profile:** Instance role with no static access keys, scoped to `s3:GetObject` on the model bucket and `CloudWatchAgentServerPolicy`.
+- **Amazon VPC & Security Groups:** Inbound firewall restricts ports `22` (SSH), `3000` (Web UI), and `8000` (API) exclusively to approved source IPs (`/32`).
 - **Amazon CloudWatch Logs:** Captures stdout and stderr streams with a **7-day retention policy** to prevent disk saturation while maintaining troubleshooting history.
 - **Amazon CloudWatch Agent & Alarm:** Collects OS-level RAM telemetry (`mem_used_percent`) under namespace `PlantDisease/Host`. The alarm triggers when RAM exceeds **85% for 3 consecutive minutes**, notifying operators via **Amazon SNS**.
 

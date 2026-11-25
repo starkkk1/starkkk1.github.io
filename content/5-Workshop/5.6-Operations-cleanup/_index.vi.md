@@ -56,7 +56,7 @@ sudo docker start plant-disease-frontend
 Khi kết thúc khóa thực tập hoặc hoàn thành báo cáo workshop, thực hiện quy trình giải phóng hoàn toàn hạ tầng để đưa chi phí tài nguyên phát sinh về mức 0:
 
 ```mermaid
-flowchart TD
+graph TD
     Step1["1. Hủy máy ảo EC2 (Terminate)<br/>(Tự động xóa ổ đĩa root EBS gắn kèm)"]
     Step2["2. Xóa các bản Snapshot EBS và ổ đĩa phụ còn sót"]
     Step3["3. Xóa các nhóm CloudWatch Log Groups<br/>(/plant-disease/backend, /plant-disease/frontend)"]
@@ -64,7 +64,11 @@ flowchart TD
     Step5["5. Làm rỗng và xóa Bucket Amazon S3<br/>(mobilenet-distilled-v1/)"]
     Step6["6. Hủy giải phóng địa chỉ Elastic IP (nếu có cấp)"]
     
-    Step1 --> Step2 --> Step3 --> Step4 --> Step5 --> Step6
+    Step1 --> Step2
+    Step2 --> Step3
+    Step3 --> Step4
+    Step4 --> Step5
+    Step5 --> Step6
 ```
 
 #### Các Lệnh Dọn dẹp Tài nguyên Thực tế:

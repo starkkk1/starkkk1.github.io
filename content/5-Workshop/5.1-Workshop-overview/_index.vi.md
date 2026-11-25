@@ -46,14 +46,14 @@ Mạng nơ-ron được huấn luyện để nhận dạng chính xác **11 phâ
 Để dung hòa giữa độ chính xác cao và chi phí vận hành máy chủ CPU giá rẻ trên AWS EC2, dự án đã áp dụng kỹ thuật **Chưng cất Tri thức (Knowledge Distillation)**:
 
 ```mermaid
-flowchart TD
+graph TD
     Teacher["Mô hình Giáo viên: ConvNeXt-Tiny<br/>(Dung lượng lớn ~114 MiB, Độ chính xác cao)"]
     Student["Mô hình Học sinh: MobileNetV3-Small<br/>(Tối ưu CPU, Dung lượng siêu nhẹ ~6 MiB)"]
     
     Data["Tập dữ liệu Lá Cà chua<br/>(Tiền xử lý & Tăng cường)"] --> Teacher
     Data --> Student
     
-    Teacher -->|Xác suất mềm (Soft Logits)| KD_Loss["Hàm Mất mát Chưng cất<br/>(KL Divergence + Cross-Entropy)"]
+    Teacher -->|Xác suất mềm Soft Logits| KD_Loss["Hàm Mất mát Chưng cất<br/>(KL Divergence + Cross-Entropy)"]
     Student -->|Dự đoán của Học sinh| KD_Loss
     
     KD_Loss -->|Lan truyền ngược / Học hỏi| DistilledModel["Tệp trọng số Triển khai:<br/>mobilenetv3_small_100_distilled_best.pth<br/>(Độ trễ: 29.23 ms | Dung lượng: 6 MiB)"]
@@ -90,5 +90,5 @@ Chu trình vận hành kết nối liền mạch từ kho mã nguồn đến h�
 1. **Tự động hóa CI/CD:** Các commit trên nhánh `master` kích hoạt GitHub Actions chạy kiểm thử mã nguồn Python, build giao diện Next.js và đóng gói container image đẩy lên **GHCR (GitHub Container Registry)**.
 2. **Lưu trữ Tách rời Trọng số:** Tệp mô hình (`model.pth`) và ánh xạ phân lớp (`class_to_idx.json`) được lưu trữ tại **Amazon S3** bảo mật dưới tiền tố `mobilenet-distilled-v1/`.
 3. **Máy chủ EC2 Chạy Container:** Máy chủ Amazon Linux 2023 kéo images từ GHCR và gắn ổ đĩa S3 chỉ đọc (read-only) vào thư mục `/app/artifacts`.
-4. **Mạng & Cổng Giao tiếp:** Người dùng truy cập giao diện Next.js tại cổng `3000`, giao diện tự động gửi yêu cầu suy luận tới FastAPI tại cổng `8000`.
+4. **Mạng & Cổng Giao tiếp:** Trình duyệt kết nối tới giao diện Next.js tại cổng `3000` và gọi API FastAPI tại cổng `8000` (`/health`, `/predict`, `/explain`) qua Internet Gateway và Security Group giới hạn theo các IP nguồn được phê duyệt (kèm cấu hình `CORS_ORIGINS`).
 5. **Khả năng Quan sát:** Nhật ký stdout/stderr được chuyển về CloudWatch Logs bằng Docker `awslogs` driver. **CloudWatch Agent** đo đạc chỉ số RAM và đĩa định kỳ 60 giây để kích hoạt cảnh báo email tự động.

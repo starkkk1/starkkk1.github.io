@@ -132,11 +132,11 @@ aws cloudwatch put-metric-alarm \
 Hạ tầng triển khai tuân thủ chặt chẽ khung nguyên tắc AWS Well-Architected Framework:
 
 ```mermaid
-flowchart TD
-    subgraph Security_Best_Practices ["Các Biện pháp Bảo mật Thực tế"]
+graph TD
+    subgraph Các Biện pháp Bảo mật Thực tế
         P1["S3 Riêng tư: Chặn toàn bộ truy cập công cộng"]
         P2["IAM Instance Profile: Không lưu Access Key tĩnh"]
-        P3["Security Group: Khóa cổng theo IP máy khách /32"]
+        P3["Security Group: Khóa cổng theo IP nguồn được phê duyệt /32"]
         P4["Cô lập Container: Gắn ổ đĩa chỉ đọc Read-Only"]
         P5["Không dùng Root: Tài khoản nextjs và appuser"]
     end

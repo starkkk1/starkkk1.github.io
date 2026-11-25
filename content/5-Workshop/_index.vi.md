@@ -43,26 +43,31 @@ Một máy ảo **Amazon EC2** đóng vai trò máy chủ lưu trữ cho hai con
 ### Sơ đồ Quy trình Vận hành Toàn diện
 
 ```mermaid
-flowchart LR
-    Dev[Lập trình viên / Git Push] --> GHA[GitHub Actions CI/CD]
-    GHA -->|Kiểm thử & Đóng gói| GHCR[GitHub Container Registry]
-    
-    subgraph AWS_Cloud ["Hạ tầng Đám mây AWS (ap-southeast-2)"]
-        subgraph EC2_Host ["Máy chủ Amazon EC2"]
-            FE["Container Frontend Next.js (:3000)"]
-            BE["Container Backend FastAPI (:8000)"]
-            CW_Agent["CloudWatch Agent (Thu thập Metrics)"]
-            FE -->|Gọi API suy luận| BE
+graph LR
+    Dev["Lập trình viên / Git Push"] -->|push master| GHA["GitHub Actions: pytest, build, smoke"]
+    GHA -->|publish| GHCR["GHCR: api + frontend"]
+    Local["Máy cục bộ: Huấn luyện & Kiểm định"] -->|upload| S3
+
+    subgraph Hạ tầng AWS ap-southeast-2
+        subgraph Máy chủ EC2 Amazon Linux 2023
+            FE["frontend: Next.js :3000"]
+            BE["backend: FastAPI :8000"]
+            CW_Agent["CloudWatch Agent: 60s"]
         end
-        
-        S3["Amazon S3 Bucket (Lưu Model Private)"] -->|Gắn ổ đĩa Chỉ đọc| BE
-        BE -->|stdout / stderr| CW_Logs["CloudWatch Logs (/plant-disease)"]
-        CW_Agent -->|mem_used_percent| CW_Alarm["Cảnh báo RAM CloudWatch (>85%)"]
-        CW_Alarm -->|Kích hoạt| SNS["Amazon SNS Topic (Email Thông báo)"]
+
+        S3["Amazon S3: Bucket riêng tư"] -->|aws s3 cp + sha256| BE
+        IAM["AWS IAM: Instance Role"] -.->|instance profile| BE
+        FE -->|awslogs| CW["Amazon CloudWatch"]
+        BE -->|awslogs| CW
+        CW_Agent -->|mem + disk| CW
+        CW -->|RAM > 85pct, 3x1 min| SNS["Amazon SNS: plant-disease-alerts"]
     end
-    
-    GHCR -->|Triển khai Images| EC2_Host
-    Client["Trình duyệt Điện thoại / Máy tính"] -->|HTTP :3000| FE
+
+    GHCR -->|docker pull sha256 thủ công| FE
+    GHCR -->|docker pull sha256 thủ công| BE
+    Client["Người dùng / Trình duyệt"] -->|GET :3000| FE
+    Client -->|POST :8000| BE
+    SNS -->|email cảnh báo| Dev
 ```
 
 ---
