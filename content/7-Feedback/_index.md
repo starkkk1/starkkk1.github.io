@@ -1,47 +1,43 @@
 ---
 title: "Sharing and Feedback"
-date: 2024-01-01
+date: 2026-11-26
 weight: 7
 chapter: false
 pre: " <b> 7. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your report, including this warning.
-{{% /notice %}}
+# Sharing and Feedback
 
-> Here, you can freely share your personal opinions about your experience participating in the First Cloud AI Journey program. This will help the FCAJ team improve any shortcomings based on the following aspects:
+## Overall Evaluation
 
-### Overall Evaluation
+### 1. Learning experience
+The most valuable part of this internship has been working through a project that connects machine learning with cloud deployment. I began with tomato leaf images and a classification model, then worked on packaging the application and operating it on AWS. This helped me understand that a useful demonstration depends on more than model output: model files, class mapping, permissions, network access, logs, monitoring, cost and recovery all need attention.
 
-**1. Working Environment**  
-The working environment is very friendly and open. FCAJ members are always willing to help whenever I encounter difficulties, even outside working hours. The workspace is tidy and comfortable, helping me focus better. However, I think it would be nice to have more social gatherings or team bonding activities to strengthen relationships.
+### 2. Relevance to my major
+The project was relevant to my Information Technology studies and gave me a chance to apply programming and machine learning in a practical setting. It also introduced me to cloud operations that I had less experience with, including IAM roles, private S3 artifacts, Docker containers on EC2, CloudWatch logs and metrics, and secure web access.
 
-**2. Support from Mentor / Team Admin**  
-The mentor provides very detailed guidance, explains clearly when I don’t understand, and always encourages me to ask questions. The admin team supports administrative tasks, provides necessary documents, and creates favorable conditions for me to work effectively. I especially appreciate that the mentor allows me to try and solve problems myself instead of just giving the answer.
+### 3. Skills and professional growth
+Troubleshooting access, configuration and deployment issues taught me to verify each layer instead of assuming that a running page means the whole application works. Preparing worklogs, a workshop guide and technical blog posts also helped me explain technical decisions and limitations more clearly. Participating in cloud and AI community events gave me additional perspectives on system resilience, security, cost awareness and responsible use of AI.
 
-**3. Relevance of Work to Academic Major**  
-The tasks I was assigned align well with the knowledge I learned at university, while also introducing me to new areas I had never encountered before. This allowed me to both strengthen my foundational knowledge and gain practical skills.
+### 4. Project challenges and lessons
+The project made the limits of a small demonstration clear. A single EC2 instance can become a point of failure, and a resource alarm does not prove that predictions are available or accurate. I also learned to distinguish a sample inference time from a proper performance measurement, and to avoid making claims about field accuracy without independent labeled data. In future work, I would plan acceptance checks and operational evidence alongside implementation from the start.
 
-**4. Learning & Skill Development Opportunities**  
-During the internship, I learned many new skills such as using project management tools, teamwork skills, and professional communication in a corporate environment. The mentor also shared valuable real-world experiences that helped me better plan my career path.
+## Additional Questions
 
-**5. Company Culture & Team Spirit**  
-The company culture is very positive: everyone respects each other, works seriously but still keeps things enjoyable. When there are urgent projects, everyone works together and supports one another regardless of their position. This made me feel like a real part of the team, even as an intern.
+**What did I find most satisfying?**  
+Connecting the model and web application to AWS, then documenting the configuration and operational lessons, was the most satisfying part. It gave me a more complete view of how an AI feature moves from an experiment toward a usable service.
 
-**6. Internship Policies / Benefits**  
-The company provides an internship allowance and offers flexible working hours when needed. In addition, having the opportunity to join internal training sessions is a big plus.
+**What could be improved for future interns?**  
+A short milestone checklist with expected deliverables and acceptance criteria would help interns understand what evidence to collect at each stage. Regular review points for architecture, security and deployment would also help surface issues earlier while leaving room for interns to investigate and solve them.
 
----
+**Would I recommend the program to a friend?**  
+Yes, especially to someone interested in cloud and AI who is ready to learn by building and documenting a practical project. A clear project scope and regular feedback would make that experience even more effective.
 
-### Additional Questions
-- What did you find **most satisfying** during your internship?  
-- What do you think the company **should improve** for future interns?  
-- If recommending to a friend, would you **suggest they intern here**? Why or why not?  
+## Suggestions and Expectations
 
----
+- Provide a concise project-start guide covering scope, milestones, expected evidence and report structure.
+- Include periodic mentor reviews at key stages, such as model integration, AWS permissions, public access and final acceptance.
+- Share a cloud cost and cleanup checklist so interns can review running resources, budgets and end-of-project cleanup with confidence.
+- Keep opportunities to present project results and exchange feedback with other interns or the AWS Study Group community.
 
-### Suggestions & Expectations
-- Do you have any suggestions to improve the internship experience?  
-- Would you like to continue this program in the future?  
-- Any other comments (free sharing):
+I hope to continue learning through hands-on cloud and AI projects, community knowledge sharing and feedback from experienced practitioners. I am grateful for the opportunity to build, troubleshoot and reflect on this project during the First Cloud AI Journey.
