@@ -1,22 +1,24 @@
 ---
 title: "Blogs Posted"
-date: 2024-01-01
+date: 2026-10-21
 weight: 3
 chapter: false
 pre: " <b> 3. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your own report, including this warning.
-{{% /notice %}}
+# Technical Blogs Shared
 
-This section will list and introduce the blogs you have posted to [AWS Study Group](https://www.facebook.com/groups/awsstudygroupfcj). For example:
+During the First Cloud AI Journey internship, I read, analyzed, and shared technical summaries of three AWS architecture and cloud-AI articles with the [AWS Study Group](https://www.facebook.com/groups/awsstudygroupfcj) community. Each post breaks down the underlying AWS architecture, cost-optimization trade-offs, and practical caveats from the original article.
 
-###  [Blog 1 - SESSION POLICIES IN AMAZON EKS POD IDENTITY](3.1-Blog1/)
-This blog introduces the newly added session policies feature in Amazon EKS Pod Identity, which allows you to narrow IAM permissions flexibly and precisely for each pod without needing to create multiple separate IAM roles. This is an important step forward that helps apply the principle of least privilege more effectively in large-scale Kubernetes environments.
+### [Blog 1 — Automating Medical Coding with Step Functions and Amazon Bedrock AgentCore](3.1-Blog1/)
+An architectural breakdown of combining deterministic **AWS Step Functions** orchestration with a bounded **Amazon Bedrock AgentCore** agent (backed by MCP tools and **Aurora PostgreSQL + pgvector**) to automate medical coding while maintaining auditability and confidence-based human-in-the-loop routing.
 
-###  [Blog 2 - ...](3.2-Blog2/)
-This blog introduces the newly added session policies feature in Amazon EKS Pod Identity, which allows you to narrow IAM permissions flexibly and precisely for each pod without needing to create multiple separate IAM roles. This is an important step forward that helps apply the principle of least privilege more effectively in large-scale Kubernetes environments.
+---
 
-###  [Blog 3 - ...](3.3-Blog3/)
-This blog introduces the newly added session policies feature in Amazon EKS Pod Identity, which allows you to narrow IAM permissions flexibly and precisely for each pod without needing to create multiple separate IAM roles. This is an important step forward that helps apply the principle of least privilege more effectively in large-scale Kubernetes environments.
+### [Blog 2 — Upgrading AI-Powered Game Backends with New Amazon DynamoDB Features](3.2-Blog2/)
+A review of four **Amazon DynamoDB** capabilities for stateful AI game backends—**Multi-Region Strong Consistency (MRSC)**, **Zero-ETL to Amazon SageMaker Lakehouse**, **LangGraph DynamoDBSaver**, and **On-Demand / Global Tables pricing reductions**—along with practical constraints and cost-calculation checks.
+
+---
+
+### [Blog 3 — Resolving Security Signals Faster with Arctic Wolf’s Aurora Agentic SOC](3.3-Blog3/)
+An analysis of Arctic Wolf's **Aurora Agentic SOC** integration on AWS Marketplace, tracing its event-driven ingestion pipeline (**Security Hub CSPM &rarr; EventBridge &rarr; Data Firehose &rarr; S3 &rarr; Lambda**) and how AI agents handle high-volume triage before escalating complex decisions to human analysts.
