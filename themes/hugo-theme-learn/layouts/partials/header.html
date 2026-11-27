@@ -91,7 +91,8 @@
           <div id="chapter">
         {{ end }}
         <div id="body-inner">
-          {{if and (not .IsHome) (not .Params.chapter) }}
+          {{ $hasMarkdownTitle := findRE "(?m)^# [^\\r\\n]+" .RawContent 1 }}
+          {{if and (not .IsHome) (not .Params.chapter) (not $hasMarkdownTitle) }}
             <h1>
               {{ if eq .Kind "taxonomy" }}
                 {{.Kind}} ::

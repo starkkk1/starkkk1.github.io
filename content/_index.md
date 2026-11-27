@@ -14,11 +14,11 @@ chapter: false
 
 &emsp; **Email:** tranhunganh215@gmail.com
 
-&emsp; **University:** Ho Chi Minh City University of Technology and Education
+&emsp; **University:** FPT University
 
 &emsp; **Major:** Information Technology
 
-&emsp; **Class:** AWS082025
+&emsp; **Class:** FCAJ - FPT - Season 4
 
 &emsp; **Internship Company:** Amazon Web Services Viet Nam Company Limited
 
