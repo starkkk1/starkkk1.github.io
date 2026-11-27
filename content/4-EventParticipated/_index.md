@@ -30,7 +30,7 @@ During my internship, I participated in three cloud and AI community events in H
 
 ### [Event 3 — Navigating the Future of Cloud & AI in Vietnam](4.3-Event3/)
 &emsp;**Event Name:** Navigating the Future of Cloud & AI in Vietnam (Keynote by Dr. Werner Vogels)  
-&emsp;**Date & Time:** 2026  
+&emsp;**Date & Time:** 9:00 AM–12:00 PM, October 2, 2026<br>
 &emsp;**Location:** Ho Chi Minh City, Vietnam  
 &emsp;**Role:** Attendee  
 &emsp;**Summary:** Keynote by Amazon CTO Dr. Werner Vogels on software engineering in the AI era, Amazon's operational discipline and resilience drills, workload-driven architecture (the Dynamo/DynamoDB story), and the five traits of the "Renaissance Developer."

@@ -30,7 +30,7 @@ Trong quá trình thực tập, em đã tham gia ba sự kiện cộng đồng v
 
 ### [Event 3 — Navigating the Future of Cloud & AI in Vietnam](4.3-Event3/)
 &emsp;**Tên sự kiện:** Navigating the Future of Cloud & AI in Vietnam (Keynote của Dr. Werner Vogels)  
-&emsp;**Thời gian:** Năm 2026  
+&emsp;**Thời gian:** 09:00–12:00, ngày 02/10/2026<br>
 &emsp;**Địa điểm:** Thành phố Hồ Chí Minh, Việt Nam  
 &emsp;**Vai trò:** Người tham dự  
 &emsp;**Tóm tắt:** Bài diễn thuyết của Dr. Werner Vogels (CTO của Amazon) về tương lai ngành kỹ thuật phần mềm trong kỷ nguyên AI, kỷ luật vận hành và diễn tập sự cố tại Amazon, thiết kế hệ thống xuất phát từ khối lượng công việc thực tế (câu chuyện Dynamo/DynamoDB) và năm phẩm chất của "Renaissance Developer".

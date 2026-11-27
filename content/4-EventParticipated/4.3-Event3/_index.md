@@ -1,6 +1,6 @@
 ---
 title: "Event 3"
-date: 2026-11-24
+date: 2026-10-02
 weight: 3
 chapter: false
 pre: " <b> 4.3. </b> "
@@ -10,7 +10,7 @@ pre: " <b> 4.3. </b> "
 
 > **Event:** Navigating the Future of Cloud & AI in Vietnam  
 > **Speaker:** Dr. Werner Vogels, Amazon CTO  
-> **Date:** 2026  
+> **Date & Time:** 9:00 AM–12:00 PM, October 2, 2026
 > **Location:** Ho Chi Minh City, Vietnam  
 > **Role:** Attendee
 
