@@ -6,37 +6,31 @@ chapter: false
 pre: " <b> 4.2. </b> "
 ---
 
-# AWS Cloud & AI Day 2026: HCMC Watch Party
+# AWS Cloud & AI Day 2026: Learning Beyond the Livestream
 
 > **Event:** AWS Cloud & AI Day 2026: HCMC Watch Party  
-> **Date & Time:** 2026 (Full-day Watch Party)  
-> **Location:** AWS Office, Ho Chi Minh City (hosted by the AWS Study Group community)  
+> **Date & Time:** 2026, full-day watch party  
+> **Location:** AWS Office, Ho Chi Minh City; hosted by the AWS Study Group community  
 > **Role:** Attendee
 
-When AWS Cloud & AI Day 2026 took place in Hanoi, I couldn’t fly up to attend in person. Instead, I joined the Watch Party at the AWS office in Ho Chi Minh City, hosted by the AWS Study Group community. At first, I just wanted to watch the livestream and soak in the atmosphere. As it turned out, the most valuable part of the day came from the casual conversations during the breaks.
+I joined the HCMC watch party while the main AWS Cloud & AI Day event was taking place in Hanoi. More than 300 builders gathered to watch the sessions and discuss them together. I expected to spend most of the day following the livestream; I ended up learning just as much from the conversations between talks.
 
-The room was packed with over 300 builders who had set aside their daily work for the entire day. The vibe was warm and buzzed with energy every time the screen cut to an intermission, as everyone immediately turned to discuss what they had just heard.
+### From AI features to AI systems
 
----
+The keynote connected three topics: agentic systems, data foundations, and cloud modernization. I had previously thought about an AI agent mostly as a model with tools. The discussion made me consider the parts around it: where its data comes from, what permissions it receives, and which existing business process it is meant to improve.
 
-### What Stood Out Most
+In the smaller roundtables, Solution Architects and developers spoke candidly about moving agents from proof-of-concept to production and managing cloud spend. That shifted my attention from whether an agent can complete a demo task to whether a team can operate it repeatedly, trace its actions, and justify its cost.
 
-- **Three Key Takeaways from the Keynote:** I paid close attention to three major themes: the rise of **Agentic AI** (where AI moves beyond answering prompts to autonomously executing multi-step workflows); the criticality of a solid **data foundation** as a prerequisite for real-world AI adoption; and **cloud infrastructure modernization** strategies for enterprises.
-- **Real Value at the Roundtable Discussions:** Surprisingly, the best insights didn't come from the main stage. During the breakout discussions, Solution Architects and developers spoke candidly about the realities of moving an AI Agent from a proof of concept (POC) into production, as well as practical ways to optimize cloud costs. Hearing practitioners share real-world roadblocks hit much harder than reading slides—I spent most of my time quietly taking notes.
+### Lessons I am taking into my own work
 
----
+I want to add three checks to my next AI project: define the data sources and their quality, log the agent's decisions and tool calls, and measure cost alongside task success. If an agent makes a workflow faster but creates hard-to-debug failures or unpredictable usage, the design still needs work.
 
-### 4 Lessons I’m Applying to My Own Work
+This also connects with the current AI market. Adoption is broad, but useful deployment depends on dependable systems and clear value, not just adding an AI feature. Stanford HAI's 2026 AI Index describes cost, reliability, and practical value as increasingly important competitive factors. I see those as engineering questions I can test on a small project: compare an AI-assisted workflow with a baseline, count failures, and track cost per completed task. [Stanford HAI, 2026 AI Index](https://hai.stanford.edu/ai-index/2026-ai-index-report).
 
-1. **A working demo is just the starting line:** Listening to everyone break down real deployments made me realize how wide the gap is between an AI Agent running smoothly on a local machine and operating reliably in production. For my own small side project, I plan to add the things I previously overlooked: logging to trace the agent’s actions, tightening access permissions (least privilege), and setting up monitoring to detect when the agent makes a mistake.
-2. **Data defines the ceiling of what AI can do:** The emphasis on data foundations made me take an honest look at my current project: my data is scattered, with inconsistent naming conventions everywhere. This week, I will consolidate and standardize my dataset before even thinking about upgrading models or making the agent "smarter."
-3. **Cost is an architectural concern, not an afterthought:** Until now, I only cared about getting things to work. The discussions showed me that serious engineers factor in costs right when drawing the architecture diagram, rather than getting shocked by the bill at the end of the month. I’m going to make a habit of estimating costs for every project—even learning ones—and comparing them against actual usage after 30 days.
-4. **Don't hesitate to start a conversation at events:** I’m naturally hesitant to strike up conversations with strangers, but this time I pushed myself to ask a few people sitting next to me about their work. Those chats gave me far more practical perspective than grinding through documentation alone at home. My goal for future events is simple: meet at least two new people and follow up with them afterward.
+The most valuable part of attending in person was being able to compare notes with other learners and practitioners. For my next event, I plan to arrive with a concrete question about measuring agent quality and leave with one experiment I can reproduce in my own project.
+
+
 
 ---
 
-### Reflection & Next Steps
-
-I walked away feeling caught up with where the industry is heading, yet my biggest takeaway was about how we learn: watching the exact same keynote alone versus watching it surrounded by a community yields two completely different experiences.
-
-My first step this week is to audit my personal AI Agent project against those three pillars: **logging, data, and cost**. If you’re learning on your own and feeling stuck, try finding a local tech community—having peers to bounce ideas off makes the lessons stick much faster.
+![AWS Cloud and AI Day event photo](/images/4-EventParticipated/aws-cloud-ai-day.jpg?width=100%)

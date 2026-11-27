@@ -6,37 +6,32 @@ chapter: false
 pre: " <b> 4.3. </b> "
 ---
 
-# Những Điều Em Rút Ra Khi Nghe Tiến sĩ Werner Vogels Chia Sẻ
+# Kỹ thuật phần mềm trong thời đại AI: Suy nghĩ sau keynote của Werner Vogels
 
-> **Sự kiện:** Navigating the Future of Cloud & AI in Vietnam (Keynote của Dr. Werner Vogels)  
+> **Sự kiện:** Navigating the Future of Cloud & AI in Vietnam  
+> **Diễn giả:** Tiến sĩ Werner Vogels, CTO của Amazon  
 > **Thời gian:** Năm 2026  
 > **Địa điểm:** Thành phố Hồ Chí Minh, Việt Nam  
 > **Vai trò:** Người tham dự
 
-Em đã tham dự sự kiện **"Navigating the Future of Cloud & AI in Vietnam"** để lắng nghe **Tiến sĩ Werner Vogels** (CTO của Amazon) chia sẻ về tương lai của ngành kỹ thuật phần mềm. Là một sinh viên vừa làm bài tập trên lớp vừa phát triển các dự án cá nhân, câu hỏi *"Liệu AI có thay thế lập trình viên không?"* đối với em là một trăn trở rất thực tế. Nhìn quanh khán phòng, ai cũng chăm chú ghi chép — và mỗi lần diễn giả nhắc đến AI, cả hội trường lại im ắng hẳn xuống.
+Em đến nghe keynote của Tiến sĩ Werner Vogels với một câu hỏi mà nhiều sinh viên phần mềm đang quan tâm: cần học gì khi AI ngày càng xuất hiện trong công việc phát triển hằng ngày? Bài nói không đặt con người và AI vào thế cạnh tranh trực tiếp. Diễn giả quay lại những nền tảng quen thuộc nhưng quan trọng: hiểu workload, thiết kế cho tình huống lỗi và chịu trách nhiệm với hệ thống mình xây.
+
+### Thiết kế theo dữ liệu, chuẩn bị cho sự cố
+
+Vogels nhắc lại áp lực mà Amazon từng gặp với cơ sở dữ liệu trong mùa mua sắm cao điểm. Khi xem xét cách hệ thống được sử dụng, đội ngũ nhận ra nhiều truy vấn thực chất chỉ là tra cứu key-value. Hiểu workload cụ thể đã góp phần định hướng thiết kế Dynamo, tiền thân của DynamoDB. Em ghi nhớ rằng trước khi chọn một công nghệ đang thịnh hành, cần biết ứng dụng thực sự phải xử lý kiểu yêu cầu nào.
+
+Ông cũng nói về kỷ luật vận hành: số trung bình có thể che đi trải nghiệm rất tệ của một nhóm người dùng, còn lỗi thì luôn có thể xảy ra. Vì vậy độ bền cần được thử nghiệm, không thể chỉ giả định. Với sản phẩm AI, em nghĩ điều này cũng đúng cho lỗi mô hình hay dịch vụ: cần có trạng thái lỗi dễ hiểu, phương án dự phòng và cách kiểm tra đầu ra.
+
+### Góc nhìn của một sinh viên AI
+
+Hình ảnh “Renaissance Developer” nhấn mạnh sự tò mò, tư duy hệ thống, tinh thần làm chủ, kiến thức rộng đi cùng chuyên môn sâu và giao tiếp. Những phẩm chất này càng cần thiết khi công cụ AI hỗ trợ viết code ngày càng phổ biến. Sinh code có thể nhanh hơn, nhưng kiểm tra tính đúng, an toàn, dễ bảo trì và phù hợp workload vẫn là việc của kỹ sư.
+
+Em sẽ đọc kỹ code do AI tạo như khi review thay đổi của một thành viên nhóm: hiểu từng phần, kiểm thử trường hợp biên và ghi lại giả định. Em cũng muốn vẽ luồng dữ liệu trong dự án để biết chuyện gì xảy ra khi model, API hoặc dependency gặp lỗi. Báo cáo Future of Jobs 2025 của WEF xếp AI và dữ liệu lớn vào nhóm kỹ năng tăng nhu cầu nhanh, đồng thời vẫn đề cao tư duy phân tích và cộng tác. Điều đó khớp với bài học em nhận được: biết dùng công nghệ là cần thiết, nhưng phán đoán và giao tiếp quyết định cách dùng nó có trách nhiệm. [World Economic Forum, Future of Jobs Report 2025](https://www.weforum.org/publications/the-future-of-jobs-report-2025/3-skills-outlook).
+
+Em rời sự kiện với mục tiêu cụ thể hơn việc đoán AI sẽ thay thế nghề nào: trở thành kỹ sư biết tận dụng công cụ AI, kiểm chứng kết quả và hiểu hệ thống mà mình đang xây dựng.
+
+
 
 ---
 
-### Những Điều Đọng Lại Sâu Sắc Nhất
-
-- **Sự Cố Ngày Mua Sắm Cao Điểm:** Ông kể lại câu chuyện từ những ngày đầu của Amazon khi cơ sở dữ liệu quan hệ bị quá tải trong mùa mua sắm lễ hội, gây sập hệ thống suốt cả ngày và thiệt hại nặng nề. Điều nổi bật nhất là thái độ xử lý: khi nhà cung cấp phần mềm chỉ ra rằng Amazon đã đẩy sản phẩm vượt quá xa giới hạn thiết kế, Vogels thẳng thắn thừa nhận họ đúng. Thay vì chắp vá tạm bợ, đội ngũ kỹ sư đã lùi lại để đo đạc cách hệ thống thực sự được sử dụng. Họ nhận ra phần lớn truy vấn chỉ là tra cứu key-value đơn giản mà không cần đến một cơ sở dữ liệu quan hệ nặng nề. Phát hiện đó đã dẫn đến sự ra đời của **Dynamo**, và sau này là **Amazon DynamoDB**.
-- **Kỷ Luật Vận Hành (Operational Discipline):** Theo Vogels, chỉ dựa vào giá trị trung bình là cách dễ nhất để tự đánh lừa mình, vì con số trung bình che lấp trải nghiệm tệ hại của những người dùng ở hai đầu cực. Ông nhấn mạnh tư duy *"mọi thứ đều có thể hỏng bất cứ lúc nào"* (*everything fails all the time*) và giải thích cách Amazon chủ động diễn tập bằng việc cố tình tắt một phần hạ tầng đang chạy thật để kiểm chứng khả năng phục hồi của hệ thống.
-- **Hình Mẫu "Renaissance Developer":** Đây là phần em tâm đắc nhất. Lập trình viên sẽ không bị lỗi thời nếu phát triển bản thân xoay quanh năm phẩm chất: **tính tò mò, tư duy hệ thống, tinh thần làm chủ (ownership), kiến thức rộng kết hợp chuyên môn sâu, và kỹ năng giao tiếp**. Ông ví AI như một trình biên dịch ngôn ngữ tự nhiên — cực kỳ nhanh nhưng dễ sai sót, đồng nghĩa đầu ra của nó luôn cần con người kiểm chứng.
-
----
-
-### 5 Bài Học Em Áp Dụng Vào Công Việc Của Mình
-
-1. **AI viết code, nhưng chính mình chịu trách nhiệm:** Trước đây em từng copy code do AI sinh ra, chạy thử nhanh rồi đẩy thẳng vào dự án nếu thấy chạy ổn. Sau buổi nói chuyện này, em đặt ra nguyên tắc cứng: không bao giờ commit một dòng code nào mà bản thân không giải thích được. Trước khi chấp nhận code từ AI, em cần kiểm tra các trường hợp biên (edge cases), lỗ hổng bảo mật và điểm nghẽn hiệu năng. Nếu chưa hiểu nó, em không thể nhận đó là sản phẩm của mình.
-2. **Nhìn toàn bộ hệ thống, không chỉ các tính năng rời rạc:** Phần lớn bài tập ở trường chỉ tập trung vào từng module tách biệt. Sắp tới, em sẽ lấy một dự án cá nhân, vẽ lại toàn bộ luồng dữ liệu từ giao diện xuống cơ sở dữ liệu và tự hỏi: *điều gì xảy ra nếu thành phần đơn lẻ này chết?* Các sự cố nghiêm trọng gần như luôn bắt nguồn từ những giả định chưa từng được kiểm chứng.
-3. **Hiểu rõ workload thực tế trước khi chọn công nghệ:** Em thường chọn công cụ chỉ vì chúng đang phổ biến hoặc theo xu hướng. Câu chuyện của Amazon nhắc em phải bắt đầu từ mô hình sử dụng thực tế. Từ nay, trước khi chọn cơ sở dữ liệu hay framework, em sẽ liệt kê rõ các dạng truy vấn và xử lý dữ liệu mà ứng dụng thực sự cần.
-4. **Coi trọng kỹ năng giao tiếp:** Em từng xem giao tiếp là kỹ năng phụ, nhưng giờ em thấy nó giúp kỹ sư bóc tách đúng vấn đề cốt lõi đằng sau những yêu cầu mơ hồ và giải thích được các đánh đổi kỹ thuật cho những người không làm chuyên môn. Em sẽ rèn luyện cách viết tài liệu ngắn gọn cho công việc của mình và chủ động thuyết trình nhiều hơn trong các dự án nhóm.
-5. **Cảnh giác với câu *"trước giờ tụi mình vẫn làm thế"*:** Tiến sĩ Werner Vogels khép lại bằng lời cảnh báo nổi tiếng của Grace Hopper về câu nói nguy hiểm nhất trong ngôn ngữ. Với em, đó là lời nhắc phải định kỳ rà soát và làm mới cách mình học tập cũng như viết code.
-
----
-
-### Tổng Kết & Hành Động Tiếp Theo
-
-Em bước ra khỏi khán phòng với tâm trạng nhẹ nhõm hơn nhiều so với nỗi lo ban đầu. Điều đọng lại không phải là một lời trấn an sáo rỗng kiểu "đừng lo về AI", mà là cái nhìn rõ ràng về những gì AI vẫn chưa thể thay thế: **khả năng phán đoán chuẩn xác, tư duy hệ thống, tinh thần chịu trách nhiệm và niềm tự hào nghề nghiệp**. Đó chính xác là những kỹ năng em cần mài giũa bắt đầu từ hôm nay.
-
-Bước đầu tiên trong tuần này của em là vẽ lại sơ đồ kiến trúc cho dự án hiện tại và rà soát từng đoạn code trước đây em từng để AI viết giúp. Nếu bạn cũng đang ở giai đoạn đầu trên hành trình kỹ sư phần mềm như em, hy vọng những ghi chép này sẽ hữu ích.
+![Ảnh sự kiện về kỹ thuật](/images/4-EventParticipated/engineering.jpg?width=100%)

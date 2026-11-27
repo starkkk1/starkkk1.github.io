@@ -6,37 +6,31 @@ chapter: false
 pre: " <b> 4.2. </b> "
 ---
 
-# AWS Cloud & AI Day 2026: HCMC Watch Party
+# AWS Cloud & AI Day 2026: Học thêm ngoài buổi livestream
 
 > **Sự kiện:** AWS Cloud & AI Day 2026: HCMC Watch Party  
-> **Thời gian:** Năm 2026 (Sự kiện Watch Party trọn ngày)  
-> **Địa điểm:** Văn phòng AWS tại Thành phố Hồ Chí Minh (do cộng đồng AWS Study Group tổ chức)  
+> **Thời gian:** Năm 2026, watch party trọn ngày  
+> **Địa điểm:** Văn phòng AWS tại Thành phố Hồ Chí Minh, do cộng đồng AWS Study Group tổ chức  
 > **Vai trò:** Người tham dự
 
-Khi AWS Cloud & AI Day 2026 diễn ra tại Hà Nội, em không thể bay ra tham dự trực tiếp nên đã đăng ký tham gia buổi Watch Party tại văn phòng AWS ở Thành phố Hồ Chí Minh do cộng đồng AWS Study Group tổ chức. Ban đầu em chỉ định xem livestream và cảm nhận không khí sự kiện, nhưng hóa ra phần giá trị nhất của cả ngày lại đến từ những cuộc trò chuyện trao đổi trong giờ giải lao.
+Em tham gia watch party ở TP. Hồ Chí Minh trong lúc sự kiện AWS Cloud & AI Day chính diễn ra tại Hà Nội. Hơn 300 người cùng theo dõi các phiên và trao đổi tại chỗ. Ban đầu em nghĩ mình sẽ chủ yếu xem livestream; thực tế, các cuộc trò chuyện giữa giờ cũng giúp em hiểu vấn đề sâu hơn.
 
-Khán phòng chật kín với hơn 300 lập trình viên và kỹ sư đã gác lại công việc thường nhật để tham dự trọn vẹn cả ngày. Không khí rất cởi mở và sôi nổi mỗi khi màn hình chuyển sang giờ nghỉ giữa phiên, khi mọi người lập tức quay sang thảo luận về những nội dung vừa được nghe.
+### Từ tính năng AI đến một hệ thống AI
 
----
+Bài keynote nối ba chủ đề: agentic systems, nền tảng dữ liệu và hiện đại hóa Cloud. Trước đây em thường hình dung AI agent là một mô hình được gắn thêm công cụ. Những trao đổi hôm đó khiến em để ý hơn đến các thành phần xung quanh: dữ liệu agent sử dụng đến từ đâu, agent có quyền gì, và quy trình nào cần được cải thiện.
 
-### Những Điểm Nổi Bật Nhất
+Trong các phiên bàn tròn, Solution Architects và lập trình viên chia sẻ khá thẳng thắn về việc đưa agent từ proof-of-concept lên production cũng như kiểm soát chi phí Cloud. Em chuyển câu hỏi từ “agent có làm được demo không?” sang “đội ngũ có thể vận hành nó lặp lại, truy vết hành động và giải thích khoản chi đó không?”.
 
-- **Ba Điểm Trọng Tâm từ Bài Keynote:** Em đặc biệt chú ý đến ba chủ đề lớn: sự trỗi dậy của **Agentic AI** (nơi AI vượt ra khỏi việc trả lời prompt đơn lẻ để tự động thực thi các quy trình nhiều bước); tầm quan trọng sống còn của một **nền tảng dữ liệu (data foundation)** vững chắc làm điều kiện tiên quyết để ứng dụng AI vào thực tế; và các chiến lược **hiện đại hóa hạ tầng đám mây** cho doanh nghiệp.
-- **Giá Trị Thực Tế Tại Các Phiên Thảo Luận Bàn Tròn:** Thật bất ngờ là những góc nhìn sâu sắc nhất lại không đến từ sân khấu chính. Trong các phiên thảo luận nhóm nhỏ, các Solution Architects và lập trình viên đã chia sẻ rất thẳng thắn về thực tế khi đưa một AI Agent từ bản thử nghiệm (POC) lên môi trường production, cũng như các phương pháp tối ưu chi phí cloud. Việc được nghe các kỹ sư đi trước kể lại những vướng mắc thực tế thấm thía hơn nhiều so với việc đọc slide — phần lớn thời gian em ngồi chăm chú ghi chép lại.
+### Bài học em sẽ thử trong dự án
 
----
+Ở dự án AI tiếp theo, em muốn kiểm tra ba điểm: nguồn dữ liệu và chất lượng dữ liệu, log của quyết định và lần gọi công cụ, cùng chi phí cho mỗi tác vụ. Nếu agent giúp quy trình nhanh hơn nhưng tạo lỗi khó tìm hoặc mức sử dụng khó dự đoán thì thiết kế vẫn cần cải thiện.
 
-### 4 Bài Học Em Áp Dụng Vào Công Việc Của Mình
+Điều này cũng gần với thị trường AI hiện nay. Mức độ ứng dụng đang tăng, nhưng giá trị thực tế phụ thuộc vào hệ thống đáng tin cậy và lợi ích rõ ràng, chứ không chỉ thêm một tính năng AI. Stanford HAI trong AI Index 2026 cũng nhấn mạnh vai trò ngày càng lớn của chi phí, độ tin cậy và tính hữu ích trong cạnh tranh. Em muốn biến nhận định đó thành thử nghiệm nhỏ: so sánh workflow có AI với cách làm ban đầu, đếm lỗi và theo dõi chi phí trên mỗi tác vụ hoàn tất. [Stanford HAI, AI Index 2026](https://hai.stanford.edu/ai-index/2026-ai-index-report).
 
-1. **Một bản demo chạy được mới chỉ là vạch xuất phát:** Nghe mọi người phân tích các hệ thống triển khai thực tế giúp em nhận ra khoảng cách rất lớn giữa một AI Agent chạy mượt trên máy cá nhân và việc vận hành ổn định trên production. Với dự án cá nhân nhỏ của mình, em dự định bổ sung những phần trước đây mình từng bỏ qua: ghi log để truy vết hành động của agent, siết chặt quyền truy cập (least privilege) và thiết lập giám sát để phát hiện khi agent xử lý sai.
-2. **Dữ liệu quyết định giới hạn trần của những gì AI có thể làm:** Việc nhấn mạnh vào nền tảng dữ liệu khiến em nhìn lại dự án hiện tại của mình một cách thẳng thắn: dữ liệu còn rời rạc và quy ước đặt tên thiếu nhất quán ở nhiều chỗ. Tuần này em sẽ gom gọn và chuẩn hóa lại tập dữ liệu trước khi nghĩ đến việc nâng cấp mô hình hay làm cho agent "thông minh" hơn.
-3. **Chi phí là một bài toán kiến trúc, không phải việc làm sau cùng:** Trước nay em chỉ quan tâm làm sao để hệ thống chạy được. Các buổi thảo luận giúp em thấy kỹ sư chuyên nghiệp luôn tính toán chi phí ngay từ lúc vẽ sơ đồ kiến trúc, thay vì cuối tháng mới giật mình khi nhìn hóa đơn. Em sẽ tập thói quen ước tính chi phí cho mọi dự án — kể cả dự án học tập — và đối chiếu lại với mức sử dụng thực tế sau 30 ngày.
-4. **Đừng ngại bắt chuyện tại các sự kiện:** Bản tính em vốn hơi ngại mở lời với người lạ, nhưng lần này em đã chủ động hỏi thăm công việc của vài anh chị ngồi cạnh. Những cuộc trò chuyện đó mang lại cho em góc nhìn thực tiễn hơn nhiều so với việc tự cày tài liệu một mình ở nhà. Mục tiêu của em ở các sự kiện tiếp theo rất đơn giản: làm quen ít nhất hai người mới và giữ liên lạc trao đổi sau sự kiện.
+Phần đáng giá nhất của việc tham dự trực tiếp là được đối chiếu suy nghĩ với người đang học và người đang làm. Ở sự kiện sau, em sẽ chuẩn bị một câu hỏi cụ thể về cách đo chất lượng agent và chọn một thử nghiệm có thể tự tái hiện trong dự án.
+
+
 
 ---
 
-### Tổng Kết & Bước Tiếp Theo
-
-Em rời sự kiện với cảm giác đã bắt kịp được xu hướng chuyển dịch của ngành, nhưng bài học lớn nhất lại nằm ở cách chúng ta học: tự xem một bài keynote một mình và cùng xem giữa một cộng đồng mang lại hai trải nghiệm hoàn toàn khác nhau.
-
-Bước đầu tiên trong tuần này của em là rà soát lại dự án AI Agent cá nhân theo ba trụ cột: **logging, dữ liệu và chi phí**. Nếu bạn đang tự học và cảm thấy bế tắc, hãy thử tìm đến một cộng đồng công nghệ gần nơi mình ở — có những người bạn đồng hành để trao đổi ý tưởng sẽ giúp bài học thấm nhanh hơn rất nhiều.
+![Ảnh sự kiện AWS Cloud and AI Day](/images/4-EventParticipated/aws-cloud-ai-day.jpg?width=100%)
