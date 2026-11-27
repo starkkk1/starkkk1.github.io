@@ -25,8 +25,6 @@ Các lần push lên nhánh `master` kích hoạt quy trình tích hợp liên t
 | **Backend API Image** | `ghcr.io/starkkk1/plant-disease-api` | `sha256:f61be1570a834f1819614ad041f79e6114e00a0503852a121a564725cad4c27c` |
 | **Frontend Image** | `ghcr.io/starkkk1/plant-disease-frontend` | `sha256:ec211d13241680f208b29f8282c7fb12a19735e9048d1f8dab9b6a27499a7f85` |
 
-![Kết quả kiểm thử CI tự động](/images/5-Workshop/5.5-Quality-assurance/pytest_output.png?width=700px)
-
 ---
 
 ### 5.4.2 Tải và Xác minh Artifacts Mô hình
