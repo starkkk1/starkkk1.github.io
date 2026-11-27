@@ -59,7 +59,7 @@ docker run -d \
 
 ### 5.4.3 Cấu hình Giao diện Frontend và Mạng
 
-Frontend được đóng gói theo mô hình **Next.js Standalone** chạy trên Node.js 20. Container thực thi bằng tài khoản người dùng bảo mật không có quyền root (`nextjs`) và phục vụ tại cổng `3000`.
+Frontend được đóng gói theo mô hình **Next.js Standalone** chạy trên Node.js 22, khớp với Dockerfile của frontend. Container chạy bằng tài khoản riêng không có quyền root (`nextjs`) và phục vụ tại cổng `3000`.
 
 Khởi chạy container frontend:
 

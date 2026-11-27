@@ -59,7 +59,7 @@ docker run -d \
 
 ### 5.4.3 Configure Frontend and Networking
 
-The frontend is packaged using a multi-stage Docker build producing a **Next.js Standalone** server running on Node.js 20. The container runs as a dedicated non-root `nextjs` user and listens on port `3000`.
+The frontend is packaged using a multi-stage Docker build producing a **Next.js Standalone** server running on Node.js 22, matching the frontend Dockerfile. The container runs as a dedicated non-root `nextjs` user and listens on port `3000`.
 
 Start the frontend container:
 

@@ -20,7 +20,7 @@ The table below summarizes the exact configuration requirements recorded during 
 |---|---|---|
 | **AWS Account** | Personal AWS Account | Dedicated sandbox environment for demonstration and cost control |
 | **AWS Region** | Sydney (`ap-southeast-2`) | Low network latency and full regional availability of EC2, S3, and CloudWatch |
-| **Compute Engine** | Amazon EC2 (Amazon Linux 2023 x86_64) | Production host running Docker Engine and AWS CLI v2 |
+| **Compute Engine** | Amazon EC2 (Amazon Linux 2023 x86_64) | Demo host running Docker Engine and AWS CLI v2 |
 | **VPC & Network** | Public Subnet (`0.0.0.0/0` -> Internet Gateway) | Direct routing for package updates and inbound web access; Public IPv4 assigned |
 | **Inbound Security** | Port `22` (SSH), Port `3000` (Frontend), Port `8000` (API) | Restricted strictly to the operator's approved public IPv4 client address (`/32`) |
 | **Model Storage** | Amazon S3 (Private Bucket) | Stores model checkpoints under the `mobilenet-distilled-v1/` prefix |

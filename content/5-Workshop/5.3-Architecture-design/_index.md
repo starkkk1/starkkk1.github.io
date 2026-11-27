@@ -10,11 +10,11 @@ pre: "<b>5.3. </b>"
 
 ### End-to-End System Architecture
 
-The **Plant Disease Detection** system combines modern machine learning engineering (MLOps) with cloud-native infrastructure on Amazon Web Services (AWS). Designed to deliver real-time, explainable agricultural diagnostics for tomato crops, the architecture is structured into four primary subsystems within the **Sydney (`ap-southeast-2`)** region, accompanied by automated continuous delivery and operations governance:
+The **Plant Disease Detection** demonstration connects a machine-learning inference API to a web frontend and supporting AWS services in the **Sydney (`ap-southeast-2`)** region. Its architecture has four main parts: model artifact storage, CI image publishing, a two-container runtime on one EC2 host, and basic monitoring. It demonstrates selected MLOps and cloud engineering practices; it does not provide validated agricultural diagnostics or an automated production release process.
 
 1. **Model Checkpoint & Artifact Storage Pipeline (Amazon S3 &rarr; EC2 Host):** Securely decouples multi-megabyte neural network weights from application container images, verifying cryptographic integrity at runtime.
 2. **Continuous Delivery & Container Packaging (GitHub Actions &rarr; GHCR &rarr; EC2):** Runs automated tests and publishes frontend and API container images to GHCR; an operator deploys releases to EC2 manually.
-3. **Web Application & AI Diagnostics Runtime (EC2 Single Host Stack):** Hosts a responsive Next.js frontend and a high-performance PyTorch CPU FastAPI inference service featuring Grad-CAM++ explainability.
+3. **Web Application & Model Inference (Single EC2 Host):** Runs a responsive Next.js frontend and a PyTorch CPU FastAPI service with an optional Grad-CAM++ visualization.
 4. **Operations, Observability & Security:** Implements least-privilege AWS IAM instance profiles, client-locked Security Groups, Amazon CloudWatch structured logging, custom host RAM metrics, and proactive Amazon SNS incident alarms.
 
 ![Plant Disease Detection End-to-End System Architecture](/images/5-Workshop/5.3-Architecture-design/system_architecture.jpg?width=100%)
@@ -54,15 +54,15 @@ The architecture decouples application runtime code from model checkpoints:
 #### Subsystem 2: Continuous Integration & Immutable Delivery
 Every push to the `master` branch triggers an automated GitHub Actions workflow (`pytest · build · smoke`):
 - **PyTest Schema & Transform Suite:** Validates input tensor normalization, PIL image decoding, and JSON response contracts.
-- **Next.js Standalone Optimization & Smoke Tests:** Compiles TypeScript, packages a minimal Node.js 20 production server, and runs container smoke checks.
+- **Next.js Standalone Optimization & Smoke Tests:** Compiles TypeScript, packages a minimal Node.js 22 server, and runs container smoke checks.
 - **Digest-Pinned Images:** Images (`api + frontend`) are published to GitHub Container Registry (GHCR) and pulled manually over SSH onto EC2 by immutable digest hash (`@sha256:f61be157...` and `@sha256:ec211d13...`), preventing mutable tag discrepancies.
 
-#### Subsystem 3: Containerized Web & AI Diagnostics Runtime
+#### Subsystem 3: Containerized Web & Model Inference
 The compute layer runs on an Amazon Linux 2023 (`x86_64`) EC2 instance hosting two isolated containers:
 - **Next.js Standalone Frontend (`:3000`):** Runs `node server.js` as low-privilege non-root user `nextjs` (UID 1001), serving responsive mobile and desktop client interfaces.
 - **FastAPI Backend (`:8000`):** Python 3.12 + Uvicorn (`1 worker`) exposing `/health`, `/predict`, and `/explain`, with PyTorch CPU intra-op thread allocation restricted to 2 cores (`MODEL_THREADS=2`) and a single bounded execution slot (`1 slot`) to prevent CPU saturation.
-- **MobileNetV3-Small Distilled:** Retains over 96% of the ConvNeXt-Tiny teacher accuracy with a 94.7% smaller memory footprint (~6 MiB) and an ultra-fast **29.23 ms** CPU inference speed.
-- **Grad-CAM++ Explainability:** Computes second-order gradient-weighted activations over the final convolutional layer via `/explain`, empowering agricultural inspectors to visually verify necrotic spots and chlorosis margins.
+- **MobileNetV3-Small Distilled:** The demo checkpoint is approximately 6 MiB. A recorded single-request CPU inference measured 29.23 ms; this measurement is not a throughput or full-request latency result, and evaluation results do not establish field accuracy.
+- **Grad-CAM++ Visualization:** The `/explain` endpoint returns a heatmap and overlay as an aid for inspecting the model response. These visualizations do not segment lesions or verify a diagnosis.
 
 #### Subsystem 4: Operations, Least-Privilege Security & Observability
 - **AWS IAM Instance Profile:** Instance role with no static access keys, scoped to `s3:GetObject` on the model bucket and `CloudWatchAgentServerPolicy`.
@@ -122,7 +122,7 @@ The downloaded files must match the exact cryptographic digests generated during
 
 ### Model Artifact Explainability Comparison
 
-The distilled MobileNetV3-Small weights preserve high diagnostic fidelity to the ConvNeXt-Tiny teacher while significantly reducing parameter count:
+The distilled MobileNetV3-Small weights provide one compact model option for the CPU demo. Their evaluation results should be interpreted within the limits of the available test data; they do not establish diagnostic reliability in the field.
 
 | Teacher Model (ConvNeXt-Tiny) | Student Model (MobileNetV3-Small Distilled) |
 |---|---|

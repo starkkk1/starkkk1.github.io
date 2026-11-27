@@ -11,16 +11,16 @@ pre: " <b> 5. </b> "
 
 > **Region:** Asia Pacific (Sydney) `ap-southeast-2`  
 > **Source Repository:** [starkkk1/plant-disease-detection](https://github.com/starkkk1/plant-disease-detection)  
-> **Deployment Status:** Containerized Production Demonstration on AWS
+> **Deployment Status:** Single-instance AWS demonstration deployment
 > **Target Workshop Completion:** November 27, 2026 (before the November 30 deadline)
 
 ---
 
 ### Executive Summary
 
-The **Plant Disease Detection** project has successfully progressed from local PyTorch research to a containerized, production-grade cloud deployment on Amazon Web Services (AWS). 
+The **Plant Disease Detection** project has progressed from local PyTorch experiments to a working containerized demonstration on Amazon Web Services (AWS). The deployment shows how the model can be served through a web application and monitored on a small cloud setup; it is not a production service or a validated agricultural diagnostic product.
 
-A single **Amazon EC2** instance hosts a responsive **Next.js** web frontend and a high-performance **FastAPI CPU inference service**. **Amazon S3** provides secure, decoupled storage for versioned deep learning model weights, while **Amazon CloudWatch** and **Amazon SNS** collect real-time operational telemetry, host metrics, and dispatch proactive memory saturation alarms.
+A single **Amazon EC2** instance runs a responsive **Next.js** frontend and a **FastAPI CPU inference service** in separate containers. **Amazon S3** stores the model artifacts, while **Amazon CloudWatch** and **Amazon SNS** provide logs, host metrics, and a RAM threshold email alert. Deployment and rollback are manual. The setup has one host, limited access controls, and no high availability; model results have not been validated for field use.
 
 ![Plant Disease Detection UI Preview](/images/5-Workshop/plant-disease/frontend-mobile.png?width=750px)
 
@@ -33,8 +33,8 @@ A single **Amazon EC2** instance hosts a responsive **Next.js** web frontend and
 | **AWS Region** | Asia Pacific Sydney / `ap-southeast-2` |
 | **Primary AWS Services** | Amazon EC2, Amazon S3, Amazon CloudWatch |
 | **Supporting Services** | AWS IAM, Amazon VPC, Security Groups, Amazon SNS |
-| **Application Stack** | Next.js Standalone (Node.js 20), FastAPI, PyTorch (CPU), Docker, GHCR |
-| **Deployment Model** | Single host with dual isolated containers; manual release promotion |
+| **Application Stack** | Next.js Standalone (Node.js 22), FastAPI, PyTorch (CPU), Docker, GHCR |
+| **Deployment Model** | One EC2 host with two containers; manual deployment and rollback |
 | **Machine Learning Architecture** | Knowledge-distilled MobileNetV3-Small (Student) from ConvNeXt-Tiny (Teacher) |
 | **Monitoring Scope** | Custom CloudWatch Agent (CPU, RAM, Disk metrics) + Automated RAM Alarm (>85%) |
 

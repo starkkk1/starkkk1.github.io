@@ -19,7 +19,7 @@ We propose a twelve-week implementation and validation program for a containeriz
 
 The project will deliver a reproducible AWS demonstration with a responsive frontend, CPU inference API, privately stored model artifacts and one operational RAM alarm. GitHub Actions will publish images; a controlled manual procedure will deploy and roll back compatible image and model versions. This scope fits a backend and MLOps learning project without requiring serverless or microservices claims.
 
-The planning scenario uses 240 EC2 hours over twelve weeks and a gross budget of USD 67.20 including a 20 percent contingency. The account screenshot showed USD 100 available; an additional USD 100 is not assumed to be earned. Actual credit eligibility, expiry, regional prices and tax must be checked before spending. The estimate is a planning allowance, not an AWS quotation. [6–12]
+The project budget follows the low-traffic AWS demonstration configuration in the project overview: **USD 50 per month before tax**, or **USD 150 for three monthly billing periods** covering the twelve-week project. With USD 200 in eligible AWS credits, four months of this configuration are covered. Credit availability and expiration depend on the account. [6–12]
 
 
 ### 2 Problem statement
@@ -70,7 +70,7 @@ Use CloudWatch Logs for both containers and Agent metrics for RAM and disk. Reta
 
 ### 5 Timelines and milestones
 
-Each week receives 20 planned working hours, totaling 240 hours. The proposed schedule runs from September 7 through November 27, 2026, with November 27 as the final working day, ahead of the November 30 cutoff. This is a planned schedule, not a reconstruction of dates already worked. EC2 runtime is separately capped at a planning total of 240 hours; it need not match every working hour.
+Each week receives 20 planned working hours, totaling 240 hours. The proposed schedule runs from September 7 through November 27, 2026, with November 27 as the final working day, ahead of the November 30 cutoff. This is a planned schedule, not a reconstruction of dates already worked. AWS operating costs follow the monthly configuration in the budget below; they are not calculated from the planned working hours.
 
 | Week and target dates | Work package | Milestone evidence |
 | --- | --- | --- |
@@ -78,7 +78,7 @@ Each week receives 20 planned working hours, totaling 240 hours. The proposed sc
 | 2 · Sep 14–18 | Audit model preprocessing and labels | Artifact manifest and hashes |
 | 3 · Sep 21–25 | Harden API validation and errors | API contract and tests |
 | 4 · Sep 28–Oct 2 | Validate frontend and explanations | Browser workflow verified locally |
-| 5 · Oct 5–9 | Package production containers | Two images pass smoke tests |
+| 5 · Oct 5–9 | Package demo containers | Two images pass smoke tests |
 | 6 · Oct 12–16 | Complete CI and GHCR delivery | Published release digests |
 | 7 · Oct 19–23 | Prepare AWS IAM network and budget | EC2 role and restricted connectivity |
 | 8 · Oct 26–30 | Store and retrieve S3 artifacts | Download hashes match |
@@ -88,29 +88,25 @@ Each week receives 20 planned working hours, totaling 240 hours. The proposed sc
 | 12 · Nov 23–27 | Finalize report demo and cleanup | Handover and cost review |
 
 
-### 6 Budget estimation
+### 6 Cost
 
-Budget in USD before tax, credits and discounts, for Sydney. Assume one c7i-flex.large or another approved x86_64 instance only after checking availability and price. The existing instance type has not been verified. The EC2 allowance of USD 0.12 per hour and gp3 allowance of USD 0.12 per GiB-month are deliberately rounded planning inputs, not claimed Sydney list prices. Recalculate if the selected type exceeds the allowance. Public IPv4 uses the published USD 0.005 per hour rate. [6–8]
+The approved low-traffic demonstration budget for Sydney (`ap-southeast-2`) is **USD 50 per month before tax**. It covers one `t3.medium` EC2 host running 730 hours per month, a 20 GiB gp3 volume, one public IPv4 address, small S3 model artifacts, and low-volume monitoring and email alerts. The monthly allocation is:
 
-| Item | Basis | USD |
-| --- | --- | --- |
-| EC2 | 240 h × $0.12 | $28.80 |
-| Public IPv4 | 240 h × $0.005 | $1.20 |
-| EBS gp3 | 30 GiB × 3 months × $0.12 | $10.80 |
-| CloudWatch metrics dashboard alarm | $3/month allowance × 3 | $9.00 |
-| CloudWatch Logs and queries | $1/month allowance × 3 | $3.00 |
-| S3 storage versions requests | Project allowance | $1.00 |
-| SNS email | Project allowance | $0.20 |
-| Data transfer | Low-traffic allowance | $2.00 |
-| Subtotal |  | $56.00 |
-| Contingency | 20% × $56.00 | $11.20 |
-| Total |  | $67.20 |
+| Service / usage | Monthly cost |
+|---|---:|
+| EC2 Linux `t3.medium`, 730 hours | $38.54 |
+| EBS gp3, 20 GiB | $1.60 |
+| Public IPv4, 730 hours | $3.65 |
+| S3 model checkpoint and class map | $0.01 |
+| CloudWatch logs, host metrics, dashboard, and one RAM alarm | $0.00 |
+| SNS email alerts (up to 1,000 notifications) | $0.00 |
+| Internet data transfer within the 100 GB/month shared allowance | $0.00 |
+| Operating headroom | $6.20 |
+| **Monthly total** | **$50.00** |
 
-The twelve weeks span 84 days; storage and fixed monitoring allowances are rounded up to three months. CloudWatch and S3 amounts are spending envelopes, not exact unit-rate calculations, and do not rely on Free Tier exemptions. The transfer allowance is suitable only for a small demonstration. Taxes, domain purchase, load balancers, NAT Gateway, GPUs, model training and extra VPC endpoints are excluded. [7–10]
+The twelve-week project reserves three monthly billing periods, for a total project budget of **USD 150 before tax**. Eligible AWS credits of USD 200 cover four months at this monthly budget, leaving USD 50 for the twelve-week period. Credit eligibility, available balance, and expiration depend on the AWS account; confirm them in the Billing Console. Configure a monthly budget alert and review gross usage regularly, since budget notifications do not stop resources automatically. [6–12]
 
-At the same assumptions, leaving EC2 and its public IPv4 running for all 2,016 hours of twelve weeks raises the subtotal to USD 278.00 and the total with contingency to USD 333.60. Scheduled manual stops are therefore essential for this credit-limited plan. EBS and retained monitoring resources still cost money while the instance is stopped. [2,6–9]
-
-Use only the verified USD 100 credit balance until additional credit is actually granted. The planned gross estimate leaves USD 32.80 headroom before actual pricing differences and tax. Configure a monthly budget alert and review actual gross usage weekly with credits excluded from the view. Budget notifications are not an immediate hard spending cap. [11–12]
+This budget covers a single host and low-traffic demo use. It excludes tax, GPU training, load balancing, NAT Gateway, databases, high availability, traffic beyond the stated allowance, excess logs or metrics, and T3 CPU-credit surcharges. Training and research runs use a local machine; GHCR and GitHub Actions remain within included account usage. Stopping EC2 reduces compute charges, while EBS storage remains billable. Check the AWS Pricing Calculator if the region or configuration changes. [6–10]
 
 
 ### 7 Risk assessment

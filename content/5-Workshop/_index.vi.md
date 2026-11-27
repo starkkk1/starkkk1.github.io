@@ -11,16 +11,16 @@ pre: " <b> 5. </b> "
 
 > **Khu vực (Region):** Châu Á - Thái Bình Dương (Sydney) `ap-southeast-2`  
 > **Kho mã nguồn:** [starkkk1/plant-disease-detection](https://github.com/starkkk1/plant-disease-detection)  
-> **Trạng thái triển khai:** Bản demo chạy container hoàn chỉnh trên hạ tầng AWS
+> **Trạng thái triển khai:** Bản demo trên một máy chủ AWS
 > **Mốc hoàn tất workshop dự kiến:** 27/11/2026 (trước hạn 30/11)
 
 ---
 
 ### Tóm tắt Tổng quan
 
-Dự án **Nhận diện Bệnh lá Cây trồng (Plant Disease Detection)** đã hoàn thành lộ trình chuyển đổi từ mô hình nghiên cứu PyTorch cục bộ sang giải pháp triển khai đám mây hoàn chỉnh bằng container trên Amazon Web Services (AWS).
+Dự án **Plant Disease Detection** đã chuyển từ thử nghiệm PyTorch cục bộ sang một bản demo chạy container trên Amazon Web Services (AWS). Phần triển khai cho thấy cách phục vụ mô hình qua ứng dụng web và theo dõi tài nguyên trên cấu hình đám mây nhỏ; đây chưa phải dịch vụ production hay sản phẩm chẩn đoán nông nghiệp đã được kiểm chứng.
 
-Một máy ảo **Amazon EC2** đóng vai trò máy chủ lưu trữ cho hai container độc lập: giao diện web **Next.js** có thiết kế responsive tối ưu cho thiết bị di động và dịch vụ suy luận trí tuệ nhân tạo **FastAPI CPU**. Dịch vụ **Amazon S3** đảm bảo lưu trữ an toàn, tách biệt cho các tệp trọng số mô hình đã qua kiểm thử mã băm, trong khi **Amazon CloudWatch** và **Amazon SNS** phụ trách giám sát tài nguyên hệ thống theo thời gian thực và tự động phát cảnh báo khi bộ nhớ tiệm cận ngưỡng quá tải.
+Một máy **Amazon EC2** chạy hai container riêng biệt: giao diện **Next.js** và API suy luận CPU **FastAPI**. **Amazon S3** lưu các tệp mô hình; **Amazon CloudWatch** và **Amazon SNS** cung cấp log, metrics máy chủ và email cảnh báo theo ngưỡng RAM. Việc triển khai và quay lui phiên bản được thực hiện thủ công. Cấu hình chỉ có một máy chủ, khả năng kiểm soát truy cập còn hạn chế và chưa có tính sẵn sàng cao; kết quả mô hình chưa được kiểm định trên dữ liệu thực địa.
 
 ![Giao diện Ứng dụng Phân loại Bệnh lá](/images/5-Workshop/plant-disease/frontend-mobile.png?width=750px)
 
@@ -33,8 +33,8 @@ Một máy ảo **Amazon EC2** đóng vai trò máy chủ lưu trữ cho hai con
 | **Khu vực AWS (Region)** | Asia Pacific Sydney / `ap-southeast-2` |
 | **Dịch vụ AWS Chính** | Amazon EC2, Amazon S3, Amazon CloudWatch |
 | **Dịch vụ Hỗ trợ** | AWS IAM, Amazon VPC, Security Groups, Amazon SNS |
-| **Ngăn xếp Ứng dụng (Stack)** | Next.js Standalone (Node.js 20), FastAPI, PyTorch (CPU), Docker, GHCR |
-| **Mô hình Triển khai** | Một máy chủ EC2 chạy 2 container độc lập; chuyển phiên bản thủ công |
+| **Ngăn xếp Ứng dụng (Stack)** | Next.js Standalone (Node.js 22), FastAPI, PyTorch (CPU), Docker, GHCR |
+| **Mô hình Triển khai** | Một máy EC2 chạy 2 container; triển khai và quay lui thủ công |
 | **Kiến trúc Trí tuệ Nhân tạo** | MobileNetV3-Small (Student) được chưng cất tri thức từ ConvNeXt-Tiny (Teacher) |
 | **Phạm vi Giám sát** | CloudWatch Agent (CPU, RAM, Đĩa) + 1 Cảnh báo RAM tự động (>85%) |
 

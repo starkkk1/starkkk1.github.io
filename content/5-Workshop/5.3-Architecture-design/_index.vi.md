@@ -10,7 +10,7 @@ pre: "<b>5.3. </b>"
 
 ### Tổng quan Kiến trúc Toàn diện Hệ thống
 
-Hệ thống **Plant Disease Detection** kết hợp quy trình phát triển và vận hành học máy (MLOps) tiên tiến với hạ tầng điện toán đám mây tối ưu trên nền tảng Amazon Web Services (AWS). Được thiết kế để phục vụ chẩn đoán bệnh học thời gian thực trên lá cà chua có khả năng giải thích quyết định (Explainable AI), kiến trúc hệ thống tại khu vực **Sydney (`ap-southeast-2`)** được phân tách thành 4 phân hệ cốt lõi cùng quy trình phân phối liên tục (CI/CD) và giám sát vận hành:
+Bản demo **Plant Disease Detection** kết nối API suy luận học máy với giao diện web và một số dịch vụ AWS tại khu vực **Sydney (`ap-southeast-2`)**. Kiến trúc gồm bốn phần: lưu trữ artifacts mô hình, CI phát hành image, hai container chạy trên cùng một EC2 và giám sát cơ bản. Đây là ví dụ thực hành một số kỹ thuật MLOps và cloud; hệ thống chưa cung cấp chức năng chẩn đoán nông nghiệp đã được xác minh và chưa tự động triển khai bản phát hành production:
 
 1. **Phân hệ Lưu trữ Trọng số & Tách rời Artifacts (Amazon S3 &rarr; Máy chủ EC2):** Tách biệt các tệp trọng số mạng nơ-ron nhị phân khỏi container image, đảm bảo tính toàn vẹn mật mã học SHA256 tại thời điểm chạy.
 2. **Quy trình Phân phối Liên tục & Đóng gói Container (GitHub Actions &rarr; GHCR &rarr; EC2):** Tự động kiểm thử và phát hành container image frontend cùng API lên GHCR; kỹ sư vận hành triển khai phiên bản lên EC2 theo quy trình thủ công.
@@ -54,15 +54,15 @@ Kiến trúc **Plant Disease Detection** tách biệt hoàn toàn giữa mã ngu
 #### Phân hệ 2: Tích hợp Liên tục & Phân phối Bất biến
 Mọi thao tác đẩy commit lên nhánh `master` trên GitHub đều kích hoạt quy trình CI/CD tự động (`pytest · build · smoke`):
 - **Bộ Kiểm thử PyTest Tự động:** Kiểm định tính đúng đắn của logic tiền xử lý tensor, giải mã ảnh PIL và kiểm tra định dạng dữ liệu đầu ra JSON.
-- **Tối ưu hóa Next.js Standalone & Smoke Test:** Biên dịch TypeScript, đóng gói máy chủ Node.js 20 độc lập và chạy kiểm thử smoke container.
+- **Tối ưu hóa Next.js Standalone & Smoke Test:** Biên dịch TypeScript, đóng gói máy chủ Node.js 22 độc lập và chạy kiểm thử smoke container.
 - **Gắn mã Digest Cố định:** Các image (`api + frontend`) đẩy lên GitHub Container Registry (GHCR) và được kéo thủ công qua SSH về EC2 theo mã băm digest bất biến (`@sha256:f61be157...` và `@sha256:ec211d13...`), loại bỏ hoàn toàn rủi ro sai lệch do ghi đè tag `:latest`.
 
-#### Phân hệ 3: Môi trường Container Thực thi Web & Suy luận AI
+#### Phân hệ 3: Container Web và Suy luận Mô hình
 Phân hệ tính toán chạy trên một máy chủ ảo EC2 Amazon Linux 2023 (`x86_64`) với hai container độc lập:
 - **Next.js Standalone Frontend (`:3000`):** Chạy `node server.js` dưới tài khoản không có quyền root `nextjs` (UID 1001), phục vụ giao diện người dùng đáp ứng đa nền tảng (Mobile/Desktop).
 - **FastAPI Backend (`:8000`):** Dịch vụ Python 3.12 + Uvicorn (`1 worker`) cung cấp các endpoint `/health`, `/predict`, `/explain`, giới hạn số luồng xử lý PyTorch CPU ở mức 2 core (`MODEL_THREADS=2`) và `1 slot` thực thi tuần tự để ngăn chặn quá tải CPU.
-- **MobileNetV3-Small Chưng cất Tri thức:** Giữ lại hơn 96% độ chính xác của mô hình giáo viên ConvNeXt-Tiny nhưng giảm dung lượng tới 94.7% (chỉ còn ~6 MiB) và đạt tốc độ suy luận CPU ấn tượng **29.23 ms**.
-- **Công nghệ Giải thích Grad-CAM++:** Phân tích gradient lớp tích chập cuối cùng qua `/explain` để sinh ra bản đồ nhiệt trực quan hóa, giúp người dùng nhận biết chính xác mô hình tập trung vào vết hoại tử hay viền lá úa.
+- **MobileNetV3-Small chưng cất:** Checkpoint dùng cho demo có dung lượng khoảng 6 MiB. Một lần đo suy luận CPU được ghi nhận là 29,23 ms; đây không phải kết quả throughput hay độ trễ toàn bộ request. Kết quả đánh giá không chứng minh độ chính xác ngoài thực địa.
+- **Trực quan hóa Grad-CAM++:** Endpoint `/explain` trả về bản đồ nhiệt và ảnh phủ để tham khảo vùng ảnh liên quan đến phản hồi của mô hình. Các hình ảnh này không phân đoạn tổn thương hoặc xác nhận chẩn đoán.
 
 #### Phân hệ 4: Vận hành, An ninh Phân quyền Tối thiểu & Giám sát
 - **IAM Instance Profile:** Sử dụng instance role không lưu khóa truy cập tĩnh, cấp quyền `s3:GetObject` trên bucket trọng số và policy `CloudWatchAgentServerPolicy`.
@@ -122,9 +122,9 @@ Các tệp tải về phải khớp tuyệt đối với mã băm đã được 
 
 ### So sánh Hình ảnh Giải thích Quyết định Mô hình
 
-Trọng số MobileNetV3-Small sau khi chưng cất tri thức tái hiện xuất sắc khả năng chú ý vùng bệnh học tương tự như mô hình giáo viên ConvNeXt-Tiny:
+Hai mô hình tạo ra các bản đồ nhiệt khác nhau trên ảnh ví dụ. Bản đồ này minh họa phản hồi của mô hình, không chứng minh vùng bệnh hoặc tính đúng đắn của dự đoán:
 
 | Mô hình Giáo viên (ConvNeXt-Tiny) | Mô hình Học sinh (MobileNetV3-Small Chưng cất) |
 |---|---|
 | ![ConvNeXt Overlay](/images/5-Workshop/plant-disease/explain-convnext_tiny-overlay.png?width=350px) | ![MobileNetV3 Overlay](/images/5-Workshop/plant-disease/explain-mobilenetv3_small_100_distilled-overlay.png?width=350px) |
-| Vùng bao phủ rộng, nhận diện đặc trưng toàn diện | Tập trung chính xác vào rìa hoại tử và vùng tổn thương cục bộ |
+| Các vùng được làm nổi bật khác nhau giữa hai mô hình | Bản đồ nhiệt chỉ trực quan hóa phản hồi; không xác nhận tổn thương |

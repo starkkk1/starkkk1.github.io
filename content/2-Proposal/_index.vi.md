@@ -19,7 +19,7 @@ Ngày 16 tháng 10 năm 2026  |  Sydney  |  ap-southeast-2
 
 Dự án bàn giao bản demo AWS có thể tái tạo, gồm frontend responsive, API suy luận CPU, artifacts model lưu private và một alarm RAM vận hành. GitHub Actions phát hành image; quy trình thủ công có kiểm soát triển khai và rollback các phiên bản image và model tương thích. Phạm vi phù hợp học backend và MLOps, không cần gán nhãn serverless hoặc microservices.
 
-Kịch bản dự toán dùng 240 giờ EC2 trong mười hai tuần, tổng ngân sách gộp 67,20 USD đã gồm dự phòng 20%. Ảnh tài khoản hiển thị 100 USD khả dụng; không giả định đã nhận thêm 100 USD. Cần kiểm tra dịch vụ được credit bù, hạn credit, giá Region và thuế trước khi chi tiêu. Đây là mức dự phòng lập kế hoạch, không phải báo giá AWS. [6–12]
+Ngân sách dự án theo cấu hình demo AWS tải thấp trong file tổng quan: **50 USD mỗi tháng trước thuế**, tương đương **150 USD cho ba kỳ thanh toán tháng** trong thời gian dự án mười hai tuần. Với 200 USD AWS credit đủ điều kiện, cấu hình này được chi trả trong bốn tháng. Khả năng sử dụng và hạn credit phụ thuộc vào tài khoản AWS. [6–12]
 
 
 ### 2 Phát biểu vấn đề
@@ -70,7 +70,7 @@ Dùng CloudWatch Logs cho hai container và Agent metrics cho RAM cùng đĩa. G
 
 ### 5 Tiến độ và các mốc bàn giao
 
-Mỗi tuần phân bổ 20 giờ làm việc, tổng cộng 240 giờ. Lịch đề xuất chạy từ ngày 7/9 đến 27/11/2026; ngày làm việc cuối là 27/11, trước hạn 30/11. Đây là kế hoạch, không phải ghi lại ngày công đã thực hiện. Runtime EC2 được dự toán riêng ở tổng 240 giờ; không bắt buộc trùng từng giờ làm việc.
+Mỗi tuần phân bổ 20 giờ làm việc, tổng cộng 240 giờ. Lịch đề xuất chạy từ ngày 7/9 đến 27/11/2026; ngày làm việc cuối là 27/11, trước hạn 30/11. Đây là kế hoạch, không phải ghi lại ngày công đã thực hiện. Chi phí AWS áp dụng cấu hình theo tháng trong bảng ngân sách dưới đây, không tính từ số giờ làm việc dự kiến.
 
 | Tuần và ngày dự kiến | Công việc | Bằng chứng |
 | --- | --- | --- |
@@ -78,7 +78,7 @@ Mỗi tuần phân bổ 20 giờ làm việc, tổng cộng 240 giờ. Lịch đ
 | 2 · 14–18/9 | Audit model preprocessing và nhãn | Manifest artifacts và hash |
 | 3 · 21–25/9 | Hoàn thiện validation và lỗi API | Hợp đồng API và tests |
 | 4 · 28/9–2/10 | Kiểm tra frontend và giải thích | Luồng browser local được xác minh |
-| 5 · 5–9/10 | Đóng gói container production | Hai image qua smoke tests |
+| 5 · 5–9/10 | Đóng gói container demo | Hai image qua smoke tests |
 | 6 · 12–16/10 | Hoàn thiện CI và phát hành GHCR | Digest release được phát hành |
 | 7 · 19–23/10 | Chuẩn bị IAM mạng và ngân sách | Role EC2 và kết nối giới hạn |
 | 8 · 26–30/10 | Lưu và tải artifacts từ S3 | Hash tải về khớp |
@@ -88,29 +88,25 @@ Mỗi tuần phân bổ 20 giờ làm việc, tổng cộng 240 giờ. Lịch đ
 | 12 · 23–27/11 | Hoàn thiện báo cáo demo và cleanup | Bàn giao và rà soát chi phí |
 
 
-### 6 Ước tính ngân sách
+### 6 Ngân sách
 
-Dự toán bằng USD trước thuế, credit và ưu đãi tại Sydney. Giả định một c7i-flex.large hoặc loại x86_64 được duyệt sau khi kiểm tra availability và giá. Chưa xác minh loại instance hiện có. Mức EC2 0,12 USD mỗi giờ và gp3 0,12 USD mỗi GiB tháng là giả định dự phòng làm tròn, không khẳng định là giá niêm yết Sydney. Tính lại nếu loại được chọn vượt mức dự toán. IPv4 dùng mức công bố 0,005 USD mỗi giờ. [6–8]
+Ngân sách vận hành cho bản demo tải thấp tại Sydney (`ap-southeast-2`) là **50 USD mỗi tháng trước thuế**. Mức này bao gồm một máy EC2 `t3.medium` chạy 730 giờ mỗi tháng, ổ gp3 20 GiB, một địa chỉ IPv4 public, artifacts model dung lượng nhỏ trên S3 và mức sử dụng thấp cho monitoring cùng email cảnh báo. Phân bổ theo tháng:
 
-| Hạng mục | Cơ sở | USD |
-| --- | --- | --- |
-| EC2 | 240 h × $0.12 | $28.80 |
-| Public IPv4 | 240 h × $0.005 | $1.20 |
-| EBS gp3 | 30 GiB × 3 tháng × $0.12 | $10.80 |
-| Metrics dashboard alarm | Dự phòng $3/tháng × 3 | $9.00 |
-| Log và truy vấn | Dự phòng $1/tháng × 3 | $3.00 |
-| Lưu trữ phiên bản và request | dự phòng dự án | $1.00 |
-| SNS email | dự phòng dự án | $0.20 |
-| Truyền dữ liệu | dự phòng tải thấp | $2.00 |
-| Tạm tính |  | $56.00 |
-| Dự phòng | 20% × $56.00 | $11.20 |
-| Tổng cộng |  | $67.20 |
+| Dịch vụ / mức sử dụng | Chi phí tháng |
+|---|---:|
+| EC2 Linux `t3.medium`, 730 giờ | $38.54 |
+| EBS gp3, 20 GiB | $1.60 |
+| Public IPv4, 730 giờ | $3.65 |
+| Checkpoint mô hình và class map trên S3 | $0.01 |
+| CloudWatch logs, metrics máy chủ, dashboard và một RAM alarm | $0.00 |
+| Email cảnh báo SNS (tối đa 1.000 thông báo) | $0.00 |
+| Truyền dữ liệu Internet trong hạn mức dùng chung 100 GB/tháng | $0.00 |
+| Dự phòng vận hành | $6.20 |
+| **Tổng mỗi tháng** | **$50.00** |
 
-Mười hai tuần tương đương 84 ngày; lưu trữ và monitoring cố định được làm tròn lên ba tháng. Khoản CloudWatch và S3 là hạn mức dự phòng, không phải phép tính chính xác theo đơn giá, và không dựa vào miễn phí Free Tier. Khoản truyền dữ liệu chỉ phù hợp demo nhỏ. Chưa gồm thuế, mua domain, load balancer, NAT Gateway, GPU, training model và VPC endpoint bổ sung. [7–10]
+Dự án mười hai tuần dành ngân sách cho ba kỳ thanh toán tháng, tổng cộng **150 USD trước thuế**. AWS credit đủ điều kiện trị giá 200 USD chi trả được bốn tháng theo ngân sách này, còn 50 USD sau thời gian mười hai tuần. Khả năng đủ điều kiện, số dư và hạn sử dụng credit tùy thuộc tài khoản AWS; cần xác minh tại Billing Console. Hãy đặt cảnh báo ngân sách tháng và thường xuyên kiểm tra mức dùng gộp vì thông báo ngân sách không tự dừng tài nguyên. [6–12]
 
-Với cùng giả định, để EC2 và public IPv4 chạy đủ 2.016 giờ trong mười hai tuần làm tạm tính tăng lên 278,00 USD, tổng có dự phòng là 333,60 USD. Vì vậy, stop máy giữa các buổi là yêu cầu quan trọng của kế hoạch giới hạn credit. EBS và tài nguyên monitoring giữ lại vẫn có chi phí khi instance đã dừng. [2,6–9]
-
-Chỉ dùng số credit 100 USD đã thấy cho đến khi khoản bổ sung thực sự được cấp. Dự toán gộp còn 32,80 USD dư địa trước chênh lệch giá thực và thuế. Đặt cảnh báo ngân sách tháng và rà soát sử dụng gộp hằng tuần với credit được loại khỏi góc nhìn chi phí. Thông báo ngân sách không phải cơ chế chặn chi tiêu tức thời. [11–12]
+Ngân sách này dành cho một máy chủ và lưu lượng demo thấp. Chưa bao gồm thuế, huấn luyện GPU, load balancer, NAT Gateway, database, high availability, lưu lượng vượt hạn mức nêu trên, log hoặc metrics vượt mức, và phụ phí T3 CPU credit. Huấn luyện và nghiên cứu chạy trên máy cục bộ; GHCR và GitHub Actions nằm trong mức sử dụng đã bao gồm của tài khoản. Dừng EC2 giúp giảm phí compute, nhưng dung lượng EBS vẫn tính phí. Kiểm tra AWS Pricing Calculator nếu thay đổi Region hoặc cấu hình. [6–10]
 
 
 ### 7 Đánh giá rủi ro

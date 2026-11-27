@@ -10,9 +10,9 @@ pre: "<b>5.1. </b>"
 
 ### Introduction to Plant Disease Detection
 
-The **Plant Disease Detection** system is designed to provide rapid, accurate, and explainable identification of tomato crop diseases from field images. By bridging modern computer vision research with cloud engineering on AWS, the project provides farmers, agronomists, and researchers with an intuitive web application capable of running CPU-efficient deep learning inference in real-time.
+The **Plant Disease Detection** project is a learning and engineering demonstration of tomato leaf image classification. It connects a CPU-based image classifier to a web interface and a small AWS deployment. It is not validated for field diagnosis and should not be treated as advice for farmers or agronomists.
 
-The application accepts standard **JPEG** or **PNG** leaf photographs taken from smartphones or cameras, analyzes the visual symptoms using a fine-tuned deep learning model, and outputs ranked disease predictions along with statistical confidence scores.
+The application accepts **JPEG** or **PNG** images and returns ranked class predictions with model scores. These scores are not calibrated probabilities, and performance on the small external dataset does not establish reliability on field images.
 
 ![Plant Disease Detection Mobile UI](/images/5-Workshop/plant-disease/frontend-mobile.png?width=700px)
 
@@ -37,13 +37,13 @@ The underlying neural network is trained to classify images into **11 distinct o
 | `10` | **unknown** | Out-of-Distribution | Non-tomato foliage, corrupted images, or background noise |
 
 > [!NOTE]
-> This system serves as a learning, research, and engineering deployment demonstration; field diagnostic certification must be established prior to commercial agronomic use.
+> This is a learning, research, and deployment demonstration. It has not been validated for field diagnosis or commercial agronomic use.
 
 ---
 
 ### Machine Learning Architecture: Knowledge Distillation
 
-To balance high predictive accuracy with cost-effective cloud hosting on resource-constrained AWS EC2 CPU instances, the research compared several model architectures and adopted **Knowledge Distillation**:
+The research compared several model architectures and includes a **Knowledge Distillation** experiment. This technique transfers information from a larger teacher model to a smaller student, but it does not guarantee better predictive performance:
 
 ```mermaid
 graph TD
@@ -61,13 +61,13 @@ graph TD
 
 - **Teacher Architecture (ConvNeXt-Tiny):** Modern convolutional network with inverted bottlenecks, large 7x7 receptive fields, and superior feature extraction capabilities.
 - **Student Architecture (MobileNetV3-Small):** Hardware-aware network search architecture utilizing hard-swish non-linearities and depthwise separable convolutions, optimized specifically for low-latency CPU execution.
-- **Outcome:** The distilled MobileNetV3 model retained over 96% of the teacher's classification capability while reducing model size by over **94%** (down to ~6 MiB) and achieving a lightning-fast single-request CPU inference latency of **29.23 ms**.
+- **Recorded demo model:** The distilled MobileNetV3 checkpoint is approximately **6 MiB**. A single recorded CPU request took **29.23 ms** for model inference; this is not a throughput or end-to-end latency result. Model quality varies across evaluation datasets, so this benchmark does not establish field reliability.
 
 ---
 
 ### Explainable AI (XAI) with Grad-CAM++
 
-A critical requirement in agricultural diagnostics is explainability: agronomists must understand *why* the model made a specific prediction. The application incorporates **Grad-CAM++ (Generalized Gradient-weighted Class Activation Mapping)** to generate heatmaps highlighting the exact pixel regions that contributed most strongly to the predicted disease class.
+The application includes **Grad-CAM++ (Generalized Gradient-weighted Class Activation Mapping)** as a visual aid for inspecting image regions associated with a prediction. A heatmap is an attribution visualization; it does not identify lesions or confirm a diagnosis.
 
 ![Grad-CAM++ Mobile UI](/images/5-Workshop/plant-disease/frontend-explain-mobile.png?width=700px)
 
@@ -77,7 +77,7 @@ The following visualizations illustrate how different model architectures focus 
 
 | Architecture | Model Role | Heatmap & Overlay Visualization |
 |---|---|---|
-| **MobileNetV3-Small Distilled** | Production Deployment | ![MobileNetV3 Overlay](/images/5-Workshop/plant-disease/explain-mobilenetv3_small_100_distilled-overlay.png?width=320px) |
+| **MobileNetV3-Small Distilled** | AWS demo model | ![MobileNetV3 Overlay](/images/5-Workshop/plant-disease/explain-mobilenetv3_small_100_distilled-overlay.png?width=320px) |
 | **ConvNeXt-Tiny** | Teacher Baseline | ![ConvNeXt Overlay](/images/5-Workshop/plant-disease/explain-convnext_tiny-overlay.png?width=320px) |
 | **EfficientNet-B0** | Candidate Student | ![EfficientNet Overlay](/images/5-Workshop/plant-disease/explain-efficientnet_b0-overlay.png?width=320px) |
 

@@ -10,9 +10,9 @@ pre: "<b>5.1. </b>"
 
 ### Giới thiệu Dự án Phân loại Bệnh lá Cây trồng
 
-Hệ thống **Plant Disease Detection** được nghiên cứu và phát triển nhằm mang lại giải pháp nhận diện nhanh chóng, chính xác và có khả năng giải thích trực quan các loại bệnh thường gặp trên cây cà chua. Bằng cách kết hợp nghiên cứu thị giác máy tính hiện đại với kỹ thuật hạ tầng đám mây trên AWS, dự án mang đến cho nhà nông, kỹ sư nông nghiệp và chuyên gia một ứng dụng web trực quan có khả năng suy luận AI theo thời gian thực ngay trên vi xử lý CPU thông thường.
+**Plant Disease Detection** là bản thực hành kỹ thuật về phân loại ảnh lá cà chua. Dự án kết nối bộ phân loại ảnh chạy trên CPU với giao diện web và một môi trường AWS quy mô nhỏ. Hệ thống chưa được kiểm chứng để chẩn đoán ngoài thực địa và không nên được xem là công cụ tư vấn cho nông dân hoặc chuyên gia nông học.
 
-Hệ thống tiếp nhận ảnh chụp lá cây ở định dạng **JPEG** hoặc **PNG** từ điện thoại di động hoặc máy ảnh, phân tích các biểu hiện bệnh học bằng mô hình Deep Learning đã được tinh chỉnh, và trả về danh sách phân loại bệnh được sắp xếp kèm theo độ tin cậy thống kê (confidence score).
+Ứng dụng nhận ảnh **JPEG** hoặc **PNG** và trả về danh sách lớp dự đoán theo thứ hạng cùng điểm số của mô hình. Điểm số này chưa được hiệu chuẩn thành xác suất; kết quả trên tập dữ liệu ngoài nhỏ chưa chứng minh độ tin cậy với ảnh chụp thực địa.
 
 ![Giao diện Ứng dụng Di động](/images/5-Workshop/plant-disease/frontend-mobile.png?width=700px)
 
@@ -20,7 +20,7 @@ Hệ thống tiếp nhận ảnh chụp lá cây ở định dạng **JPEG** ho�
 
 ### Phạm vi Phân loại & Danh mục 11 Lớp Bệnh
 
-Mạng nơ-ron được huấn luyện để nhận dạng chính xác **11 phân lớp đầu ra**, bao gồm các loại bệnh do vi khuẩn, nấm, virus phổ biến trên lá cà chua, cùng với mẫu đối chứng khỏe mạnh và mẫu không xác định:
+Mạng nơ-ron được huấn luyện để phân loại ảnh vào **11 lớp đầu ra**: các nhóm bệnh do vi khuẩn, nấm, virus trên lá cà chua, lá khỏe mạnh và lớp `unknown`:
 
 | Mã lớp | Tên Phân loại Bệnh | Tác nhân Gây bệnh | Triệu chứng Hình thái Điển hình |
 |---|---|---|---|
@@ -37,13 +37,13 @@ Mạng nơ-ron được huấn luyện để nhận dạng chính xác **11 phâ
 | `10` | **unknown** | Mẫu Ngoài Phân bố (OOD) | Ảnh không phải lá cà chua, ảnh mờ nhiễu hoặc phông nền không xác định |
 
 > [!NOTE]
-> Hệ thống hiện tại đóng vai trò là một dự án nghiên cứu và triển khai thử nghiệm trên AWS; cần thực hiện các đánh giá thực địa mở rộng trước khi áp dụng vào hoạt động nông nghiệp quy mô lớn.
+> Đây là bản demo phục vụ học tập, nghiên cứu và thực hành triển khai. Hệ thống chưa được xác minh cho chẩn đoán thực địa hoặc mục đích thương mại trong nông nghiệp.
 
 ---
 
 ### Kiến trúc Trí tuệ Nhân tạo: Chưng cất Tri thức (Knowledge Distillation)
 
-Để dung hòa giữa độ chính xác cao và chi phí vận hành máy chủ CPU giá rẻ trên AWS EC2, dự án đã áp dụng kỹ thuật **Chưng cất Tri thức (Knowledge Distillation)**:
+Nghiên cứu có thử nghiệm **Chưng cất Tri thức (Knowledge Distillation)**, kỹ thuật truyền thông tin từ mô hình giáo viên lớn sang mô hình học sinh nhỏ hơn. Kỹ thuật này không bảo đảm mô hình học sinh sẽ đạt kết quả dự đoán tốt hơn:
 
 ```mermaid
 graph TD
@@ -61,13 +61,13 @@ graph TD
 
 - **Mô hình Giáo viên (ConvNeXt-Tiny):** Kiến trúc tích chập hiện đại với các khối inverted bottleneck và trường tiếp nhận lớn 7x7, cung cấp khả năng trích xuất đặc trưng sâu sắc.
 - **Mô hình Học sinh (MobileNetV3-Small):** Được tối ưu hóa bằng thuật toán tìm kiếm kiến trúc phần cứng, sử dụng depthwise separable convolutions và hàm kích hoạt hard-swish, cực kỳ tối ưu cho CPU.
-- **Kết quả Thực nghiệm:** Mô hình MobileNetV3 chưng cất giữ được hơn 96% độ chính xác của giáo viên, trong khi giảm hơn **94%** dung lượng tệp trọng số (chỉ còn khoảng 6 MiB) và đạt tốc độ suy luận CPU xuất sắc: **29.23 ms** cho mỗi yêu cầu.
+- **Mô hình dùng trong demo:** Checkpoint MobileNetV3 chưng cất có dung lượng khoảng **6 MiB**. Một lần đo suy luận CPU được ghi nhận là **29,23 ms**; đây không phải kết quả throughput hay độ trễ đầu-cuối. Chất lượng mô hình thay đổi giữa các tập đánh giá, vì vậy số đo này không chứng minh độ tin cậy khi dùng ngoài thực địa.
 
 ---
 
 ### Khả năng Giải thích Quyết định với Grad-CAM++
 
-Khả năng giải thích là tiêu chuẩn thiết yếu trong chẩn đoán nông nghiệp. Ứng dụng tích hợp công nghệ **Grad-CAM++** để vẽ biểu đồ nhiệt (heatmap), làm nổi bật chính xác các khu vực pixel trên lá mà mạng nơ-ron đã căn cứ vào đó để đưa ra kết luận chẩn đoán.
+Ứng dụng có **Grad-CAM++** để trực quan hóa các vùng ảnh liên quan đến dự đoán. Bản đồ nhiệt chỉ hỗ trợ quan sát cách mô hình phản hồi; nó không phân đoạn tổn thương hay xác nhận chẩn đoán.
 
 ![Tính năng Grad-CAM++ trên Giao diện Di động](/images/5-Workshop/plant-disease/frontend-explain-mobile.png?width=700px)
 
@@ -77,7 +77,7 @@ Bảng sau đây thể hiện cách các kiến trúc mạng khác nhau tập tr
 
 | Kiến trúc | Vai trò | Hình ảnh Trực quan hóa Lớp Phủ (Overlay) |
 |---|---|---|
-| **MobileNetV3-Small Chưng cất** | Mô hình Triển khai Chính | ![MobileNetV3 Overlay](/images/5-Workshop/plant-disease/explain-mobilenetv3_small_100_distilled-overlay.png?width=320px) |
+| **MobileNetV3-Small Chưng cất** | Mô hình dùng trong demo AWS | ![MobileNetV3 Overlay](/images/5-Workshop/plant-disease/explain-mobilenetv3_small_100_distilled-overlay.png?width=320px) |
 | **ConvNeXt-Tiny** | Mô hình Giáo viên | ![ConvNeXt Overlay](/images/5-Workshop/plant-disease/explain-convnext_tiny-overlay.png?width=320px) |
 | **EfficientNet-B0** | Mô hình Ứng viên | ![EfficientNet Overlay](/images/5-Workshop/plant-disease/explain-efficientnet_b0-overlay.png?width=320px) |
 
