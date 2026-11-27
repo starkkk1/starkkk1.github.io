@@ -1,16 +1,16 @@
 ---
-title: "Testing & Quality"
+title: "Monitoring & Security"
 date: 2026-10-28T10:00:00+07:00
 weight: 50
 chapter: false
 pre: "<b>5.5. </b>"
 ---
 
-# Testing & Quality
+# Monitoring & Security
 
 ### 5.5.1 Container Logging & Host Metrics Collection
 
-Production observabilty relies on **Amazon CloudWatch Logs** and the **Amazon CloudWatch Agent**:
+The demonstration's basic observability uses **Amazon CloudWatch Logs** and the **Amazon CloudWatch Agent**:
 
 #### 1. Container Structured Logging
 The Docker daemon uses the `awslogs` log driver to stream all `stdout` and `stderr` output directly to dedicated CloudWatch Log Groups:
@@ -129,7 +129,7 @@ aws cloudwatch put-metric-alarm \
 
 ### 5.5.3 Security Hardening & Least Privilege
 
-The architecture adheres strictly to AWS Well-Architected security best practices:
+The demonstration applies a small set of access and runtime controls:
 
 ```mermaid
 graph TD
@@ -145,6 +145,4 @@ graph TD
 1. **Private S3 Bucket:** S3 Block Public Access is completely enabled. Model weights are accessible solely by authenticated requests bearing the EC2 instance's assumed IAM role.
 2. **Elimination of Long-Lived Credentials:** No access keys, secret keys, or private SSH keys are stored in source control or on the server file system.
 3. **Read-Only Container Mounts:** The model weights directory `/app/artifacts` is mounted into the container with the `:ro` flag, ensuring the inference engine cannot mutate model checkpoints.
-4. **Non-Root Execution:** The production container images create and execute under dedicated low-privilege system accounts (`nextjs` UID 1001 for frontend, `appuser` for backend).
-
-![Automated Test Verification](/images/5-Workshop/5.5-Quality-assurance/pytest_output.png?width=700px)
+4. **Non-Root Execution:** The container images run under dedicated low-privilege system accounts (`nextjs` UID 1001 for frontend, `appuser` for backend).

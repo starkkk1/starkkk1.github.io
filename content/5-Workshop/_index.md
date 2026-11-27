@@ -11,7 +11,7 @@ pre: " <b> 5. </b> "
 
 > **Region:** Asia Pacific (Sydney) `ap-southeast-2`  
 > **Source Repository:** [starkkk1/plant-disease-detection](https://github.com/starkkk1/plant-disease-detection)  
-> **Deployment Status:** Single-instance AWS demonstration deployment
+> **Deployment Status:** Single-instance AWS demonstration deployment<br>
 > **Target Workshop Completion:** November 27, 2026 (before the November 30 deadline)
 
 ---
@@ -40,34 +40,20 @@ A single **Amazon EC2** instance runs a responsive **Next.js** frontend and a **
 
 ---
 
-### End-to-End Operational Pipeline
+### Deployment Overview
+
+The diagram summarizes the release path. Detailed architecture is in [5.3](5.3-architecture-design/); manual deployment steps are in [5.4](5.4-deployment-strategy/).
 
 ```mermaid
 graph LR
-    Dev["Developer / Git Push"] -->|push master| GHA["GitHub Actions: pytest, build, smoke"]
-    GHA -->|publish| GHCR["GHCR: api + frontend"]
-    Local["Local Workstation: Training & Audit"] -->|upload| S3
-
-    subgraph AWS Cloud ap-southeast-2
-        subgraph EC2 Host Amazon Linux 2023
-            FE["frontend: Next.js :3000"]
-            BE["backend: FastAPI :8000"]
-            CW_Agent["CloudWatch Agent: 60s"]
-        end
-
-        S3["Amazon S3: Private Bucket"] -->|aws s3 cp + sha256| BE
-        IAM["AWS IAM: Instance Role"] -.->|instance profile| BE
-        FE -->|awslogs| CW["Amazon CloudWatch"]
-        BE -->|awslogs| CW
-        CW_Agent -->|mem + disk| CW
-        CW -->|RAM > 85pct, 3x1 min| SNS["Amazon SNS: plant-disease-alerts"]
-    end
-
-    GHCR -->|manual docker pull sha256| FE
-    GHCR -->|manual docker pull sha256| BE
-    Client["Users / Browser"] -->|GET :3000| FE
-    Client -->|POST :8000| BE
-    SNS -->|email alert| Dev
+    Dev["Developer"] -->|push to master| CI["GitHub Actions<br/>test and build"]
+    CI -->|publish images| GHCR["GHCR"]
+    Train["Local model workflow"] -->|upload artifacts| S3["Private S3"]
+    GHCR -->|manual pull| EC2["Single EC2 host<br/>Next.js + FastAPI"]
+    S3 -->|manual download and hash check| EC2
+    User["Browser"] -->|HTTP| EC2
+    EC2 -->|logs and host metrics| CW["CloudWatch"]
+    CW -->|RAM alarm| SNS["SNS email"]
 ```
 
 ---
@@ -79,10 +65,10 @@ graph LR
 2. **[5.2 Prerequisites & Setup](5.2-prerequiste/)**
    AWS account configuration, VPC subnets, client-restricted Security Groups, IAM Instance Profiles, and Docker engine setup.
 3. **[5.3 Architecture & Design](5.3-architecture-design/)**
-   Decoupled model artifact architecture, S3 bucket security, IAM assumed-role validation, and SHA256 integrity verification.
+   System boundaries, component roles, single-host design, and how S3 artifacts connect to the API runtime.
 4. **[5.4 Deployment Strategy](5.4-deployment-strategy/)**
-   Multi-stage Docker builds, runtime environment configuration, Next.js standalone serving, and live inference validation with real leaf fixtures.
-5. **[5.5 Testing & Quality](5.5-quality-assurance/)**
-   Structured JSON container logging with AWSlogs driver, CloudWatch Agent memory telemetry, automated RAM breach alarms, and least-privilege security.
+   CI image publishing, manual model-artifact retrieval and hash verification, container startup, and application checks.
+5. **[5.5 Monitoring & Security](5.5-quality-assurance/)**
+   Container logs, CloudWatch host metrics and RAM alerts, plus the access and container controls used in the demo.
 6. **[5.6 Operations & Cleanup](5.6-operations-cleanup/)**
-   Daily container start/stop procedures, dynamic public IP management, and complete cloud resource teardown checklist.
+   Daily start/stop procedures, public IP updates, removal of demo resources, and a final check for leftover billable resources.

@@ -51,24 +51,22 @@ sudo docker start plant-disease-frontend
 
 ---
 
-### Quy trình Thu hồi Hoàn toàn Tài nguyên Đám mây
+### Xóa Tài nguyên Demo và Rà soát Chi phí Còn lại
 
-Khi kết thúc khóa thực tập hoặc hoàn thành báo cáo workshop, thực hiện quy trình giải phóng hoàn toàn hạ tầng để đưa chi phí tài nguyên phát sinh về mức 0:
+Khi kết thúc workshop, xóa các tài nguyên được tạo riêng cho bản demo, sau đó kiểm tra AWS Billing để xem còn phát sinh phí hay không. Checklist này không xóa tài nguyên khác trong tài khoản và không bảo đảm tổng hóa đơn của tài khoản bằng 0.
 
 ```mermaid
 graph TD
-    Step1["1. Hủy máy ảo EC2 (Terminate)<br/>(Tự động xóa ổ đĩa root EBS gắn kèm)"]
-    Step2["2. Xóa các bản Snapshot EBS và ổ đĩa phụ còn sót"]
-    Step3["3. Xóa các nhóm CloudWatch Log Groups<br/>(/plant-disease/backend, /plant-disease/frontend)"]
-    Step4["4. Xóa CloudWatch Alarm và Topic SNS<br/>(PlantDisease-HighMemoryUtilization)"]
-    Step5["5. Làm rỗng và xóa Bucket Amazon S3<br/>(mobilenet-distilled-v1/)"]
-    Step6["6. Hủy giải phóng địa chỉ Elastic IP (nếu có cấp)"]
+    Step1["1. Terminate máy EC2 của bản demo"]
+    Step2["2. Xóa log, alarm CloudWatch và SNS topic của demo"]
+    Step3["3. Làm rỗng và xóa bucket model riêng cho dự án"]
+    Step4["4. Giải phóng Elastic IP của demo nếu có"]
+    Step5["5. Kiểm tra volume, snapshot và tài nguyên còn tính phí"]
     
     Step1 --> Step2
     Step2 --> Step3
     Step3 --> Step4
     Step4 --> Step5
-    Step5 --> Step6
 ```
 
 #### Các Lệnh Dọn dẹp Tài nguyên Thực tế:
@@ -99,12 +97,22 @@ aws sns delete-topic \
   --region ap-southeast-2
 
 # 5. Làm rỗng và xóa Bucket S3
+# Lệnh này xóa các object hiện tại. Nếu bật versioning, hãy xóa các
+# phiên bản object cũ trong S3 Console trước khi xóa bucket.
 aws s3 rm "s3://$MODEL_BUCKET" --recursive
 aws s3api delete-bucket --bucket "$MODEL_BUCKET" --region ap-southeast-2
 
 # 6. Giải phóng địa chỉ Elastic IP (nếu có)
 aws ec2 release-address --allocation-id "$EIP_ALLOC_ID" --region ap-southeast-2
+
+# 7. Liệt kê EBS volume khả dụng và snapshot của tài khoản để rà soát.
+# Chỉ xóa tài nguyên đã xác nhận thuộc bản demo; không xóa hàng loạt.
+aws ec2 describe-volumes --filters Name=status,Values=available --region ap-southeast-2
+aws ec2 describe-snapshots --owner-ids self --region ap-southeast-2
 ```
+
+> [!WARNING]
+> Xác nhận EC2, bucket S3 và Elastic IP thuộc bản demo trước khi xóa. `aws s3 rm --recursive` không xóa các phiên bản object cũ trong bucket bật versioning. Sau khi dọn dẹp, rà soát EBS volume, snapshot và kiểm tra Billing để tìm tài nguyên vẫn còn tính phí.
 
 ---
 

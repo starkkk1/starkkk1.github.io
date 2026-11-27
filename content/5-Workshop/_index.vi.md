@@ -11,7 +11,7 @@ pre: " <b> 5. </b> "
 
 > **Khu vực (Region):** Châu Á - Thái Bình Dương (Sydney) `ap-southeast-2`  
 > **Kho mã nguồn:** [starkkk1/plant-disease-detection](https://github.com/starkkk1/plant-disease-detection)  
-> **Trạng thái triển khai:** Bản demo trên một máy chủ AWS
+> **Trạng thái triển khai:** Bản demo trên một máy chủ AWS<br>
 > **Mốc hoàn tất workshop dự kiến:** 27/11/2026 (trước hạn 30/11)
 
 ---
@@ -40,34 +40,20 @@ Một máy **Amazon EC2** chạy hai container riêng biệt: giao diện **Next
 
 ---
 
-### Sơ đồ Quy trình Vận hành Toàn diện
+### Sơ đồ Tổng quan Triển khai
+
+Sơ đồ tóm tắt luồng phát hành. Xem [5.3](5.3-architecture-design/) để hiểu kiến trúc và [5.4](5.4-deployment-strategy/) để làm theo các bước triển khai thủ công.
 
 ```mermaid
 graph LR
-    Dev["Lập trình viên / Git Push"] -->|push master| GHA["GitHub Actions: pytest, build, smoke"]
-    GHA -->|publish| GHCR["GHCR: api + frontend"]
-    Local["Máy cục bộ: Huấn luyện & Kiểm định"] -->|upload| S3
-
-    subgraph Hạ tầng AWS ap-southeast-2
-        subgraph Máy chủ EC2 Amazon Linux 2023
-            FE["frontend: Next.js :3000"]
-            BE["backend: FastAPI :8000"]
-            CW_Agent["CloudWatch Agent: 60s"]
-        end
-
-        S3["Amazon S3: Bucket riêng tư"] -->|aws s3 cp + sha256| BE
-        IAM["AWS IAM: Instance Role"] -.->|instance profile| BE
-        FE -->|awslogs| CW["Amazon CloudWatch"]
-        BE -->|awslogs| CW
-        CW_Agent -->|mem + disk| CW
-        CW -->|RAM > 85pct, 3x1 min| SNS["Amazon SNS: plant-disease-alerts"]
-    end
-
-    GHCR -->|docker pull sha256 thủ công| FE
-    GHCR -->|docker pull sha256 thủ công| BE
-    Client["Người dùng / Trình duyệt"] -->|GET :3000| FE
-    Client -->|POST :8000| BE
-    SNS -->|email cảnh báo| Dev
+    Dev["Lập trình viên"] -->|push lên master| CI["GitHub Actions<br/>kiểm thử và build"]
+    CI -->|phát hành image| GHCR["GHCR"]
+    Train["Huấn luyện model cục bộ"] -->|tải artifacts lên| S3["S3 riêng tư"]
+    GHCR -->|kéo image thủ công| EC2["Một máy EC2<br/>Next.js + FastAPI"]
+    S3 -->|tải artifacts và kiểm tra hash| EC2
+    User["Trình duyệt"] -->|HTTP| EC2
+    EC2 -->|log và metrics máy chủ| CW["CloudWatch"]
+    CW -->|cảnh báo RAM| SNS["Email SNS"]
 ```
 
 ---
@@ -79,10 +65,10 @@ graph LR
 2. **[5.2 Chuẩn bị & Cài đặt](5.2-prerequiste/)**
    Cấu hình tài khoản AWS, thiết lập mạng VPC, phân quyền Security Group theo IP máy khách, IAM Instance Profile và cài đặt Docker Engine.
 3. **[5.3 Kiến trúc & Thiết kế](5.3-architecture-design/)**
-   Kiến trúc tách rời tệp trọng số mô hình ra S3, cấu hình bảo mật bucket, xác thực danh tính assumed-role và kiểm tra tính toàn vẹn SHA256.
+   Ranh giới hệ thống, vai trò các thành phần, thiết kế một máy chủ và cách artifacts S3 được kết nối với API.
 4. **[5.4 Chiến lược Triển khai](5.4-deployment-strategy/)**
-   Đóng gói Docker nhiều giai đoạn, thiết lập môi trường thực thi, triển khai Next.js standalone và kiểm thử suy luận với ảnh lá thực tế.
-5. **[5.5 Kiểm thử & Chất lượng](5.5-quality-assurance/)**
-   Cấu hình ghi log JSON có cấu trúc qua awslogs driver, đo đạc RAM máy chủ bằng CloudWatch Agent, tạo cảnh báo RAM qua SNS và bảo mật quyền tối thiểu.
+   CI phát hành image, tải artifacts và kiểm tra mã băm thủ công, khởi chạy container và xác minh ứng dụng.
+5. **[5.5 Giám sát & Bảo mật](5.5-quality-assurance/)**
+   Log container, metrics máy chủ và cảnh báo RAM qua CloudWatch, cùng các biện pháp giới hạn truy cập và container trong bản demo.
 6. **[5.6 Vận hành & Thu hồi](5.6-operations-cleanup/)**
-   Quy trình bật/tắt container mỗi ngày, quản lý thay đổi IP public khi dừng máy ảo và quy trình giải phóng hoàn toàn tài nguyên đám mây.
+   Quy trình bật/tắt hằng ngày, cập nhật public IP, xóa tài nguyên demo và kiểm tra các tài nguyên còn tính phí.

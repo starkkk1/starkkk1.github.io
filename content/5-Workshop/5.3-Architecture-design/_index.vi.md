@@ -13,7 +13,7 @@ pre: "<b>5.3. </b>"
 Bản demo **Plant Disease Detection** kết nối API suy luận học máy với giao diện web và một số dịch vụ AWS tại khu vực **Sydney (`ap-southeast-2`)**. Kiến trúc gồm bốn phần: lưu trữ artifacts mô hình, CI phát hành image, hai container chạy trên cùng một EC2 và giám sát cơ bản. Đây là ví dụ thực hành một số kỹ thuật MLOps và cloud; hệ thống chưa cung cấp chức năng chẩn đoán nông nghiệp đã được xác minh và chưa tự động triển khai bản phát hành production:
 
 1. **Phân hệ Lưu trữ Trọng số & Tách rời Artifacts (Amazon S3 &rarr; Máy chủ EC2):** Tách biệt các tệp trọng số mạng nơ-ron nhị phân khỏi container image, đảm bảo tính toàn vẹn mật mã học SHA256 tại thời điểm chạy.
-2. **Quy trình Phân phối Liên tục & Đóng gói Container (GitHub Actions &rarr; GHCR &rarr; EC2):** Tự động kiểm thử và phát hành container image frontend cùng API lên GHCR; kỹ sư vận hành triển khai phiên bản lên EC2 theo quy trình thủ công.
+2. **CI Build và Phát hành Image (GitHub Actions &rarr; GHCR):** Tự động kiểm tra và phát hành image frontend cùng API; người vận hành triển khai phiên bản lên EC2 theo quy trình thủ công.
 3. **Phân hệ Thực thi Web & Suy luận Trí tuệ Nhân tạo (Docker Stack trên EC2):** Chạy giao diện người dùng tương tác Next.js và dịch vụ suy luận FastAPI PyTorch CPU tích hợp công nghệ giải thích Grad-CAM++.
 4. **Phân hệ Vận hành, An ninh & Giám sát Hệ thống:** Áp dụng nguyên tắc đặc quyền tối thiểu với IAM Role, Security Group khóa địa chỉ IP client, thu thập log với CloudWatch Logs, đo đạc RAM tùy biến với CloudWatch Agent và kích hoạt cảnh báo email qua Amazon SNS.
 
@@ -72,59 +72,8 @@ Phân hệ tính toán chạy trên một máy chủ ảo EC2 Amazon Linux 2023 
 
 ---
 
-### 5.3.1 Chuẩn bị Danh tính và Quyền hạn Tải Tệp
+### Ranh giới Lưu trữ Artifacts Mô hình
 
-Trước khi thực hiện tải tệp, cần đảm bảo máy chủ EC2 đã được gắn IAM Role phù hợp và có thể kết nối với dịch vụ S3 trong khu vực:
+Checkpoint và class map được lưu trong S3 riêng tư, tách khỏi image ứng dụng. Trong quy trình phát hành thủ công, người vận hành tải hai tệp xuống, kiểm tra mã băm SHA256 rồi gắn thư mục vào container API ở chế độ chỉ đọc. Các lệnh tải và xác minh nằm trong quy trình triển khai tại [5.4](../5.4-deployment-strategy/).
 
-```bash
-# Xác thực danh tính IAM Role của máy ảo EC2
-aws sts get-caller-identity
-
-# Đặt biến môi trường làm việc khu vực Sydney
-export AWS_DEFAULT_REGION="ap-southeast-2"
-read -r -p "Nhập tên S3 bucket lưu model: " MODEL_BUCKET
-
-# Tạo thư mục lưu trữ trọng số trên máy chủ
-mkdir -p checkpoints/v1
-```
-
-> [!NOTE]
-> Bản demo hiện tại truy cập dịch vụ S3 qua bảng định tuyến internet thông thường của public subnet ra Internet Gateway. Đối với môi trường doanh nghiệp có subnet riêng tư (private subnet), người quản trị nên tạo thêm một **Amazon S3 Gateway VPC Endpoint** để lưu lượng tải tệp đi hoàn toàn trên mạng nội bộ của AWS với chi phí đường truyền bằng 0.
-
----
-
-### 5.3.2 Tải về và Kiểm tra Tính Toàn vẹn của Artifacts
-
-Chạy các lệnh sau để tải tệp checkpoint mô hình và từ điển phân lớp từ S3, sau đó tiến hành kiểm tra mã băm mật mã học SHA256:
-
-```bash
-# Tải tệp mô hình và tệp ánh xạ nhãn
-aws s3 cp "s3://$MODEL_BUCKET/mobilenet-distilled-v1/model.pth" checkpoints/v1/model.pth
-aws s3 cp "s3://$MODEL_BUCKET/mobilenet-distilled-v1/class_to_idx.json" checkpoints/v1/class_to_idx.json
-
-# Xác thực mã băm SHA256
-sha256sum checkpoints/v1/model.pth checkpoints/v1/class_to_idx.json
-```
-
-#### Bảng Đối soát Mã băm Ghi nhận Thực tế
-
-Các tệp tải về phải khớp tuyệt đối với mã băm đã được kiểm định từ quá trình huấn luyện và đánh giá ngoại tuyến:
-
-| Tên Tệp | Mã băm SHA256 Tiêu chuẩn | Dung lượng | Trạng thái Kiểm định |
-|---|---|---|---|
-| `model.pth` | `05e72798a74193499f17c4c8267c1436e8bc65cc1e8b8037245664a17644efa5` | `~6.0 MiB` | **TRÙNG KHỚP** |
-| `class_to_idx.json` | `ff5c73e7a7e3e495593fa664b75ebc73de4c9a425f1d847351ae60bc1fbaa786` | `~1.2 KiB` | **TRÙNG KHỚP** |
-
-> [!IMPORTANT]
-> Sai khác mã băm SHA256 đồng nghĩa tệp tải về bị lỗi, phiên bản không đồng bộ hoặc đã bị chỉnh sửa bất thường. Backend FastAPI sẽ từ chối khởi động và trả về mã lỗi 503 nếu trọng số không hợp lệ.
-
----
-
-### So sánh Hình ảnh Giải thích Quyết định Mô hình
-
-Hai mô hình tạo ra các bản đồ nhiệt khác nhau trên ảnh ví dụ. Bản đồ này minh họa phản hồi của mô hình, không chứng minh vùng bệnh hoặc tính đúng đắn của dự đoán:
-
-| Mô hình Giáo viên (ConvNeXt-Tiny) | Mô hình Học sinh (MobileNetV3-Small Chưng cất) |
-|---|---|
-| ![ConvNeXt Overlay](/images/5-Workshop/plant-disease/explain-convnext_tiny-overlay.png?width=350px) | ![MobileNetV3 Overlay](/images/5-Workshop/plant-disease/explain-mobilenetv3_small_100_distilled-overlay.png?width=350px) |
-| Các vùng được làm nổi bật khác nhau giữa hai mô hình | Bản đồ nhiệt chỉ trực quan hóa phản hồi; không xác nhận tổn thương |
+Bản demo hiện tại truy cập endpoint S3 theo Region qua định tuyến của public subnet. S3 VPC endpoint riêng tư có thể được xem xét như một cải tiến mạng sau này; đây chưa phải cấu hình đã triển khai.

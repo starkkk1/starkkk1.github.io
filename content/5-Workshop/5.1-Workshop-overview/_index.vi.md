@@ -87,7 +87,7 @@ Bảng sau đây thể hiện cách các kiến trúc mạng khác nhau tập tr
 
 Chu trình vận hành kết nối liền mạch từ kho mã nguồn đến hạ tầng đám mây AWS:
 
-1. **Tự động hóa CI/CD:** Các commit trên nhánh `master` kích hoạt GitHub Actions chạy kiểm thử mã nguồn Python, build giao diện Next.js và đóng gói container image đẩy lên **GHCR (GitHub Container Registry)**.
+1. **CI Build và Phát hành Thủ công:** Push lên `master` kích hoạt GitHub Actions chạy kiểm tra Python, build Next.js và phát hành container image lên **GHCR (GitHub Container Registry)**. Người vận hành tự triển khai hoặc quay lui phiên bản trên EC2.
 2. **Lưu trữ Tách rời Trọng số:** Tệp mô hình (`model.pth`) và ánh xạ phân lớp (`class_to_idx.json`) được lưu trữ tại **Amazon S3** bảo mật dưới tiền tố `mobilenet-distilled-v1/`.
 3. **Máy chủ EC2 Chạy Container:** Máy chủ Amazon Linux 2023 kéo images từ GHCR và gắn ổ đĩa S3 chỉ đọc (read-only) vào thư mục `/app/artifacts`.
 4. **Mạng & Cổng Giao tiếp:** Trình duyệt kết nối tới giao diện Next.js tại cổng `3000` và gọi API FastAPI tại cổng `8000` (`/health`, `/predict`, `/explain`) qua Internet Gateway và Security Group giới hạn theo các IP nguồn được phê duyệt (kèm cấu hình `CORS_ORIGINS`).

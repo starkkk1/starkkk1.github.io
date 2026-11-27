@@ -51,24 +51,22 @@ sudo docker start plant-disease-frontend
 
 ---
 
-### Complete Teardown & Resource Deletion Checklist
+### Remove Demo Resources and Review Remaining Costs
 
-At the conclusion of the workshop or project lifecycle, execute the following teardown procedure to ensure zero residual billing across your AWS account:
+At the end of the workshop, remove resources created specifically for this demo, then review the AWS Billing console for remaining charges. This checklist does not delete unrelated account resources or guarantee that the account's total bill will be zero.
 
 ```mermaid
 graph TD
-    Step1["1. Terminate EC2 Instance<br/>(Automatically deletes attached root EBS volume)"]
-    Step2["2. Delete EBS Snapshots & Unattached Volumes"]
-    Step3["3. Delete CloudWatch Log Groups<br/>(/plant-disease/backend, /plant-disease/frontend)"]
-    Step4["4. Delete CloudWatch Alarm & SNS Topic<br/>(PlantDisease-HighMemoryUtilization)"]
-    Step5["5. Empty and Delete S3 Bucket Artifacts<br/>(mobilenet-distilled-v1/)"]
-    Step6["6. Release Elastic IP Address (if assigned)"]
+    Step1["1. Terminate the demo EC2 instance"]
+    Step2["2. Delete demo CloudWatch logs, alarm, and SNS topic"]
+    Step3["3. Empty and delete the dedicated model bucket"]
+    Step4["4. Release the demo Elastic IP, if allocated"]
+    Step5["5. Review leftover volumes, snapshots, and billable resources"]
     
     Step1 --> Step2
     Step2 --> Step3
     Step3 --> Step4
     Step4 --> Step5
-    Step5 --> Step6
 ```
 
 #### Step-by-Step Deletion Commands:
@@ -99,12 +97,22 @@ aws sns delete-topic \
   --region ap-southeast-2
 
 # 5. Empty and delete S3 Bucket
+# This command removes current objects. If bucket versioning is enabled,
+# remove prior object versions using the S3 console before deleting the bucket.
 aws s3 rm "s3://$MODEL_BUCKET" --recursive
 aws s3api delete-bucket --bucket "$MODEL_BUCKET" --region ap-southeast-2
 
 # 6. Release Elastic IP (if allocated)
 aws ec2 release-address --allocation-id "$EIP_ALLOC_ID" --region ap-southeast-2
+
+# 7. List available EBS volumes and your account's snapshots for review.
+# Delete only resources confirmed to belong to this demo; do not bulk-delete.
+aws ec2 describe-volumes --filters Name=status,Values=available --region ap-southeast-2
+aws ec2 describe-snapshots --owner-ids self --region ap-southeast-2
 ```
+
+> [!WARNING]
+> Confirm the EC2 instance, S3 bucket, and Elastic IP belong to this demo before deleting them. `aws s3 rm --recursive` does not remove previous object versions from a versioned bucket. After cleanup, review EBS volumes and snapshots, then check billing for resources that remain in use.
 
 ---
 

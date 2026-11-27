@@ -13,7 +13,7 @@ pre: "<b>5.3. </b>"
 The **Plant Disease Detection** demonstration connects a machine-learning inference API to a web frontend and supporting AWS services in the **Sydney (`ap-southeast-2`)** region. Its architecture has four main parts: model artifact storage, CI image publishing, a two-container runtime on one EC2 host, and basic monitoring. It demonstrates selected MLOps and cloud engineering practices; it does not provide validated agricultural diagnostics or an automated production release process.
 
 1. **Model Checkpoint & Artifact Storage Pipeline (Amazon S3 &rarr; EC2 Host):** Securely decouples multi-megabyte neural network weights from application container images, verifying cryptographic integrity at runtime.
-2. **Continuous Delivery & Container Packaging (GitHub Actions &rarr; GHCR &rarr; EC2):** Runs automated tests and publishes frontend and API container images to GHCR; an operator deploys releases to EC2 manually.
+2. **CI Image Build and Publishing (GitHub Actions &rarr; GHCR):** Runs automated checks and publishes frontend and API images; an operator deploys releases to EC2 manually.
 3. **Web Application & Model Inference (Single EC2 Host):** Runs a responsive Next.js frontend and a PyTorch CPU FastAPI service with an optional Grad-CAM++ visualization.
 4. **Operations, Observability & Security:** Implements least-privilege AWS IAM instance profiles, client-locked Security Groups, Amazon CloudWatch structured logging, custom host RAM metrics, and proactive Amazon SNS incident alarms.
 
@@ -72,59 +72,8 @@ The compute layer runs on an Amazon Linux 2023 (`x86_64`) EC2 instance hosting t
 
 ---
 
-### 5.3.1 Prepare Identity and Artifact Permissions
+### Model Artifact Boundary
 
-Before initiating artifact downloads, verify that the EC2 instance has successfully assumed the IAM role and can interact with the regional S3 service endpoint:
+The checkpoint and class map are stored in a private S3 bucket rather than inside the application image. During a manual release, the operator downloads both files, verifies their SHA256 hashes, and mounts the directory read-only into the API container. The download and verification commands are part of the deployment procedure in [5.4](../5.4-deployment-strategy/).
 
-```bash
-# Verify EC2 instance profile identity
-aws sts get-caller-identity
-
-# Configure working regional context
-export AWS_DEFAULT_REGION="ap-southeast-2"
-read -r -p "Enter S3 bucket name: " MODEL_BUCKET
-
-# Create host directory for model artifacts
-mkdir -p checkpoints/v1
-```
-
-> [!NOTE]
-> The current demonstration utilizes S3 regional public endpoints routed via the public subnet's default route table to the Internet Gateway. In enterprise production environments with private VPC subnets, an **Amazon S3 Gateway VPC Endpoint** can be provisioned to route artifact downloads entirely across AWS private network backbones at zero data transfer cost.
-
----
-
-### 5.3.2 Download and Validate Artifacts
-
-Execute the following commands to download the release checkpoint and class index from Amazon S3, followed by immediate cryptographic hash verification:
-
-```bash
-# Download model weights and class index
-aws s3 cp "s3://$MODEL_BUCKET/mobilenet-distilled-v1/model.pth" checkpoints/v1/model.pth
-aws s3 cp "s3://$MODEL_BUCKET/mobilenet-distilled-v1/class_to_idx.json" checkpoints/v1/class_to_idx.json
-
-# Verify SHA256 checksums
-sha256sum checkpoints/v1/model.pth checkpoints/v1/class_to_idx.json
-```
-
-#### Recorded Verification Hashes
-
-The downloaded files must match the exact cryptographic digests generated during the offline model training and validation audit:
-
-| Artifact File | Expected SHA256 Checksum | Approximate Size | Verification Status |
-|---|---|---|---|
-| `model.pth` | `05e72798a74193499f17c4c8267c1436e8bc65cc1e8b8037245664a17644efa5` | `~6.0 MiB` | **MATCHED** |
-| `class_to_idx.json` | `ff5c73e7a7e3e495593fa664b75ebc73de4c9a425f1d847351ae60bc1fbaa786` | `~1.2 KiB` | **MATCHED** |
-
-> [!IMPORTANT]
-> A mismatch in SHA256 indicates either an incomplete download, an outdated release artifact, or potential tampering. The FastAPI backend refuses to serve traffic and returns an explicit 503 Service Unavailable if weights fail integrity checks.
-
----
-
-### Model Artifact Explainability Comparison
-
-The distilled MobileNetV3-Small weights provide one compact model option for the CPU demo. Their evaluation results should be interpreted within the limits of the available test data; they do not establish diagnostic reliability in the field.
-
-| Teacher Model (ConvNeXt-Tiny) | Student Model (MobileNetV3-Small Distilled) |
-|---|---|
-| ![ConvNeXt Overlay](/images/5-Workshop/plant-disease/explain-convnext_tiny-overlay.png?width=350px) | ![MobileNetV3 Overlay](/images/5-Workshop/plant-disease/explain-mobilenetv3_small_100_distilled-overlay.png?width=350px) |
-| Broad receptive field capturing overall leaf morphology | Concentrated gradient heatmaps targeting necrotic lesion margins |
+The current demo reaches the regional S3 endpoint through its public subnet route. A private S3 VPC endpoint is a possible later network enhancement and is not part of the deployed configuration.

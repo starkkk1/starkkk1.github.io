@@ -8,12 +8,12 @@ pre: "<b>5.4. </b>"
 
 # Chiến lược Triển khai
 
-### 5.4.1 Quy trình Triển khai Tự động (Continuous Delivery)
+### 5.4.1 CI Build và Phát hành Image
 
-Hệ thống triển khai được xây dựng dựa trên luồng tự động hóa tích hợp liên tục (CI) với **GitHub Actions** (`.github/workflows/ci.yml`). Mỗi khi có commit mới vào kho mã nguồn:
-1. Chạy toàn bộ bộ kiểm thử tự động Python (linting, kiểm thử unit test cho tiền xử lý và schema dữ liệu).
+Các lần push lên nhánh `master` kích hoạt quy trình tích hợp liên tục (CI) bằng **GitHub Actions** (`.github/workflows/ci.yml`):
+1. Chạy các kiểm tra Python và unit test cho bước tiền xử lý cùng schema dự đoán.
 2. Xây dựng gói mã nguồn giao diện Next.js, tối ưu hóa các tệp tĩnh và đảm bảo tương thích khi chạy với tài khoản không có quyền root.
-3. Đóng gói container Docker nhiều giai đoạn (multi-stage) cho cả frontend và backend, tự động gắn thẻ và phát hành lên **GHCR (GitHub Container Registry)**.
+3. Đóng gói Docker nhiều giai đoạn cho frontend và API suy luận rồi phát hành image lên **GHCR (GitHub Container Registry)**. Workflow không triển khai lên EC2; việc phát hành và quay lui phiên bản được thực hiện thủ công.
 
 #### Ghi nhận Định danh Bản phát hành
 
@@ -25,9 +25,45 @@ Hệ thống triển khai được xây dựng dựa trên luồng tự động 
 | **Backend API Image** | `ghcr.io/starkkk1/plant-disease-api` | `sha256:f61be1570a834f1819614ad041f79e6114e00a0503852a121a564725cad4c27c` |
 | **Frontend Image** | `ghcr.io/starkkk1/plant-disease-frontend` | `sha256:ec211d13241680f208b29f8282c7fb12a19735e9048d1f8dab9b6a27499a7f85` |
 
+![Kết quả kiểm thử CI tự động](/images/5-Workshop/5.5-Quality-assurance/pytest_output.png?width=700px)
+
 ---
 
-### 5.4.2 Cấu hình Môi trường Chạy Backend
+### 5.4.2 Tải và Xác minh Artifacts Mô hình
+
+Trước khi chạy API, xác nhận máy EC2 đã nhận IAM role, sau đó tải checkpoint và class map từ bucket S3 riêng tư:
+
+```bash
+# Xác nhận danh tính instance profile và chọn Region triển khai
+aws sts get-caller-identity
+export AWS_DEFAULT_REGION="ap-southeast-2"
+read -r -p "Nhập tên S3 bucket: " MODEL_BUCKET
+
+# Tải trọng số mô hình và class map
+mkdir -p /home/ec2-user/checkpoints/v1
+aws s3 cp "s3://$MODEL_BUCKET/mobilenet-distilled-v1/model.pth" /home/ec2-user/checkpoints/v1/model.pth
+aws s3 cp "s3://$MODEL_BUCKET/mobilenet-distilled-v1/class_to_idx.json" /home/ec2-user/checkpoints/v1/class_to_idx.json
+
+# Kiểm tra mã băm SHA256
+sha256sum /home/ec2-user/checkpoints/v1/model.pth /home/ec2-user/checkpoints/v1/class_to_idx.json
+```
+
+Các tệp tải về cần khớp với mã băm của bản phát hành:
+
+| Artifact | SHA256 chuẩn | Dung lượng gần đúng |
+|---|---|---:|
+| `model.pth` | `05e72798a74193499f17c4c8267c1436e8bc65cc1e8b8037245664a17644efa5` | ~6.0 MiB |
+| `class_to_idx.json` | `ff5c73e7a7e3e495593fa664b75ebc73de4c9a425f1d847351ae60bc1fbaa786` | ~1.2 KiB |
+
+> [!IMPORTANT]
+> Nếu mã băm không khớp, dừng phát hành và kiểm tra hai tệp có cùng phiên bản mô hình hay không. API sẽ báo model không khả dụng nếu artifacts bắt buộc thiếu hoặc không hợp lệ.
+
+> [!NOTE]
+> Bản demo tải artifacts qua tuyến mạng từ public subnet tới endpoint S3 theo Region. S3 VPC endpoint riêng tư là một thay đổi mạng có thể xem xét sau này, chưa nằm trong cấu hình hiện tại.
+
+---
+
+### 5.4.3 Cấu hình Môi trường Chạy Backend
 
 Container backend chạy ứng dụng FastAPI trên nền Python 3.12 với PyTorch CPU. Máy chủ gắn thư mục `checkpoints/v1` đã tải từ S3 vào container theo chế độ **chỉ đọc (read-only)** tại đường dẫn `/app/artifacts`.
 
@@ -57,7 +93,7 @@ docker run -d \
 
 ---
 
-### 5.4.3 Cấu hình Giao diện Frontend và Mạng
+### 5.4.4 Cấu hình Giao diện Frontend và Mạng
 
 Frontend được đóng gói theo mô hình **Next.js Standalone** chạy trên Node.js 22, khớp với Dockerfile của frontend. Container chạy bằng tài khoản riêng không có quyền root (`nextjs`) và phục vụ tại cổng `3000`.
 
@@ -79,7 +115,7 @@ docker run -d \
 
 ---
 
-### 5.4.4 Xác minh Hoạt động của Ứng dụng
+### 5.4.5 Xác minh Hoạt động của Ứng dụng
 
 Kiểm tra trạng thái của các container và gửi yêu cầu suy luận thử nghiệm với tệp ảnh mẫu:
 

@@ -1,16 +1,16 @@
 ---
-title: "Kiểm thử & Chất lượng"
+title: "Giám sát & Bảo mật"
 date: 2026-10-28T10:00:00+07:00
 weight: 50
 chapter: false
 pre: "<b>5.5. </b>"
 ---
 
-# Kiểm thử & Chất lượng
+# Giám sát & Bảo mật
 
 ### 5.5.1 Thu thập Nhật ký Container & Metrics Hệ thống
 
-Hệ thống giám sát vận hành được xây dựng trên nền tảng **Amazon CloudWatch Logs** và **Amazon CloudWatch Agent**:
+Khả năng quan sát cơ bản của bản demo dựa trên **Amazon CloudWatch Logs** và **Amazon CloudWatch Agent**:
 
 #### 1. Nhật ký Container Có Cấu trúc (Structured Logging)
 Docker daemon sử dụng `awslogs` driver để chuyển toàn bộ luồng `stdout` và `stderr` trực tiếp về các nhóm CloudWatch Log Groups riêng biệt:
@@ -129,7 +129,7 @@ aws cloudwatch put-metric-alarm \
 
 ### 5.5.3 Thắt chặt Bảo mật & Nguyên tắc Quyền Tối thiểu
 
-Hạ tầng triển khai tuân thủ chặt chẽ khung nguyên tắc AWS Well-Architected Framework:
+Bản demo áp dụng một số biện pháp kiểm soát truy cập và môi trường chạy:
 
 ```mermaid
 graph TD
@@ -145,6 +145,4 @@ graph TD
 1. **Khóa Toàn bộ Quyền Public của S3:** Bật tính năng Block All Public Access. Trọng số mô hình chỉ có thể được đọc thông qua IAM Role hợp lệ của máy chủ EC2.
 2. **Loại bỏ Tuyệt đối Khóa Truy cập Tĩnh:** Không lưu trữ bất kỳ access key hoặc secret key nào trong mã nguồn hoặc tệp cấu hình trên máy chủ.
 3. **Gắn Ổ đĩa Chỉ Đọc (Read-Only Mount):** Thư mục tệp mô hình `/app/artifacts` được gắn vào container với cờ `:ro`, ngăn chặn triệt để nguy cơ tệp mô hình bị ghi đè hoặc chỉnh sửa.
-4. **Thực thi bằng Tài khoản Phổ thông:** Các image production chạy hoàn toàn dưới tài khoản người dùng hạn chế quyền (`nextjs` UID 1001 và `appuser`).
-
-![Kiểm thử Tự động với Pytest](/images/5-Workshop/5.5-Quality-assurance/pytest_output.png?width=700px)
+4. **Không chạy bằng Root:** Các container sử dụng tài khoản hệ thống riêng với quyền hạn thấp (`nextjs` UID 1001 và `appuser`).

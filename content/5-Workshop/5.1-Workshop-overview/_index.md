@@ -87,7 +87,7 @@ The following visualizations illustrate how different model architectures focus 
 
 The operational lifecycle connects code repository automation to AWS infrastructure:
 
-1. **Automated Continuous Delivery:** Commits to the `master` branch in GitHub trigger GitHub Actions workflows that execute Python unit tests, Next.js build verification, and build production container images published to **GHCR (GitHub Container Registry)**.
+1. **CI Build and Manual Release:** Pushes to `master` trigger GitHub Actions to run Python checks, build Next.js and publish container images to **GHCR (GitHub Container Registry)**. An operator deploys or rolls back a release on EC2 manually.
 2. **Decoupled Checkpoint Storage:** Model weights (`model.pth`) and class label mappings (`class_to_idx.json`) are maintained in a secure, private **Amazon S3** bucket under the prefix `mobilenet-distilled-v1/`.
 3. **Containerized EC2 Host:** A single Amazon Linux 2023 EC2 instance pulls container images and mounts S3 model artifacts read-only into `/app/artifacts`.
 4. **Networking & Ingress:** The browser connects to the Next.js frontend on port `3000` and calls the FastAPI backend on port `8000` (`/health`, `/predict`, `/explain`) via the VPC Internet Gateway and Security Group rules restricted to approved source IPs (with `CORS_ORIGINS` configured).
