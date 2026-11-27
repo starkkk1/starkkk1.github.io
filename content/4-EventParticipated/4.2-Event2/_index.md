@@ -1,6 +1,6 @@
 ---
 title: "Event 2"
-date: 2026-11-24
+date: 2026-09-29
 weight: 2
 chapter: false
 pre: " <b> 4.2. </b> "
@@ -9,7 +9,7 @@ pre: " <b> 4.2. </b> "
 # AWS Cloud & AI Day 2026: Learning Beyond the Livestream
 
 > **Event:** AWS Cloud & AI Day 2026: HCMC Watch Party  
-> **Date & Time:** 2026, full-day watch party  
+> **Date & Time:** September 29, 2026, full-day watch party
 > **Location:** AWS Office, Ho Chi Minh City; hosted by the AWS Study Group community  
 > **Role:** Attendee
 

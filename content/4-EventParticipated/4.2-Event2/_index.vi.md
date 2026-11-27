@@ -1,6 +1,6 @@
 ---
 title: "Event 2"
-date: 2026-11-24
+date: 2026-09-29
 weight: 2
 chapter: false
 pre: " <b> 4.2. </b> "
@@ -9,7 +9,7 @@ pre: " <b> 4.2. </b> "
 # AWS Cloud & AI Day 2026: Học thêm ngoài buổi livestream
 
 > **Sự kiện:** AWS Cloud & AI Day 2026: HCMC Watch Party  
-> **Thời gian:** Năm 2026, watch party trọn ngày  
+> **Thời gian:** Cả ngày, 29/09/2026
 > **Địa điểm:** Văn phòng AWS tại Thành phố Hồ Chí Minh, do cộng đồng AWS Study Group tổ chức  
 > **Vai trò:** Người tham dự
 

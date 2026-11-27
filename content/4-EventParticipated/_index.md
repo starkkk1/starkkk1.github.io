@@ -21,7 +21,7 @@ During my internship, I participated in three cloud and AI community events in H
 
 ### [Event 2 — AWS Cloud & AI Day 2026: HCMC Watch Party](4.2-Event2/)
 &emsp;**Event Name:** AWS Cloud & AI Day 2026: HCMC Watch Party  
-&emsp;**Date & Time:** 2026 (Full-day Watch Party)  
+&emsp;**Date & Time:** September 29, 2026 (Full-day Watch Party)<br>
 &emsp;**Location:** AWS Office, Ho Chi Minh City (hosted by the AWS Study Group community)  
 &emsp;**Role:** Attendee  
 &emsp;**Summary:** Community Watch Party with over 300 builders featuring keynotes on Agentic AI, data foundations, and enterprise cloud modernization, followed by candid roundtable discussions with Solution Architects and developers on moving AI agents to production and optimizing cloud costs.

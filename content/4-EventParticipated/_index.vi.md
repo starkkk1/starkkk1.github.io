@@ -21,7 +21,7 @@ Trong quá trình thực tập, em đã tham gia ba sự kiện cộng đồng v
 
 ### [Event 2 — AWS Cloud & AI Day 2026: HCMC Watch Party](4.2-Event2/)
 &emsp;**Tên sự kiện:** AWS Cloud & AI Day 2026: HCMC Watch Party  
-&emsp;**Thời gian:** Năm 2026 (Sự kiện Watch Party trọn ngày)  
+&emsp;**Thời gian:** Cả ngày, 29/09/2026<br>
 &emsp;**Địa điểm:** Văn phòng AWS tại Thành phố Hồ Chí Minh (do cộng đồng AWS Study Group tổ chức)  
 &emsp;**Vai trò:** Người tham dự  
 &emsp;**Tóm tắt:** Buổi Watch Party cùng hơn 300 kỹ sư xoay quanh các bài keynote về Agentic AI, nền tảng dữ liệu và hiện đại hóa hạ tầng đám mây cho doanh nghiệp, cùng các phiên thảo luận bàn tròn thực tế với Solution Architects và lập trình viên về việc đưa AI Agent từ POC lên production và tối ưu chi phí cloud.
