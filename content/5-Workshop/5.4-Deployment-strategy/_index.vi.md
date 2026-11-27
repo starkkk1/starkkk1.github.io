@@ -22,8 +22,8 @@ Các lần push lên nhánh `master` kích hoạt quy trình tích hợp liên t
 | Thành phần | Định danh Phiên bản | Mã băm Ghi nhận Thực tế |
 |---|---|---|
 | **Git Commit** | `ff6b75bf3a625db124cc6449f52fa224bf76631e` | Bản phát hành chính thức |
-| **Backend API Image** | `ghcr.io/starkkk1/plant-disease-api` | `sha256:f61be1570a834f1819614ad041f79e6114e00a0503852a121a564725cad4c27c` |
-| **Frontend Image** | `ghcr.io/starkkk1/plant-disease-frontend` | `sha256:ec211d13241680f208b29f8282c7fb12a19735e9048d1f8dab9b6a27499a7f85` |
+| **Backend API Image** | `ghcr.io/starkkk1/plant-disease-detection-api` | `sha256:f61be1570a834f1819614ad041f79e6114e00a0503852a121a564725cad4c27c` |
+| **Frontend Image** | `ghcr.io/starkkk1/plant-disease-detection-frontend` | `sha256:ec211d13241680f208b29f8282c7fb12a19735e9048d1f8dab9b6a27499a7f85` |
 
 ---
 
@@ -82,7 +82,7 @@ docker run -d \
   --log-opt awslogs-region=ap-southeast-2 \
   --log-opt awslogs-group=/plant-disease/backend \
   --log-opt awslogs-create-group=true \
-  ghcr.io/starkkk1/plant-disease-api@sha256:f61be1570a834f1819614ad041f79e6114e00a0503852a121a564725cad4c27c
+  ghcr.io/starkkk1/plant-disease-detection-api@sha256:f61be1570a834f1819614ad041f79e6114e00a0503852a121a564725cad4c27c
 ```
 
 > [!NOTE]
@@ -108,7 +108,7 @@ docker run -d \
   --log-opt awslogs-region=ap-southeast-2 \
   --log-opt awslogs-group=/plant-disease/frontend \
   --log-opt awslogs-create-group=true \
-  ghcr.io/starkkk1/plant-disease-frontend@sha256:ec211d13241680f208b29f8282c7fb12a19735e9048d1f8dab9b6a27499a7f85
+  ghcr.io/starkkk1/plant-disease-detection-frontend@sha256:ec211d13241680f208b29f8282c7fb12a19735e9048d1f8dab9b6a27499a7f85
 ```
 
 ---

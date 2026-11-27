@@ -61,7 +61,7 @@ Create `/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json`:
 }
 ```
 
-Start the CloudWatch Agent service and verify status:
+Start the CloudWatch Agent service and verify status. The current deployment also provides the `plant-disease-demo` CloudWatch dashboard for reviewing host metrics alongside logs:
 
 ```bash
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
@@ -73,61 +73,7 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status
 
 ---
 
-### 5.5.2 Configure Host RAM Saturation Alarm
-
-To protect the single-host deployment from memory exhaustion caused by unexpected traffic surges, configure a CloudWatch Alarm on host memory usage:
-
-#### Alarm Specification
-
-| Metric Parameter | Target Setting |
-|---|---|
-| **Namespace** | `PlantDisease/Host` |
-| **Metric Name** | `mem_used_percent` |
-| **Statistic** | Average |
-| **Evaluation Period** | 60 seconds (1 minute) |
-| **Breach Threshold** | Greater than **85%** (`> 85`) |
-| **Evaluation Window** | 3 consecutive periods out of 3 (3 breaching datapoints) |
-| **Missing Data Treatment** | Treat missing data as missing |
-| **Alarm Action** | Publish notification to SNS topic `plant-disease-alerts` |
-
-Create the SNS notification topic and alarm via the AWS CLI:
-
-```bash
-# 1. Create SNS topic
-SNS_TOPIC_ARN=$(aws sns create-topic \
-  --name plant-disease-alerts \
-  --region ap-southeast-2 \
-  --query 'TopicArn' --output text)
-
-# 2. Subscribe operator email address
-aws sns subscribe \
-  --topic-arn "$SNS_TOPIC_ARN" \
-  --protocol email \
-  --notification-endpoint "your-email@example.com" \
-  --region ap-southeast-2
-
-# 3. Create CloudWatch Metric Alarm
-aws cloudwatch put-metric-alarm \
-  --alarm-name "PlantDisease-HighMemoryUtilization" \
-  --alarm-description "Triggers when host memory exceeds 85% for 3 consecutive minutes" \
-  --namespace "PlantDisease/Host" \
-  --metric-name "mem_used_percent" \
-  --statistic Average \
-  --period 60 \
-  --threshold 85 \
-  --comparison-operator GreaterThanThreshold \
-  --evaluation-periods 3 \
-  --datapoints-to-alarm 3 \
-  --alarm-actions "$SNS_TOPIC_ARN" \
-  --region ap-southeast-2
-```
-
-> [!TIP]
-> **Controlled Testing:** To verify email dispatch without artificially exhausting system memory, temporarily lower the alarm threshold to `0%` (`--threshold 0`). Confirm that CloudWatch transitions to the `ALARM` state and an email arrives in your inbox. Once confirmed, restore the threshold to `85%` and verify the alarm returns to `OK`.
-
----
-
-### 5.5.3 Security Hardening & Least Privilege
+### 5.5.2 Security Hardening & Least Privilege
 
 The demonstration applies a small set of access and runtime controls:
 

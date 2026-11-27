@@ -19,7 +19,7 @@ Bảng dưới đây tổng hợp các yêu cầu cấu hình thực tế đư�
 | Nhóm Yêu cầu | Cấu hình Tiêu chuẩn | Mục đích & Chi tiết Kỹ thuật |
 |---|---|---|
 | **Tài khoản AWS** | Tài khoản AWS Cá nhân | Đảm bảo môi trường thực hành độc lập, kiểm soát chi phí tối ưu |
-| **Khu vực AWS (Region)** | Sydney (`ap-southeast-2`) | Độ trễ thấp, hỗ trợ đầy đủ các dịch vụ EC2, S3, CloudWatch và SNS |
+| **Khu vực AWS (Region)** | Sydney (`ap-southeast-2`) | Độ trễ thấp, hỗ trợ các dịch vụ EC2, S3 và CloudWatch |
 | **Máy chủ Ảo (EC2)** | Amazon EC2 (Amazon Linux 2023 x86_64) | Máy chủ chạy Docker Engine, AWS CLI v2 để điều phối container |
 | **Mạng & VPC** | Public Subnet (`0.0.0.0/0` -> Internet Gateway) | Cung cấp đường truyền tải gói phần mềm và phục vụ web; gán Public IPv4 |
 | **Bảo mật Cổng vào** | Cổng `22` (SSH), Cổng `3000` (Frontend), Cổng `8000` (API) | Giới hạn duy nhất tới địa chỉ IP công cộng của người vận hành (`/32`) |

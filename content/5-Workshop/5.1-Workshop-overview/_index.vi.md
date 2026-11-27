@@ -91,4 +91,4 @@ Chu trình vận hành kết nối liền mạch từ kho mã nguồn đến h�
 2. **Lưu trữ Tách rời Trọng số:** Tệp mô hình (`model.pth`) và ánh xạ phân lớp (`class_to_idx.json`) được lưu trữ tại **Amazon S3** bảo mật dưới tiền tố `mobilenet-distilled-v1/`.
 3. **Máy chủ EC2 Chạy Container:** Máy chủ Amazon Linux 2023 kéo images từ GHCR và gắn ổ đĩa S3 chỉ đọc (read-only) vào thư mục `/app/artifacts`.
 4. **Mạng & Cổng Giao tiếp:** Trình duyệt kết nối tới giao diện Next.js tại cổng `3000` và gọi API FastAPI tại cổng `8000` (`/health`, `/predict`, `/explain`) qua Internet Gateway và Security Group giới hạn theo các IP nguồn được phê duyệt (kèm cấu hình `CORS_ORIGINS`).
-5. **Khả năng Quan sát:** Nhật ký stdout/stderr được chuyển về CloudWatch Logs bằng Docker `awslogs` driver. **CloudWatch Agent** đo đạc chỉ số RAM và đĩa định kỳ 60 giây để kích hoạt cảnh báo email tự động.
+5. **Khả năng Quan sát:** Nhật ký stdout/stderr được chuyển về CloudWatch Logs bằng Docker `awslogs` driver. **CloudWatch Agent** đo đạc chỉ số bộ nhớ và đĩa định kỳ 60 giây để theo dõi trên dashboard CloudWatch.

@@ -61,7 +61,7 @@ Tạo tệp cấu hình `/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-
 }
 ```
 
-Khởi chạy dịch vụ CloudWatch Agent:
+Khởi chạy dịch vụ CloudWatch Agent và kiểm tra trạng thái. Bản triển khai hiện tại cũng có dashboard `plant-disease-demo` để theo dõi metrics máy chủ cùng log:
 
 ```bash
 sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
@@ -73,61 +73,7 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status
 
 ---
 
-### 5.5.2 Cấu hình Cảnh báo Quá tải RAM
-
-Để bảo vệ máy chủ đơn khỏi nguy cơ cạn kiệt bộ nhớ khi lưu lượng truy cập tăng đột biến, cấu hình một CloudWatch Alarm giám sát chỉ số RAM của máy chủ:
-
-#### Thông số Cấu hình Cảnh báo
-
-| Thuộc tính | Giá trị Thiết lập Thực tế |
-|---|---|
-| **Namespace** | `PlantDisease/Host` |
-| **Tên Chỉ số (Metric)** | `mem_used_percent` |
-| **Cách tính (Statistic)** | Trung bình (Average) |
-| **Chu kỳ Đánh giá** | 60 giây (1 phút) |
-| **Ngưỡng Vi phạm** | Lớn hơn **85%** (`> 85`) |
-| **Số lần Vi phạm Kích hoạt** | 3 chu kỳ liên tiếp (3 datapoints) |
-| **Xử lý Dữ liệu Thiếu** | Xem như dữ liệu bị thiếu (Treat missing as missing) |
-| **Hành động Cảnh báo** | Gửi thông báo đến SNS Topic `plant-disease-alerts` |
-
-Tạo topic SNS và kích hoạt cảnh báo CloudWatch bằng AWS CLI:
-
-```bash
-# 1. Tạo topic SNS
-SNS_TOPIC_ARN=$(aws sns create-topic \
-  --name plant-disease-alerts \
-  --region ap-southeast-2 \
-  --query 'TopicArn' --output text)
-
-# 2. Đăng ký email nhận thông báo
-aws sns subscribe \
-  --topic-arn "$SNS_TOPIC_ARN" \
-  --protocol email \
-  --notification-endpoint "your-email@example.com" \
-  --region ap-southeast-2
-
-# 3. Tạo CloudWatch Alarm
-aws cloudwatch put-metric-alarm \
-  --alarm-name "PlantDisease-HighMemoryUtilization" \
-  --alarm-description "Kích hoạt khi RAM máy chủ vượt 85% trong 3 phút liên tiếp" \
-  --namespace "PlantDisease/Host" \
-  --metric-name "mem_used_percent" \
-  --statistic Average \
-  --period 60 \
-  --threshold 85 \
-  --comparison-operator GreaterThanThreshold \
-  --evaluation-periods 3 \
-  --datapoints-to-alarm 3 \
-  --alarm-actions "$SNS_TOPIC_ARN" \
-  --region ap-southeast-2
-```
-
-> [!TIP]
-> **Phương pháp Kiểm thử Có Kiểm soát:** Để xác minh cơ chế gửi email mà không cần làm đầy RAM thật, tạm thời hạ ngưỡng cảnh báo xuống `0%` (`--threshold 0`). Kiểm tra trạng thái alarm chuyển sang `ALARM` và có email gửi về hòm thư. Sau đó khôi phục lại ngưỡng `85%` và xác nhận trạng thái trở về `OK`.
-
----
-
-### 5.5.3 Thắt chặt Bảo mật & Nguyên tắc Quyền Tối thiểu
+### 5.5.2 Thắt chặt Bảo mật & Nguyên tắc Quyền Tối thiểu
 
 Bản demo áp dụng một số biện pháp kiểm soát truy cập và môi trường chạy:
 

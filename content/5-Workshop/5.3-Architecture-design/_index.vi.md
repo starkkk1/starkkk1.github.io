@@ -15,15 +15,24 @@ Bản demo **Plant Disease Detection** kết nối API suy luận học máy v�
 1. **Phân hệ Lưu trữ Trọng số & Tách rời Artifacts (Amazon S3 &rarr; Máy chủ EC2):** Tách biệt các tệp trọng số mạng nơ-ron nhị phân khỏi container image, đảm bảo tính toàn vẹn mật mã học SHA256 tại thời điểm chạy.
 2. **CI Build và Phát hành Image (GitHub Actions &rarr; GHCR):** Tự động kiểm tra và phát hành image frontend cùng API; người vận hành triển khai phiên bản lên EC2 theo quy trình thủ công.
 3. **Phân hệ Thực thi Web & Suy luận Trí tuệ Nhân tạo (Docker Stack trên EC2):** Chạy giao diện người dùng tương tác Next.js và dịch vụ suy luận FastAPI PyTorch CPU tích hợp công nghệ giải thích Grad-CAM++.
-4. **Phân hệ Vận hành, An ninh & Giám sát Hệ thống:** Áp dụng nguyên tắc đặc quyền tối thiểu với IAM Role, Security Group khóa địa chỉ IP client, thu thập log với CloudWatch Logs, đo đạc RAM tùy biến với CloudWatch Agent và kích hoạt cảnh báo email qua Amazon SNS.
+4. **Phân hệ Vận hành, An ninh & Giám sát Hệ thống:** Áp dụng nguyên tắc đặc quyền tối thiểu với IAM Role, Security Group khóa địa chỉ IP client, thu thập log với CloudWatch Logs, thu thập metrics máy chủ qua CloudWatch Agent và theo dõi trên dashboard CloudWatch.
 
-![Kiến trúc Toàn diện Hệ thống Nhận diện Bệnh Cây trồng](/images/5-Workshop/5.3-Architecture-design/system_architecture.jpg?width=100%)
+```mermaid
+graph LR
+    Dev["Lập trình viên"] -->|push lên master| CI["GitHub Actions: kiểm thử, build, smoke"]
+    CI -->|phát hành image| GHCR["GHCR"]
+    Model["Artifacts model"] -->|tải lên| S3["S3 riêng tư"]
+    GHCR -->|kéo thủ công| EC2["Một máy EC2: Next.js + FastAPI"]
+    S3 -->|tải thủ công + kiểm tra hash| EC2
+    Browser["Trình duyệt"] -->|HTTP: 3000 / 8000| EC2
+    EC2 -->|log container + metrics máy chủ| CW["CloudWatch Logs + dashboard"]
+```
 
 ---
 
-### Bảng Mô tả 11 Bước Vận hành Hệ thống Chi tiết
+### Bảng Mô tả Luồng Vận hành Hệ thống
 
-Chuỗi tương tác xuyên suốt 11 bước được đánh số trên sơ đồ kiến trúc như sau:
+Luồng tương tác từ phát hành code đến vận hành ứng dụng được tóm tắt như sau:
 
 | Bước # | Phân hệ / Ranh giới | Thành phần Khởi phát | Thành phần Tiếp nhận | Giao thức / Cơ chế | Mô tả Kỹ thuật Chi tiết |
 |:---:|---|---|---|---|---|
@@ -36,8 +45,6 @@ Chuỗi tương tác xuyên suốt 11 bước được đánh số trên sơ đ�
 | **⑦** | Tải lên Trọng số | Local Workstation | Amazon S3 (Private Bucket) | `upload` | Quy trình huấn luyện & kiểm định (`audit_models.py`, tập dữ liệu cà chua Kaggle) tải `mobilenet-distilled-v1/model.pth` (~6 MiB) và `class_to_idx.json` lên S3 (không dùng VPC endpoint). |
 | **⑧** | Nạp Trọng số | Amazon S3 | Máy chủ EC2 &rarr; `backend` | `aws s3 cp + sha256` | EC2 sử dụng IAM instance profile (không lưu key tĩnh) để tải tệp trọng số, kiểm tra mã băm SHA256 và gắn `/app/artifacts (ro)`. |
 | **⑨** | Ghi log & Giám sát | EC2 Containers & CloudWatch Agent | Amazon CloudWatch | `awslogs` + host metrics | Container đẩy log qua `awslogs` và CloudWatch Agent gửi thông số `mem + disk` mỗi 60 giây. |
-| **⑩** | Cảnh báo Ngưỡng | Amazon CloudWatch | Amazon SNS (`plant-disease-alerts`) | `RAM > 85%, 3 × 1 min` | CloudWatch Alarm kích hoạt khi mức sử dụng RAM vượt 85% trong 3 chu kỳ 1 phút liên tiếp. |
-| **⑪** | Thông báo Sự cố | Amazon SNS | Developer / Operator | `email alert` | SNS gửi email cảnh báo tức thời đến hộp thư của kỹ sư vận hành. |
 
 ---
 
@@ -68,7 +75,7 @@ Phân hệ tính toán chạy trên một máy chủ ảo EC2 Amazon Linux 2023 
 - **IAM Instance Profile:** Sử dụng instance role không lưu khóa truy cập tĩnh, cấp quyền `s3:GetObject` trên bucket trọng số và policy `CloudWatchAgentServerPolicy`.
 - **Amazon VPC & Security Groups:** Tường lửa bảo vệ chỉ cho phép truy cập các cổng `22` (SSH), `3000` (Web UI) và `8000` (API) từ các IP nguồn được phê duyệt (`/32`).
 - **Amazon CloudWatch Logs:** Thu thập toàn bộ luồng log stdout/stderr với chính sách lưu trữ **7 ngày**, cân đối giữa nhu cầu khắc phục sự cố và tối ưu chi phí lưu trữ.
-- **CloudWatch Agent & Alarm:** Thu thập mức sử dụng RAM thực tế (`mem_used_percent`) trong namespace `PlantDisease/Host`. Chuông báo động kích hoạt khi RAM **vượt quá 85% trong 3 phút liên tục**, gửi email cảnh báo qua **Amazon SNS**.
+- **CloudWatch Agent:** Thu thập metrics bộ nhớ và đĩa trong namespace `PlantDisease/Host`; CloudWatch Logs lưu đầu ra của hai container và dashboard hỗ trợ theo dõi vận hành.
 
 ---
 

@@ -20,7 +20,7 @@ Dự án phù hợp với ngành Công nghệ thông tin mình đang học và c
 Việc xử lý các vấn đề về quyền truy cập, cấu hình và triển khai dạy mình kiểm tra từng lớp của hệ thống thay vì cho rằng trang web mở được đồng nghĩa toàn bộ ứng dụng đang hoạt động đúng. Viết worklog, hướng dẫn workshop và bài chia sẻ kỹ thuật cũng giúp mình trình bày quyết định và giới hạn kỹ thuật rõ ràng hơn. Các sự kiện về cloud và AI mang đến thêm góc nhìn về khả năng phục hồi của hệ thống, bảo mật, quản lý chi phí và sử dụng AI có trách nhiệm.
 
 ### 4. Thách thức và bài học từ dự án
-Dự án giúp mình nhận ra giới hạn của một bản demo quy mô nhỏ. Một máy EC2 có thể trở thành điểm lỗi duy nhất; cảnh báo tài nguyên cũng không chứng minh dịch vụ dự đoán luôn sẵn sàng hoặc mô hình chính xác. Mình học được cách phân biệt thời gian suy luận của một mẫu với phép đo hiệu năng đầy đủ, đồng thời tránh đưa ra kết luận về độ chính xác thực địa khi chưa có dữ liệu gán nhãn độc lập. Ở các dự án sau, mình muốn xác định tiêu chí nghiệm thu và bằng chứng vận hành ngay từ đầu, song song với việc triển khai.
+Dự án giúp mình nhận ra giới hạn của một bản demo quy mô nhỏ. Một máy EC2 có thể trở thành điểm lỗi duy nhất; metrics giám sát tài nguyên cũng không chứng minh dịch vụ dự đoán luôn sẵn sàng hoặc mô hình chính xác. Mình học được cách phân biệt thời gian suy luận của một mẫu với phép đo hiệu năng đầy đủ, đồng thời tránh đưa ra kết luận về độ chính xác thực địa khi chưa có dữ liệu gán nhãn độc lập. Ở các dự án sau, mình muốn xác định tiêu chí nghiệm thu và bằng chứng vận hành ngay từ đầu, song song với việc triển khai.
 
 ## Một số câu hỏi khác
 

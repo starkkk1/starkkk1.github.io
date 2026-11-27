@@ -15,15 +15,24 @@ The **Plant Disease Detection** demonstration connects a machine-learning infere
 1. **Model Checkpoint & Artifact Storage Pipeline (Amazon S3 &rarr; EC2 Host):** Securely decouples multi-megabyte neural network weights from application container images, verifying cryptographic integrity at runtime.
 2. **CI Image Build and Publishing (GitHub Actions &rarr; GHCR):** Runs automated checks and publishes frontend and API images; an operator deploys releases to EC2 manually.
 3. **Web Application & Model Inference (Single EC2 Host):** Runs a responsive Next.js frontend and a PyTorch CPU FastAPI service with an optional Grad-CAM++ visualization.
-4. **Operations, Observability & Security:** Implements least-privilege AWS IAM instance profiles, client-locked Security Groups, Amazon CloudWatch structured logging, custom host RAM metrics, and proactive Amazon SNS incident alarms.
+4. **Operations, Observability & Security:** Uses least-privilege AWS IAM instance profiles, client-restricted Security Groups, CloudWatch Logs, custom host memory and disk metrics, and a monitoring dashboard.
 
-![Plant Disease Detection End-to-End System Architecture](/images/5-Workshop/5.3-Architecture-design/system_architecture.jpg?width=100%)
+```mermaid
+graph LR
+    Dev["Developer"] -->|push to master| CI["GitHub Actions: tests, builds, smoke checks"]
+    CI -->|publish images| GHCR["GHCR"]
+    Model["Model artifacts"] -->|upload| S3["Private S3"]
+    GHCR -->|manual pull| EC2["Single EC2 host: Next.js + FastAPI"]
+    S3 -->|manual download + hash check| EC2
+    Browser["Browser"] -->|HTTP: 3000 / 8000| EC2
+    EC2 -->|container logs + host metrics| CW["CloudWatch logs + dashboard"]
+```
 
 ---
 
 ### End-to-End Operational Lifecycle & Sequence Flow
 
-The interaction sequence across the 11 numbered steps shown in the architecture diagram is detailed below:
+The interaction sequence across the nine steps in the architecture flow below is detailed below:
 
 | Step # | Subsystem / Boundary | Source Component | Destination Component | Protocol / Mechanism | Technical Action & Description |
 |:---:|---|---|---|---|---|
@@ -36,8 +45,6 @@ The interaction sequence across the 11 numbered steps shown in the architecture 
 | **⑦** | Offline Training Upload | Local Workstation | Amazon S3 (Private Bucket) | `upload` | Training & audit workflow (`audit_models.py`, Kaggle tomato set) uploads `mobilenet-distilled-v1/model.pth` (~6 MiB) and `class_to_idx.json` (no VPC endpoint). |
 | **⑧** | Artifact Retrieval | Amazon S3 | EC2 Host &rarr; `backend` | `aws s3 cp + sha256` | EC2 uses its AWS IAM instance profile (no static keys) to download weights, verify SHA256 hashes, and mount `/app/artifacts (ro)`. |
 | **⑨** | Logging & Telemetry | EC2 Containers & CloudWatch Agent | Amazon CloudWatch | `awslogs` + host metrics | Containers stream `awslogs` and CloudWatch Agent reports `mem + disk` every 60 s. |
-| **⑩** | Threshold Alarm | Amazon CloudWatch | Amazon SNS (`plant-disease-alerts`) | `RAM > 85%, 3 × 1 min` | CloudWatch Alarm triggers when host RAM exceeds 85% across three consecutive 1-minute periods. |
-| **⑪** | Incident Notification | Amazon SNS | Developer / Operator | `email alert` | SNS dispatches an email alert directly to the operator's inbox. |
 
 ---
 
@@ -68,7 +75,7 @@ The compute layer runs on an Amazon Linux 2023 (`x86_64`) EC2 instance hosting t
 - **AWS IAM Instance Profile:** Instance role with no static access keys, scoped to `s3:GetObject` on the model bucket and `CloudWatchAgentServerPolicy`.
 - **Amazon VPC & Security Groups:** Inbound firewall restricts ports `22` (SSH), `3000` (Web UI), and `8000` (API) exclusively to approved source IPs (`/32`).
 - **Amazon CloudWatch Logs:** Captures stdout and stderr streams with a **7-day retention policy** to prevent disk saturation while maintaining troubleshooting history.
-- **Amazon CloudWatch Agent & Alarm:** Collects OS-level RAM telemetry (`mem_used_percent`) under namespace `PlantDisease/Host`. The alarm triggers when RAM exceeds **85% for 3 consecutive minutes**, notifying operators via **Amazon SNS**.
+- **Amazon CloudWatch Agent:** Collects host memory and disk metrics under namespace `PlantDisease/Host`; CloudWatch Logs stores both containers’ output and the dashboard provides an operational view.
 
 ---
 

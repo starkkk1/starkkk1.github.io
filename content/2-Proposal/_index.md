@@ -17,7 +17,7 @@ We propose a twelve-week implementation and validation program for a containeriz
 
 ### 1 Executive summary
 
-The project will deliver a reproducible AWS demonstration with a responsive frontend, CPU inference API, privately stored model artifacts and one operational RAM alarm. GitHub Actions will publish images; a controlled manual procedure will deploy and roll back compatible image and model versions. This scope fits a backend and MLOps learning project without requiring serverless or microservices claims.
+The project will deliver a reproducible AWS demonstration with a responsive frontend, CPU inference API, privately stored model artifacts and basic CloudWatch observability. GitHub Actions will publish images; a controlled manual procedure will deploy and roll back compatible image and model versions. This scope fits a backend and MLOps learning project without requiring serverless or microservices claims.
 
 The project budget follows the low-traffic AWS demonstration configuration in the project overview: **USD 50 per month before tax**, or **USD 150 for three monthly billing periods** covering the twelve-week project. With USD 200 in eligible AWS credits, four months of this configuration are covered. Credit availability and expiration depend on the account. [6–12]
 
@@ -38,9 +38,8 @@ The project therefore needs a versioned release identity, least-privilege access
 | --- | --- | --- |
 | Amazon EC2 | Run frontend and API containers | One x86_64 host in Sydney |
 | Amazon S3 | Store checkpoint and class map | Private versioned artifacts |
-| Amazon CloudWatch | Logs metrics dashboard and RAM alarm | 60 second Agent metrics; 7 day logs |
+| Amazon CloudWatch | Container logs, host metrics, and dashboard | 60 second Agent metrics; 7 day logs |
 | IAM and VPC | Identity and network controls | Instance role and source IP rules |
-| Amazon SNS | Deliver alarm email | One confirmed email subscription |
 
 
 #### Component design
@@ -51,7 +50,7 @@ The browser reaches Next.js on port 3000 and FastAPI on port 8000 at the same EC
 GitHub Actions -> GHCR -> manual deployment to EC2
 Private S3 artifacts -> host version directory -> read-only API mount
 Browser -> Next.js frontend and FastAPI API
-Container logs + Agent metrics -> CloudWatch -> RAM alarm -> SNS
+Container logs + Agent metrics -> CloudWatch dashboard
 ```
 
 The architecture deliberately uses a public subnet with restricted inbound access for the demonstration. S3 VPC endpoints, on-premises connectivity, DNS simulation, load balancing and autoscaling are outside the baseline. A private-network extension can be evaluated later without being reported as an implemented feature.
@@ -65,7 +64,7 @@ Create the EC2 instance profile with scoped GetObject permission and CloudWatch 
 
 Validate readiness, real-image prediction, response schema and model identity. Then validate browser upload and Grad-CAM++ on desktop and phone. Measure API latency under a declared request count and concurrency instead of interpreting a single request as p95. Evaluate macro F1 and per-class recall only when an independent labeled dataset is available; do not promise a diagnostic accuracy without that evaluation.
 
-Use CloudWatch Logs for both containers and Agent metrics for RAM and disk. Retain logs for seven days and configure one RAM alarm at Average greater than 85 percent for three one-minute datapoints. Confirm SNS delivery with a controlled threshold test, then restore 85. Record rollback and EC2 stop/start rehearsals, including public IP and CORS updates.
+Use CloudWatch Logs for both containers and CloudWatch Agent metrics for host memory and disk, with seven-day log retention. Review the host dashboard during operation. Record rollback and EC2 stop/start rehearsals, including public IP and CORS updates.
 
 
 ### 5 Timelines and milestones
@@ -83,14 +82,14 @@ Each week receives 20 planned working hours, totaling 240 hours. The proposed sc
 | 7 · Oct 19–23 | Prepare AWS IAM network and budget | EC2 role and restricted connectivity |
 | 8 · Oct 26–30 | Store and retrieve S3 artifacts | Download hashes match |
 | 9 · Nov 2–6 | Deploy EC2 and test real inference | Desktop and phone acceptance |
-| 10 · Nov 9–13 | Configure CloudWatch and RAM alarm | Metrics logs and email test |
+| 10 · Nov 9–13 | Configure CloudWatch observability | Log groups, host metrics, and dashboard checked |
 | 11 · Nov 16–20 | Rehearse rollback and measure latency | Recovery and performance evidence |
 | 12 · Nov 23–27 | Finalize report demo and cleanup | Handover and cost review |
 
 
 ### 6 Cost
 
-The approved low-traffic demonstration budget for Sydney (`ap-southeast-2`) is **USD 50 per month before tax**. It covers one `t3.medium` EC2 host running 730 hours per month, a 20 GiB gp3 volume, one public IPv4 address, small S3 model artifacts, and low-volume monitoring and email alerts. The monthly allocation is:
+The approved low-traffic demonstration budget for Sydney (`ap-southeast-2`) is **USD 50 per month before tax**. It covers one `t3.medium` EC2 host running 730 hours per month, a 20 GiB gp3 volume, one public IPv4 address, small S3 model artifacts, and low-volume monitoring. The monthly allocation is:
 
 | Service / usage | Monthly cost |
 |---|---:|
@@ -98,8 +97,7 @@ The approved low-traffic demonstration budget for Sydney (`ap-southeast-2`) is *
 | EBS gp3, 20 GiB | $1.60 |
 | Public IPv4, 730 hours | $3.65 |
 | S3 model checkpoint and class map | $0.01 |
-| CloudWatch logs, host metrics, dashboard, and one RAM alarm | $0.00 |
-| SNS email alerts (up to 1,000 notifications) | $0.00 |
+| CloudWatch logs, host metrics, and dashboard | $0.00 |
 | Internet data transfer within the 100 GB/month shared allowance | $0.00 |
 | Operating headroom | $6.20 |
 | **Monthly total** | **$50.00** |
@@ -119,10 +117,9 @@ This budget covers a single host and low-traffic demo use. It excludes tax, GPU 
 | CORS or public IP change | High / Medium | Backend operator recreates container with correct origin |
 | Access or credential exposure | Medium / High | Operator uses instance role private S3 and restricted SSH |
 | Host outage or saturation | Medium / High | Backend operator measures queue load and rehearses recovery |
-| Alarm email not delivered | Medium / Medium | Operator confirms SNS and performs threshold test |
 | Field data differs from training | High / High | ML developer collects labeled samples and limits claims |
 
-The initial demonstrator accepts single-host downtime and HTTP access restricted to approved client IPs. Public production use requires a separate security and availability review, including HTTPS and authentication. The RAM alarm is intentionally the only operational alarm in this scope and does not cover service availability or ML quality.
+The initial demonstrator accepts single-host downtime and HTTP access restricted to approved client IPs. Public production use requires a separate security and availability review, including HTTPS and authentication. CloudWatch logs and host metrics provide operational visibility but do not establish service availability or ML quality.
 
 
 ### 8 Expected outcomes
@@ -132,7 +129,7 @@ The initial demonstrator accepts single-host downtime and HTTP access restricted
 | Reproducible release | Two image digests plus checkpoint map hashes and config |
 | Working AWS application | Health and prediction succeed; browser prediction and explanation verified |
 | Secure artifact retrieval | Private S3 GetObject by instance role with matching hashes |
-| Operational visibility | Logs host dashboard one RAM alarm and a received SNS email |
+| Operational visibility | Container logs, host metrics, and dashboard reviewed |
 | Documented recovery | Rollback and EC2 stop/start rehearsal with observed timings |
 | Measured performance | Latency report states image hardware concurrency samples and p95 |
 | Controlled cost | Weekly gross-cost log and final cleanup evidence |
@@ -152,7 +149,7 @@ AWS documentation and pricing references accessed on 16 October 2026. Usage allo
 
 [4] CloudWatch Agent installation
 
-[5] CloudWatch alarm actions
+[5] CloudWatch operational monitoring
 
 [6] EC2 On Demand pricing
 

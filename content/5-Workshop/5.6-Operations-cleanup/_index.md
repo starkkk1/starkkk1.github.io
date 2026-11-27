@@ -58,7 +58,7 @@ At the end of the workshop, remove resources created specifically for this demo,
 ```mermaid
 graph TD
     Step1["1. Terminate the demo EC2 instance"]
-    Step2["2. Delete demo CloudWatch logs, alarm, and SNS topic"]
+    Step2["2. Delete CloudWatch log groups and dashboard"]
     Step3["3. Empty and delete the dedicated model bucket"]
     Step4["4. Release the demo Elastic IP, if allocated"]
     Step5["5. Review leftover volumes, snapshots, and billable resources"]
@@ -86,26 +86,20 @@ aws logs delete-log-group \
   --log-group-name /plant-disease/frontend \
   --region ap-southeast-2
 
-# 3. Delete CloudWatch Alarm
-aws cloudwatch delete-alarms \
-  --alarm-names "PlantDisease-HighMemoryUtilization" \
+aws cloudwatch delete-dashboards \
+  --dashboard-names plant-disease-demo \
   --region ap-southeast-2
 
-# 4. Delete SNS Topic
-aws sns delete-topic \
-  --topic-arn "$SNS_TOPIC_ARN" \
-  --region ap-southeast-2
-
-# 5. Empty and delete S3 Bucket
+# 3. Empty and delete S3 Bucket
 # This command removes current objects. If bucket versioning is enabled,
 # remove prior object versions using the S3 console before deleting the bucket.
 aws s3 rm "s3://$MODEL_BUCKET" --recursive
 aws s3api delete-bucket --bucket "$MODEL_BUCKET" --region ap-southeast-2
 
-# 6. Release Elastic IP (if allocated)
+# 4. Release Elastic IP (if allocated)
 aws ec2 release-address --allocation-id "$EIP_ALLOC_ID" --region ap-southeast-2
 
-# 7. List available EBS volumes and your account's snapshots for review.
+# 5. List available EBS volumes and your account's snapshots for review.
 # Delete only resources confirmed to belong to this demo; do not bulk-delete.
 aws ec2 describe-volumes --filters Name=status,Values=available --region ap-southeast-2
 aws ec2 describe-snapshots --owner-ids self --region ap-southeast-2
@@ -124,4 +118,4 @@ The architectural designs, performance benchmarks, and implementation decisions 
 2. **[2] AWS EC2 Stop and Start Lifecycle:** [AWS Documentation on Instance Lifecycle](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html) — Details on state preservation, ephemeral storage behavior, and public IP reassignments.
 3. **[3] Amazon S3 HeadObject and Least-Privilege IAM:** [S3 Security Best Practices](https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html) — Policy scoping for model weight downloads and bucket isolation.
 4. **[4] Amazon CloudWatch Agent Installation:** [CloudWatch Agent User Guide](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html) — Custom metrics collection for host RAM and disk percent.
-5. **[5] Amazon CloudWatch Alarm Actions & Amazon SNS:** [Using Amazon CloudWatch Alarms](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html) — Configuring high-priority notification triggers for operations teams.
+5. **[5] Amazon CloudWatch operational monitoring:** [CloudWatch documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html) — Background reference for CloudWatch monitoring capabilities.

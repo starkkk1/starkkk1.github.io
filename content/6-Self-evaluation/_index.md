@@ -27,9 +27,9 @@ The work demonstrates separation of image delivery from deployment, artifact int
 
 ### 3 Limitations and next validation
 
-A single EC2 instance is a single point of failure. The HTTP demo has no application authentication or load balancer. The RAM alarm does not establish endpoint availability or model accuracy. Inference and explanation share one execution slot per backend process, so concurrent demand can produce service_busy or timeout responses. The 29.23 ms sample is not a throughput or percentile measurement.
+A single EC2 instance is a single point of failure. The HTTP demo has no application authentication or load balancer. Host metrics do not establish endpoint availability or model accuracy. Inference and explanation share one execution slot per backend process, so concurrent demand can produce service_busy or timeout responses. The 29.23 ms sample is not a throughput or percentile measurement.
 
-The next acceptance checks are browser prediction and explanation on AWS, confirmed SNS notification and restoration to the 85 percent threshold, a documented rollback rehearsal and a repeatable latency test. Field accuracy requires an independent labeled dataset; no accuracy percentage is claimed by this workshop.
+The next acceptance checks are browser prediction and explanation on AWS, dashboard review, a documented rollback rehearsal and a repeatable latency test. Field accuracy requires an independent labeled dataset; no accuracy percentage is claimed by this workshop.
 
 
 ### 4 Internship Evaluation Criteria

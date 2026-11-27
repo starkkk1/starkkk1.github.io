@@ -27,9 +27,9 @@ Quá trình thực hiện thể hiện việc tách phát hành image khỏi dep
 
 ### 3 Giới hạn và kiểm tra tiếp theo
 
-Một EC2 là một điểm lỗi duy nhất. Demo HTTP chưa có xác thực ứng dụng hoặc load balancer. Alarm RAM không chứng minh availability endpoint hay độ chính xác model. Inference và explanation dùng chung một slot mỗi backend process nên tải đồng thời có thể sinh service_busy hoặc timeout. Mẫu 29,23 ms không phải phép đo throughput hoặc percentile.
+Một EC2 là một điểm lỗi duy nhất. Demo HTTP chưa có xác thực ứng dụng hoặc load balancer. Metrics máy chủ không chứng minh availability endpoint hay độ chính xác model. Inference và explanation dùng chung một slot mỗi backend process nên tải đồng thời có thể sinh service_busy hoặc timeout. Mẫu 29,23 ms không phải phép đo throughput hoặc percentile.
 
-Các kiểm tra nghiệm thu tiếp theo là nhận diện và giải thích trong browser trên AWS, xác nhận email SNS và ngưỡng khôi phục 85%, diễn tập rollback có ghi nhận và phép đo latency lặp lại được. Độ chính xác thực địa cần tập dữ liệu gán nhãn độc lập; workshop không công bố một tỷ lệ accuracy chưa được đo.
+Các kiểm tra nghiệm thu tiếp theo là nhận diện và giải thích trong browser trên AWS, rà soát dashboard, diễn tập rollback có ghi nhận và phép đo latency lặp lại được. Độ chính xác thực địa cần tập dữ liệu gán nhãn độc lập; workshop không công bố một tỷ lệ accuracy chưa được đo.
 
 
 ### 4 Tiêu chí tự đánh giá kết quả thực tập

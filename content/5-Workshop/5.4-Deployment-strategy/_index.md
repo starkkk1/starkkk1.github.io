@@ -11,7 +11,7 @@ pre: "<b>5.4. </b>"
 ### 5.4.1 CI Build and Image Publishing
 
 Pushes to `master` trigger the automated continuous integration (CI) workflow in **GitHub Actions** (`.github/workflows/ci.yml`):
-1. Python static code analysis, linting, and unit test suites across model transforms and prediction schemas.
+1. Python unit and API tests, including model transforms and prediction schemas.
 2. Next.js production builds, ensuring static asset optimization, TypeScript type safety, and non-root runtime compatibility.
 3. Multi-stage Docker image packaging for the frontend and inference API, followed by publishing to **GHCR (GitHub Container Registry)**. The workflow does not deploy to EC2; release deployment and rollback are performed manually.
 
@@ -22,8 +22,8 @@ To guarantee reproducibility and avoid mutable tag discrepancies (such as `:late
 | Component | Target Version / Identifier | Recorded Digest Hash |
 |---|---|---|
 | **Git Commit** | `ff6b75bf3a625db124cc6449f52fa224bf76631e` | Validated release baseline |
-| **Backend API Image** | `ghcr.io/starkkk1/plant-disease-api` | `sha256:f61be1570a834f1819614ad041f79e6114e00a0503852a121a564725cad4c27c` |
-| **Frontend Image** | `ghcr.io/starkkk1/plant-disease-frontend` | `sha256:ec211d13241680f208b29f8282c7fb12a19735e9048d1f8dab9b6a27499a7f85` |
+| **Backend API Image** | `ghcr.io/starkkk1/plant-disease-detection-api` | `sha256:f61be1570a834f1819614ad041f79e6114e00a0503852a121a564725cad4c27c` |
+| **Frontend Image** | `ghcr.io/starkkk1/plant-disease-detection-frontend` | `sha256:ec211d13241680f208b29f8282c7fb12a19735e9048d1f8dab9b6a27499a7f85` |
 
 ---
 
@@ -82,7 +82,7 @@ docker run -d \
   --log-opt awslogs-region=ap-southeast-2 \
   --log-opt awslogs-group=/plant-disease/backend \
   --log-opt awslogs-create-group=true \
-  ghcr.io/starkkk1/plant-disease-api@sha256:f61be1570a834f1819614ad041f79e6114e00a0503852a121a564725cad4c27c
+  ghcr.io/starkkk1/plant-disease-detection-api@sha256:f61be1570a834f1819614ad041f79e6114e00a0503852a121a564725cad4c27c
 ```
 
 > [!NOTE]
@@ -108,7 +108,7 @@ docker run -d \
   --log-opt awslogs-region=ap-southeast-2 \
   --log-opt awslogs-group=/plant-disease/frontend \
   --log-opt awslogs-create-group=true \
-  ghcr.io/starkkk1/plant-disease-frontend@sha256:ec211d13241680f208b29f8282c7fb12a19735e9048d1f8dab9b6a27499a7f85
+  ghcr.io/starkkk1/plant-disease-detection-frontend@sha256:ec211d13241680f208b29f8282c7fb12a19735e9048d1f8dab9b6a27499a7f85
 ```
 
 ---

@@ -17,7 +17,7 @@ Ngày 16 tháng 10 năm 2026  |  Sydney  |  ap-southeast-2
 
 ### 1 Tóm tắt điều hành
 
-Dự án bàn giao bản demo AWS có thể tái tạo, gồm frontend responsive, API suy luận CPU, artifacts model lưu private và một alarm RAM vận hành. GitHub Actions phát hành image; quy trình thủ công có kiểm soát triển khai và rollback các phiên bản image và model tương thích. Phạm vi phù hợp học backend và MLOps, không cần gán nhãn serverless hoặc microservices.
+Dự án bàn giao bản demo AWS có thể tái tạo, gồm frontend responsive, API suy luận CPU, artifacts model lưu private và khả năng quan sát cơ bản qua CloudWatch. GitHub Actions phát hành image; quy trình thủ công có kiểm soát triển khai và rollback các phiên bản image và model tương thích. Phạm vi phù hợp học backend và MLOps, không cần gán nhãn serverless hoặc microservices.
 
 Ngân sách dự án theo cấu hình demo AWS tải thấp trong file tổng quan: **50 USD mỗi tháng trước thuế**, tương đương **150 USD cho ba kỳ thanh toán tháng** trong thời gian dự án mười hai tuần. Với 200 USD AWS credit đủ điều kiện, cấu hình này được chi trả trong bốn tháng. Khả năng sử dụng và hạn credit phụ thuộc vào tài khoản AWS. [6–12]
 
@@ -38,9 +38,8 @@ Dự án cần định danh release có phiên bản, quyền đọc artifacts t
 | --- | --- | --- |
 | Amazon EC2 | Chạy frontend và API | Một host x86_64 tại Sydney |
 | Amazon S3 | Lưu checkpoint và class map | Artifacts private có phiên bản |
-| Amazon CloudWatch | Log metrics dashboard và alarm RAM | Metrics Agent 60 giây; log 7 ngày |
+| Amazon CloudWatch | Log container, metrics máy chủ và dashboard | Metrics Agent 60 giây; log 7 ngày |
 | IAM and VPC | Danh tính và kiểm soát mạng | Instance role và giới hạn source IP |
-| Amazon SNS | Gửi email cảnh báo | Một email subscription đã xác nhận |
 
 
 #### Thiết kế thành phần
@@ -51,7 +50,7 @@ Browser truy cập Next.js tại port 3000 và FastAPI tại port 8000 trên cù
 GitHub Actions -> GHCR -> manual deployment to EC2
 Private S3 artifacts -> host version directory -> read-only API mount
 Browser -> Next.js frontend and FastAPI API
-Container logs + Agent metrics -> CloudWatch -> RAM alarm -> SNS
+Container logs + Agent metrics -> CloudWatch dashboard
 ```
 
 Kiến trúc demo dùng public subnet với inbound bị giới hạn. S3 VPC endpoint, kết nối on-premises, mô phỏng DNS, load balancing và autoscaling nằm ngoài baseline. Có thể đánh giá phần mở rộng mạng private sau, nhưng không ghi nhận là tính năng đã triển khai.
@@ -65,7 +64,7 @@ Tạo instance profile với GetObject giới hạn đúng prefix và quyền g�
 
 Xác minh readiness, dự đoán ảnh thật, schema response và model identity. Sau đó kiểm tra upload cùng Grad-CAM++ trên desktop và điện thoại. Đo latency API với số request và concurrency được khai báo thay vì xem một request là p95. Chỉ đánh giá macro F1 và recall từng lớp khi có dữ liệu gán nhãn độc lập; không cam kết accuracy chẩn đoán nếu chưa đánh giá.
 
-Dùng CloudWatch Logs cho hai container và Agent metrics cho RAM cùng đĩa. Giữ log bảy ngày, cấu hình một alarm RAM Average lớn hơn 85% trong ba datapoint một phút. Xác nhận SNS bằng kiểm thử ngưỡng có kiểm soát rồi khôi phục 85. Ghi nhận diễn tập rollback và EC2 stop/start, gồm cập nhật public IP và CORS.
+Dùng CloudWatch Logs cho hai container và CloudWatch Agent để thu thập metrics bộ nhớ cùng đĩa, lưu log trong bảy ngày. Theo dõi dashboard máy chủ trong quá trình vận hành. Ghi nhận diễn tập rollback và EC2 stop/start, gồm cập nhật public IP và CORS.
 
 
 ### 5 Tiến độ và các mốc bàn giao
@@ -83,14 +82,14 @@ Mỗi tuần phân bổ 20 giờ làm việc, tổng cộng 240 giờ. Lịch đ
 | 7 · 19–23/10 | Chuẩn bị IAM mạng và ngân sách | Role EC2 và kết nối giới hạn |
 | 8 · 26–30/10 | Lưu và tải artifacts từ S3 | Hash tải về khớp |
 | 9 · 2–6/11 | Triển khai EC2 và inference thật | Nghiệm thu desktop và điện thoại |
-| 10 · 9–13/11 | Cấu hình CloudWatch và alarm RAM | Kiểm tra metrics log và email |
+| 10 · 9–13/11 | Cấu hình khả năng quan sát CloudWatch | Kiểm tra log group, metrics máy chủ và dashboard |
 | 11 · 16–20/11 | Diễn tập rollback và đo latency | Bằng chứng phục hồi và hiệu năng |
 | 12 · 23–27/11 | Hoàn thiện báo cáo demo và cleanup | Bàn giao và rà soát chi phí |
 
 
 ### 6 Ngân sách
 
-Ngân sách vận hành cho bản demo tải thấp tại Sydney (`ap-southeast-2`) là **50 USD mỗi tháng trước thuế**. Mức này bao gồm một máy EC2 `t3.medium` chạy 730 giờ mỗi tháng, ổ gp3 20 GiB, một địa chỉ IPv4 public, artifacts model dung lượng nhỏ trên S3 và mức sử dụng thấp cho monitoring cùng email cảnh báo. Phân bổ theo tháng:
+Ngân sách vận hành cho bản demo tải thấp tại Sydney (`ap-southeast-2`) là **50 USD mỗi tháng trước thuế**. Mức này bao gồm một máy EC2 `t3.medium` chạy 730 giờ mỗi tháng, ổ gp3 20 GiB, một địa chỉ IPv4 public, artifacts model dung lượng nhỏ trên S3 và mức sử dụng thấp cho monitoring. Phân bổ theo tháng:
 
 | Dịch vụ / mức sử dụng | Chi phí tháng |
 |---|---:|
@@ -98,8 +97,7 @@ Ngân sách vận hành cho bản demo tải thấp tại Sydney (`ap-southeast-
 | EBS gp3, 20 GiB | $1.60 |
 | Public IPv4, 730 giờ | $3.65 |
 | Checkpoint mô hình và class map trên S3 | $0.01 |
-| CloudWatch logs, metrics máy chủ, dashboard và một RAM alarm | $0.00 |
-| Email cảnh báo SNS (tối đa 1.000 thông báo) | $0.00 |
+| CloudWatch logs, metrics máy chủ và dashboard | $0.00 |
 | Truyền dữ liệu Internet trong hạn mức dùng chung 100 GB/tháng | $0.00 |
 | Dự phòng vận hành | $6.20 |
 | **Tổng mỗi tháng** | **$50.00** |
@@ -119,10 +117,9 @@ Ngân sách này dành cho một máy chủ và lưu lượng demo thấp. Chưa
 | CORS hoặc public IP thay đổi | Cao / Vừa | Tạo lại backend với origin đúng |
 | Lộ quyền hoặc credentials | Vừa / Cao | Dùng instance role S3 private và SSH giới hạn |
 | Host lỗi hoặc quá tải | Vừa / Cao | Đo queue tải và diễn tập phục hồi |
-| Email alarm không đến | Vừa / Vừa | Xác nhận SNS và kiểm thử ngưỡng |
 | Ảnh thực địa khác dữ liệu train | Cao / Cao | Lấy mẫu có nhãn và giới hạn kết luận |
 
-Bản demo ban đầu chấp nhận downtime của một host và truy cập HTTP giới hạn theo IP đã duyệt. Mở production công khai cần đánh giá bảo mật và availability riêng, gồm HTTPS và xác thực. Alarm RAM là alarm vận hành duy nhất trong phạm vi và không bao phủ availability dịch vụ hoặc chất lượng ML.
+Bản demo ban đầu chấp nhận downtime của một host và truy cập HTTP giới hạn theo IP đã duyệt. Mở production công khai cần đánh giá bảo mật và availability riêng, gồm HTTPS và xác thực. Log và metrics CloudWatch hỗ trợ quan sát vận hành nhưng không chứng minh availability dịch vụ hay chất lượng ML.
 
 
 ### 8 Kết quả kỳ vọng
@@ -132,7 +129,7 @@ Bản demo ban đầu chấp nhận downtime của một host và truy cập HTT
 | Release có thể tái tạo | Hai digest image cùng hash checkpoint map và cấu hình |
 | Ứng dụng hoạt động trên AWS | Health predict thành công; xác minh nhận diện và giải thích trên browser |
 | Tải artifacts có kiểm soát | GetObject S3 private bằng instance role và hash khớp |
-| Khả năng quan sát | Log dashboard host một alarm RAM và email SNS nhận được |
+| Khả năng quan sát | Log container, metrics máy chủ và dashboard được rà soát |
 | Phục hồi có tài liệu | Diễn tập rollback và stop/start với thời gian ghi nhận |
 | Hiệu năng được đo | Báo cáo nêu image phần cứng concurrency số mẫu và p95 |
 | Chi phí được kiểm soát | Theo dõi chi phí gộp tuần và bằng chứng cleanup |
@@ -152,7 +149,7 @@ Tài liệu AWS và trang giá được truy cập ngày 16 tháng 10 năm 2026.
 
 [4] Cài đặt CloudWatch Agent
 
-[5] Action của CloudWatch alarm
+[5] Giám sát vận hành bằng CloudWatch
 
 [6] Giá EC2 On Demand
 

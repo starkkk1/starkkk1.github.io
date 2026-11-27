@@ -58,7 +58,7 @@ Khi kết thúc workshop, xóa các tài nguyên được tạo riêng cho bản
 ```mermaid
 graph TD
     Step1["1. Terminate máy EC2 của bản demo"]
-    Step2["2. Xóa log, alarm CloudWatch và SNS topic của demo"]
+    Step2["2. Xóa Log Group và dashboard CloudWatch"]
     Step3["3. Làm rỗng và xóa bucket model riêng cho dự án"]
     Step4["4. Giải phóng Elastic IP của demo nếu có"]
     Step5["5. Kiểm tra volume, snapshot và tài nguyên còn tính phí"]
@@ -86,26 +86,20 @@ aws logs delete-log-group \
   --log-group-name /plant-disease/frontend \
   --region ap-southeast-2
 
-# 3. Xóa CloudWatch Alarm
-aws cloudwatch delete-alarms \
-  --alarm-names "PlantDisease-HighMemoryUtilization" \
+aws cloudwatch delete-dashboards \
+  --dashboard-names plant-disease-demo \
   --region ap-southeast-2
 
-# 4. Xóa Topic SNS
-aws sns delete-topic \
-  --topic-arn "$SNS_TOPIC_ARN" \
-  --region ap-southeast-2
-
-# 5. Làm rỗng và xóa Bucket S3
+# 3. Làm rỗng và xóa Bucket S3
 # Lệnh này xóa các object hiện tại. Nếu bật versioning, hãy xóa các
 # phiên bản object cũ trong S3 Console trước khi xóa bucket.
 aws s3 rm "s3://$MODEL_BUCKET" --recursive
 aws s3api delete-bucket --bucket "$MODEL_BUCKET" --region ap-southeast-2
 
-# 6. Giải phóng địa chỉ Elastic IP (nếu có)
+# 4. Giải phóng địa chỉ Elastic IP (nếu có)
 aws ec2 release-address --allocation-id "$EIP_ALLOC_ID" --region ap-southeast-2
 
-# 7. Liệt kê EBS volume khả dụng và snapshot của tài khoản để rà soát.
+# 5. Liệt kê EBS volume khả dụng và snapshot của tài khoản để rà soát.
 # Chỉ xóa tài nguyên đã xác nhận thuộc bản demo; không xóa hàng loạt.
 aws ec2 describe-volumes --filters Name=status,Values=available --region ap-southeast-2
 aws ec2 describe-snapshots --owner-ids self --region ap-southeast-2
@@ -124,4 +118,4 @@ Các quyết định kiến trúc, tiêu chuẩn đo lường và quy trình v�
 2. **[2] Vòng đời Bật/Tắt Amazon EC2:** [Tài liệu AWS về Vòng đời Máy ảo](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html) — Chi tiết về bảo toàn dữ liệu EBS và thay đổi địa chỉ IP công cộng.
 3. **[3] Amazon S3 HeadObject và Phân quyền Tối thiểu:** [Thực hành An toàn trên Amazon S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html) — Phương pháp phân quyền chặt chẽ cho tác vụ tải tệp trọng số mô hình.
 4. **[4] Hướng dẫn Cài đặt CloudWatch Agent:** [Tài liệu Hướng dẫn CloudWatch Agent](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html) — Thu thập chỉ số phần cứng bộ nhớ RAM và tỷ lệ sử dụng đĩa.
-5. **[5] Thiết lập Hành động Cảnh báo CloudWatch & SNS:** [Sử dụng Cảnh báo CloudWatch](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html) — Kích hoạt email thông báo sự cố cho đội ngũ kỹ sư vận hành.
+5. **[5] Giám sát vận hành bằng CloudWatch:** [Tài liệu CloudWatch](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html) — Tài liệu tham khảo về các khả năng giám sát của CloudWatch.

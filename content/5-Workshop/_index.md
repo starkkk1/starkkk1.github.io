@@ -20,7 +20,7 @@ pre: " <b> 5. </b> "
 
 The **Plant Disease Detection** project has progressed from local PyTorch experiments to a working containerized demonstration on Amazon Web Services (AWS). The deployment shows how the model can be served through a web application and monitored on a small cloud setup; it is not a production service or a validated agricultural diagnostic product.
 
-A single **Amazon EC2** instance runs a responsive **Next.js** frontend and a **FastAPI CPU inference service** in separate containers. **Amazon S3** stores the model artifacts, while **Amazon CloudWatch** and **Amazon SNS** provide logs, host metrics, and a RAM threshold email alert. Deployment and rollback are manual. The setup has one host, limited access controls, and no high availability; model results have not been validated for field use.
+A single **Amazon EC2** instance runs a responsive **Next.js** frontend and a **FastAPI CPU inference service** in separate containers. **Amazon S3** stores the model artifacts, while **Amazon CloudWatch** provides container logs, host metrics, and a dashboard. Deployment and rollback are manual. The setup has one host, limited access controls, and no high availability; model results have not been validated for field use.
 
 ![Plant Disease Detection UI Preview](/images/5-Workshop/plant-disease/frontend-mobile.png?width=750px)
 
@@ -32,11 +32,11 @@ A single **Amazon EC2** instance runs a responsive **Next.js** frontend and a **
 |---|---|
 | **AWS Region** | Asia Pacific Sydney / `ap-southeast-2` |
 | **Primary AWS Services** | Amazon EC2, Amazon S3, Amazon CloudWatch |
-| **Supporting Services** | AWS IAM, Amazon VPC, Security Groups, Amazon SNS |
+| **Supporting Services** | AWS IAM, Amazon VPC, Security Groups |
 | **Application Stack** | Next.js Standalone (Node.js 22), FastAPI, PyTorch (CPU), Docker, GHCR |
 | **Deployment Model** | One EC2 host with two containers; manual deployment and rollback |
 | **Machine Learning Architecture** | Knowledge-distilled MobileNetV3-Small (Student) from ConvNeXt-Tiny (Teacher) |
-| **Monitoring Scope** | Custom CloudWatch Agent (CPU, RAM, Disk metrics) + Automated RAM Alarm (>85%) |
+| **Monitoring Scope** | CloudWatch Logs, host memory and disk metrics, and dashboard |
 
 ---
 
@@ -53,7 +53,6 @@ graph LR
     S3 -->|manual download and hash check| EC2
     User["Browser"] -->|HTTP| EC2
     EC2 -->|logs and host metrics| CW["CloudWatch"]
-    CW -->|RAM alarm| SNS["SNS email"]
 ```
 
 ---
@@ -69,6 +68,6 @@ graph LR
 4. **[5.4 Deployment Strategy](5.4-deployment-strategy/)**
    CI image publishing, manual model-artifact retrieval and hash verification, container startup, and application checks.
 5. **[5.5 Monitoring & Security](5.5-quality-assurance/)**
-   Container logs, CloudWatch host metrics and RAM alerts, plus the access and container controls used in the demo.
+   Container logs, CloudWatch host metrics and dashboard, plus the access and container controls used in the demo.
 6. **[5.6 Operations & Cleanup](5.6-operations-cleanup/)**
    Daily start/stop procedures, public IP updates, removal of demo resources, and a final check for leftover billable resources.

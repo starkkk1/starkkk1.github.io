@@ -25,7 +25,7 @@ The table below summarizes the exact configuration requirements recorded during 
 | **Inbound Security** | Port `22` (SSH), Port `3000` (Frontend), Port `8000` (API) | Restricted strictly to the operator's approved public IPv4 client address (`/32`) |
 | **Model Storage** | Amazon S3 (Private Bucket) | Stores model checkpoints under the `mobilenet-distilled-v1/` prefix |
 | **IAM Instance Role** | EC2 Instance Profile | Grants `s3:GetObject` on model artifacts and `CloudWatchAgentServerPolicy` |
-| **Log Ingestion Role** | `logs:FilterLogEvents` | Required for operators to tail and query CloudWatch container logs via the AWS CLI |
+| **Operator Log Access** | Scoped CloudWatch Logs read permissions | Allows an authorized operator to query container logs with the AWS CLI; separate from the EC2 instance role |
 | **Model Artifacts** | Verified `model.pth` and `class_to_idx.json` | Release artifacts matched via cryptographic SHA256 checksums |
 
 > [!WARNING]
@@ -66,7 +66,7 @@ Create a dedicated Security Group named `plant-disease-sg` in your default VPC. 
 
 ### Step 3: EC2 Instance Profile & IAM Permissions
 
-Attach an IAM Role to your EC2 instance so that containers and AWS CLI scripts can securely access Amazon S3 and publish CloudWatch metrics **without storing long-lived AWS Access Keys or Secret Keys** on the server.
+Attach an IAM Role to your EC2 instance so the application can read model artifacts from Amazon S3 and the CloudWatch Agent can publish host metrics **without storing long-lived AWS credentials** on the server. Operators need separate, scoped CloudWatch Logs read access to query logs from their own AWS CLI session.
 
 Attach the following IAM policies to the role:
 1. **AmazonCloudWatchAgentServerPolicy** (AWS Managed Policy): Allows the CloudWatch Agent to emit custom host metrics and create log streams.

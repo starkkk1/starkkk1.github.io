@@ -20,7 +20,7 @@ The project was relevant to my Information Technology studies and gave me a chan
 Troubleshooting access, configuration and deployment issues taught me to verify each layer instead of assuming that a running page means the whole application works. Preparing worklogs, a workshop guide and technical blog posts also helped me explain technical decisions and limitations more clearly. Participating in cloud and AI community events gave me additional perspectives on system resilience, security, cost awareness and responsible use of AI.
 
 ### 4. Project challenges and lessons
-The project made the limits of a small demonstration clear. A single EC2 instance can become a point of failure, and a resource alarm does not prove that predictions are available or accurate. I also learned to distinguish a sample inference time from a proper performance measurement, and to avoid making claims about field accuracy without independent labeled data. In future work, I would plan acceptance checks and operational evidence alongside implementation from the start.
+The project made the limits of a small demonstration clear. A single EC2 instance can become a point of failure, and host monitoring metrics do not prove that predictions are available or accurate. I also learned to distinguish a sample inference time from a proper performance measurement, and to avoid making claims about field accuracy without independent labeled data. In future work, I would plan acceptance checks and operational evidence alongside implementation from the start.
 
 ## Additional Questions
 
