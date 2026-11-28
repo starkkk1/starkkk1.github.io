@@ -10,7 +10,7 @@ pre: " <b> 4.2. </b> "
 
 > **Sự kiện:** AWS Cloud & AI Day 2026: HCMC Watch Party  
 > **Thời gian:** Cả ngày, 29/09/2026
-> **Địa điểm:** Văn phòng AWS tại Thành phố Hồ Chí Minh, do cộng đồng AWS Study Group tổ chức  
+> **Địa điểm:** Tầng 26, Tòa nhà Bitexco Financial Tower, TP. Hồ Chí Minh, Việt Nam<br>
 > **Vai trò:** Người tham dự
 
 Em tham gia watch party ở TP. Hồ Chí Minh trong lúc sự kiện AWS Cloud & AI Day chính diễn ra tại Hà Nội. Hơn 300 người cùng theo dõi các phiên và trao đổi tại chỗ. Ban đầu em nghĩ mình sẽ chủ yếu xem livestream; thực tế, các cuộc trò chuyện giữa giờ cũng giúp em hiểu vấn đề sâu hơn.

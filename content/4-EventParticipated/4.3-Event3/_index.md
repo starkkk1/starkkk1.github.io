@@ -11,7 +11,7 @@ pre: " <b> 4.3. </b> "
 > **Event:** Navigating the Future of Cloud & AI in Vietnam  
 > **Speaker:** Dr. Werner Vogels, Amazon CTO  
 > **Date & Time:** 9:00 AM–12:00 PM, October 2, 2026
-> **Location:** Ho Chi Minh City, Vietnam  
+> **Location:** 26th Floor, Bitexco Financial Tower, Ho Chi Minh City, Vietnam<br>
 > **Role:** Attendee
 
 I attended Dr. Werner Vogels' keynote with a question many software students are asking: what should engineers learn as AI becomes part of everyday development? The talk did not frame engineering as a contest between people and AI. Instead, it returned to how teams understand workloads, design for failure, and take responsibility for systems.

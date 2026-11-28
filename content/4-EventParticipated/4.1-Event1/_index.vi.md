@@ -10,7 +10,7 @@ pre: " <b> 4.1. </b> "
 
 > **Sự kiện:** First Cloud AI Journey  
 > **Thời gian:** 09:00–12:00, Thứ Bảy, ngày 24/10/2026  
-> **Địa điểm:** Tầng 26, Bitexco Financial Tower, Thành phố Hồ Chí Minh  
+> **Địa điểm:** Tầng 26, Tòa nhà Bitexco Financial Tower, TP. Hồ Chí Minh, Việt Nam<br>
 > **Vai trò:** Người tham dự
 
 Em tham dự meetup First Cloud AI Journey để nghe các nhóm kỹ thuật trong nước đưa ý tưởng Cloud và AI vào hệ thống chạy thật như thế nào. Năm phiên ngắn trong buổi sáng giống như năm góc nhìn cho cùng một câu hỏi: làm sao để AI hữu ích nhưng vẫn an toàn và dễ kiểm soát.

@@ -11,7 +11,7 @@ pre: " <b> 4.3. </b> "
 > **Sự kiện:** Navigating the Future of Cloud & AI in Vietnam  
 > **Diễn giả:** Tiến sĩ Werner Vogels, CTO của Amazon  
 > **Thời gian:** 09:00–12:00, ngày 02/10/2026
-> **Địa điểm:** Thành phố Hồ Chí Minh, Việt Nam  
+> **Địa điểm:** Tầng 26, Tòa nhà Bitexco Financial Tower, TP. Hồ Chí Minh, Việt Nam<br>
 > **Vai trò:** Người tham dự
 
 Em đến nghe keynote của Tiến sĩ Werner Vogels với một câu hỏi mà nhiều sinh viên phần mềm đang quan tâm: cần học gì khi AI ngày càng xuất hiện trong công việc phát triển hằng ngày? Bài nói không đặt con người và AI vào thế cạnh tranh trực tiếp. Diễn giả quay lại những nền tảng quen thuộc nhưng quan trọng: hiểu workload, thiết kế cho tình huống lỗi và chịu trách nhiệm với hệ thống mình xây.

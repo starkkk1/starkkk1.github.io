@@ -10,7 +10,7 @@ pre: " <b> 4.1. </b> "
 
 > **Event:** First Cloud AI Journey  
 > **Date & Time:** 09:00–12:00, Saturday, October 24, 2026  
-> **Location:** 26th Floor, Bitexco Financial Tower, Ho Chi Minh City  
+> **Location:** 26th Floor, Bitexco Financial Tower, Ho Chi Minh City, Vietnam<br>
 > **Role:** Attendee
 
 I attended the First Cloud AI Journey meetup to hear how local engineering teams are moving cloud and AI ideas into working systems. Five short sessions made the morning feel like a tour through different parts of the same problem: making AI useful while keeping the surrounding system secure and manageable.
