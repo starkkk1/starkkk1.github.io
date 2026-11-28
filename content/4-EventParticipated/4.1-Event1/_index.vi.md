@@ -9,7 +9,7 @@ pre: " <b> 4.1. </b> "
 # First Cloud AI Journey: Ghi chú từ một buổi sáng nhiều demo
 
 > **Sự kiện:** First Cloud AI Journey  
-> **Thời gian:** 09:00–12:00, Thứ Bảy, ngày 24/10/2026  
+> **Ngày:** 24/10/2026<br>
 > **Địa điểm:** Tầng 26, Tòa nhà Bitexco Financial Tower, TP. Hồ Chí Minh, Việt Nam<br>
 > **Vai trò:** Người tham dự
 

@@ -10,7 +10,7 @@ pre: " <b> 4.3. </b> "
 
 > **Event:** Navigating the Future of Cloud & AI in Vietnam  
 > **Speaker:** Dr. Werner Vogels, Amazon CTO  
-> **Date & Time:** 9:00 AM–12:00 PM, October 2, 2026
+> **Date:** October 2, 2026
 > **Location:** 26th Floor, Bitexco Financial Tower, Ho Chi Minh City, Vietnam<br>
 > **Role:** Attendee
 

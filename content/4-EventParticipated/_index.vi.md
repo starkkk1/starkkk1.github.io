@@ -12,7 +12,7 @@ Trong quá trình thực tập, em đã tham gia ba sự kiện cộng đồng v
 
 ### [Event 1 — First Cloud AI Journey](4.1-Event1/)
 &emsp;**Tên sự kiện:** Meetup First Cloud AI Journey  
-&emsp;**Thời gian:** 09:00 – 12:00, Thứ Bảy ngày 24/10/2026  
+&emsp;**Ngày:** 24/10/2026<br>
 &emsp;**Địa điểm:** Tầng 26, Tòa nhà Bitexco Financial Tower, TP. Hồ Chí Minh, Việt Nam<br>
 &emsp;**Vai trò:** Người tham dự  
 &emsp;**Tóm tắt:** Năm phiên chia sẻ liên tiếp về Cloud và AI Agents gồm: xây dựng tổng đài Voice AI tiếng Việt trên AWS, phân tách quyền liên tài khoản trong AWS Organization, đưa bảo mật hạ tầng (IaC) lên giai đoạn đầu quy trình phát triển, quản lý bộ nhớ agent trên Amazon Bedrock AgentCore và sử dụng AI Agent liên tục với Kiro Crew.
@@ -21,7 +21,7 @@ Trong quá trình thực tập, em đã tham gia ba sự kiện cộng đồng v
 
 ### [Event 2 — AWS Cloud & AI Day 2026: HCMC Watch Party](4.2-Event2/)
 &emsp;**Tên sự kiện:** AWS Cloud & AI Day 2026: HCMC Watch Party  
-&emsp;**Thời gian:** Cả ngày, 29/09/2026<br>
+&emsp;**Ngày:** 29/09/2026<br>
 &emsp;**Địa điểm:** Tầng 26, Tòa nhà Bitexco Financial Tower, TP. Hồ Chí Minh, Việt Nam<br>
 &emsp;**Vai trò:** Người tham dự  
 &emsp;**Tóm tắt:** Buổi Watch Party cùng hơn 300 kỹ sư xoay quanh các bài keynote về Agentic AI, nền tảng dữ liệu và hiện đại hóa hạ tầng đám mây cho doanh nghiệp, cùng các phiên thảo luận bàn tròn thực tế với Solution Architects và lập trình viên về việc đưa AI Agent từ POC lên production và tối ưu chi phí cloud.
@@ -30,7 +30,7 @@ Trong quá trình thực tập, em đã tham gia ba sự kiện cộng đồng v
 
 ### [Event 3 — Navigating the Future of Cloud & AI in Vietnam](4.3-Event3/)
 &emsp;**Tên sự kiện:** Navigating the Future of Cloud & AI in Vietnam (Keynote của Dr. Werner Vogels)  
-&emsp;**Thời gian:** 09:00–12:00, ngày 02/10/2026<br>
+&emsp;**Ngày:** 02/10/2026<br>
 &emsp;**Địa điểm:** Tầng 26, Tòa nhà Bitexco Financial Tower, TP. Hồ Chí Minh, Việt Nam<br>
 &emsp;**Vai trò:** Người tham dự  
 &emsp;**Tóm tắt:** Bài diễn thuyết của Dr. Werner Vogels (CTO của Amazon) về tương lai ngành kỹ thuật phần mềm trong kỷ nguyên AI, kỷ luật vận hành và diễn tập sự cố tại Amazon, thiết kế hệ thống xuất phát từ khối lượng công việc thực tế (câu chuyện Dynamo/DynamoDB) và năm phẩm chất của "Renaissance Developer".

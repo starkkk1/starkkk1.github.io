@@ -9,7 +9,7 @@ pre: " <b> 4.2. </b> "
 # AWS Cloud & AI Day 2026: Học thêm ngoài buổi livestream
 
 > **Sự kiện:** AWS Cloud & AI Day 2026: HCMC Watch Party  
-> **Thời gian:** Cả ngày, 29/09/2026
+> **Ngày:** 29/09/2026
 > **Địa điểm:** Tầng 26, Tòa nhà Bitexco Financial Tower, TP. Hồ Chí Minh, Việt Nam<br>
 > **Vai trò:** Người tham dự
 

@@ -9,7 +9,7 @@ pre: " <b> 4.1. </b> "
 # First Cloud AI Journey: Notes from a Morning of Demos
 
 > **Event:** First Cloud AI Journey  
-> **Date & Time:** 09:00–12:00, Saturday, October 24, 2026  
+> **Date:** October 24, 2026<br>
 > **Location:** 26th Floor, Bitexco Financial Tower, Ho Chi Minh City, Vietnam<br>
 > **Role:** Attendee
 
