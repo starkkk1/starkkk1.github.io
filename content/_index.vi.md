@@ -26,7 +26,7 @@ chapter: false
 
 &emsp; **Dự án:** Nhận diện bệnh lá cà chua trên AWS (EC2, S3, CloudWatch)
 
-&emsp; **Thời gian thực tập:** 12 tuần (tháng 9–11/2026; ngày làm việc cuối dự kiến 27/11)
+&emsp; **Thời gian thực tập:** 12 tuần (14/9–14/12/2026)
 
 ![Ảnh chân dung của Tran Hung Anh](/images/profile.jpg)
 
